@@ -1,0 +1,11 @@
+{
+  "name": "NutriMind AI",
+  "description": "NutriMind AI v1.0 — Built with passion for human health, longevity and AI. Founder & Creator: Mitrabha Deb. 'Simple Outside. Infinite Intelligence Inside.' Designed & Developed in India.",
+  "requestFramePermissions": [
+    "camera",
+    "microphone"
+  ],
+  "majorCapabilities": [
+    "MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"
+  ]
+}
