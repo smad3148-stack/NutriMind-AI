@@ -1,0 +1,116 @@
+// NutriMind-AI Prisma schema
+// Mirrors the Supabase Postgres schema in supabase_schema.sql so that the
+// server can use Prisma Client against the same database when DATABASE_URL
+// is configured. Generated client output is committed for zero-build deploys.
+
+generator client {
+  provider = "prisma-client-js"
+  // Default output (node_modules/.prisma/client) so `@prisma/client`
+  // re-exports the generated client without extra wiring.
+  binaryTargets = ["native"]
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model FeatureFlag {
+  id          String   @id @default(uuid())
+  name        String
+  key         String   @unique
+  description String?
+  enabled     Boolean  @default(true)
+  createdAt   DateTime @default(now()) @map("created_at")
+
+  @@map("feature_flags")
+}
+
+model SystemLog {
+  id        String   @id @default(uuid())
+  level     String
+  service   String
+  message   String
+  timestamp DateTime @default(now())
+
+  @@map("system_logs")
+}
+
+model SystemPlugin {
+  id           String   @id @default(uuid())
+  name         String
+  description  String?
+  version      String
+  status       String   @default("inactive")
+  category     String
+  isInstalled  Boolean  @default(true) @map("is_installed")
+  permissions  String?
+  dependencies String?
+  author       String?
+  rating       Float?
+  installCount Int      @default(0) @map("install_count")
+
+  @@map("system_plugins")
+}
+
+model OtaUpdate {
+  id         String   @id @default(uuid())
+  version    String   @unique
+  channel    String
+  description String?
+  bundleUrl  String?  @map("bundle_url")
+  status     String   @default("draft")
+  createdAt  DateTime @default(now()) @map("created_at")
+  deployedAt DateTime? @map("deployed_at")
+
+  deployments OtaDeployment[]
+
+  @@map("ota_updates")
+}
+
+model OtaDeployment {
+  id          String   @id @default(uuid())
+  otaUpdateId String   @map("ota_update_id")
+  version     String
+  channel     String
+  action      String
+  deployedBy  String?  @map("deployed_by")
+  status      String
+  notes       String?
+  createdAt   DateTime @default(now()) @map("created_at")
+
+  otaUpdate OtaUpdate @relation(fields: [otaUpdateId], references: [id], onDelete: Cascade)
+
+  @@map("ota_deployments")
+}
+
+model RevenueMetric {
+  id                String   @id @default(uuid())
+  mrr               Decimal
+  arr               Decimal
+  activeSubscribers Int      @map("active_subscribers")
+  conversionRate    Decimal  @map("conversion_rate")
+
+  @@map("revenue_metrics")
+}
+
+model RevenueByMonth {
+  id        String   @id @default(uuid())
+  month     String
+  amount    Decimal
+  target    Decimal
+  createdAt DateTime @default(now()) @map("created_at")
+
+  @@map("revenue_by_month")
+}
+
+model Transaction {
+  id        String   @id @default(uuid())
+  userEmail String   @map("user_email")
+  plan      String
+  amount    Decimal
+  status    String
+  timestamp DateTime @default(now())
+
+  @@map("transactions")
+}

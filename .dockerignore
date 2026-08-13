@@ -1,0 +1,17 @@
+node_modules
+dist
+build
+coverage
+.git
+.gitignore
+*.log
+.env
+.env.*
+!.env.example
+*.zip
+screen.png
+code.html
+README.md
+AGENTS.md
+.github
+.agents
