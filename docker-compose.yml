@@ -1,0 +1,19 @@
+# NutriMind-AI local orchestration.
+# Run `docker compose up --build` to build and serve the app on http://localhost:3000.
+# Configure credentials via the .env file (see .env.example) before running.
+
+services:
+  nutrimind:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: nutrimind-ai:latest
+    container_name: nutrimind-ai
+    ports:
+      - "3000:3000"
+    env_file:
+      - .env
+    environment:
+      - NODE_ENV=production
+      - PORT=3000
+    restart: unless-stopped
