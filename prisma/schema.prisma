@@ -5,9 +5,8 @@
 
 generator client {
   provider = "prisma-client-js"
-  // Commit the generated client so production builds don't require a
-  // post-install `prisma generate` step.
-  output   = "../node_modules/.prisma/nutrimind-client"
+  // Default output (node_modules/.prisma/client) so `@prisma/client`
+  // re-exports the generated client without extra wiring.
   binaryTargets = ["native"]
 }
 

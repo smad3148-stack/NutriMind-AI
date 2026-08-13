@@ -35,9 +35,5 @@ COPY --from=build /app/dist ./dist
 COPY --from=build /app/prisma ./prisma
 COPY --from=build /app/node_modules/.prisma ./node_modules/.prisma
 
-# Express serves the Vite build from the project root; keep index.html for
-# static asset resolution.
-COPY index.html ./
-
 EXPOSE 3000
 CMD ["node", "dist/server.cjs"]
