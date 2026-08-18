@@ -1,326 +1,956 @@
 {
   "maggi": {
-    "name": "Maggi Noodles",
-    "category": "Snack",
+    "name": "Maggi",
+    "category": "Street Foods",
     "portions": {
-      "Small": {
-        "calories": 290,
-        "protein": 5,
-        "carbs": 42,
-        "fat": 11,
-        "label": "Small"
-      },
-      "Medium": {
-        "calories": 380,
-        "protein": 7,
-        "carbs": 55,
-        "fat": 14,
-        "label": "Medium"
-      },
-      "Large": {
-        "calories": 470,
-        "protein": 9,
-        "carbs": 68,
-        "fat": 17,
-        "label": "Large"
-      }
+      "Small": { "label": "Half Pack", "calories": 175, "protein": 4, "carbs": 25, "fat": 6 },
+      "Medium": { "label": "1 Pack", "calories": 350, "protein": 8, "carbs": 50, "fat": 12 },
+      "Large": { "label": "2 Packs", "calories": 700, "protein": 16, "carbs": 100, "fat": 24 }
     }
   },
   "paneer": {
-    "name": "Paneer Tikka",
-    "category": "Lunch",
+    "name": "Paneer",
+    "category": "Indian",
     "portions": {
-      "Small": {
-        "calories": 220,
-        "protein": 14,
-        "carbs": 6,
-        "fat": 16,
-        "label": "Small"
-      },
-      "Medium": {
-        "calories": 320,
-        "protein": 21,
-        "carbs": 9,
-        "fat": 23,
-        "label": "Medium"
-      },
-      "Large": {
-        "calories": 420,
-        "protein": 28,
-        "carbs": 12,
-        "fat": 30,
-        "label": "Large"
-      }
-    }
-  },
-  "thali": {
-    "name": "Indian Thali",
-    "category": "Lunch",
-    "portions": {
-      "Small": {
-        "calories": 650,
-        "protein": 22,
-        "carbs": 88,
-        "fat": 22,
-        "label": "Small"
-      },
-      "Medium": {
-        "calories": 820,
-        "protein": 28,
-        "carbs": 112,
-        "fat": 28,
-        "label": "Medium"
-      },
-      "Large": {
-        "calories": 990,
-        "protein": 34,
-        "carbs": 136,
-        "fat": 34,
-        "label": "Large"
-      }
+      "Small": { "label": "100g", "calories": 265, "protein": 18, "carbs": 4, "fat": 20 },
+      "Medium": { "label": "200g", "calories": 530, "protein": 36, "carbs": 8, "fat": 40 },
+      "Large": { "label": "300g", "calories": 795, "protein": 54, "carbs": 12, "fat": 60 }
     }
   },
   "biryani": {
-    "name": "Chicken Biryani",
-    "category": "Lunch",
+    "name": "Biryani",
+    "category": "Indian",
     "portions": {
-      "Small": {
-        "calories": 480,
-        "protein": 18,
-        "carbs": 58,
-        "fat": 18,
-        "label": "Small"
-      },
-      "Medium": {
-        "calories": 620,
-        "protein": 24,
-        "carbs": 76,
-        "fat": 23,
-        "label": "Medium"
-      },
-      "Large": {
-        "calories": 780,
-        "protein": 30,
-        "carbs": 96,
-        "fat": 29,
-        "label": "Large"
-      }
+      "Small": { "label": "Small Plate", "calories": 300, "protein": 10, "carbs": 40, "fat": 10 },
+      "Medium": { "label": "Regular Plate", "calories": 600, "protein": 20, "carbs": 80, "fat": 20 },
+      "Large": { "label": "Large Plate", "calories": 900, "protein": 30, "carbs": 120, "fat": 30 }
     }
   },
   "butter_chicken": {
     "name": "Butter Chicken",
-    "category": "Dinner",
+    "category": "Indian",
     "portions": {
-      "Small": {
-        "calories": 380,
-        "protein": 22,
-        "carbs": 12,
-        "fat": 28,
-        "label": "Small"
-      },
-      "Medium": {
-        "calories": 520,
-        "protein": 30,
-        "carbs": 16,
-        "fat": 38,
-        "label": "Medium"
-      },
-      "Large": {
-        "calories": 660,
-        "protein": 38,
-        "carbs": 20,
-        "fat": 48,
-        "label": "Large"
-      }
+      "Small": { "label": "Small Bowl", "calories": 225, "protein": 16, "carbs": 7, "fat": 15 },
+      "Medium": { "label": "Regular Bowl", "calories": 450, "protein": 32, "carbs": 14, "fat": 30 },
+      "Large": { "label": "Large Bowl", "calories": 675, "protein": 48, "carbs": 21, "fat": 45 }
     }
   },
   "pizza": {
-    "name": "Margherita Pizza",
-    "category": "Dinner",
+    "name": "Pizza",
+    "category": "Italian",
     "portions": {
-      "Small": {
-        "calories": 240,
-        "protein": 11,
-        "carbs": 30,
-        "fat": 9,
-        "label": "Small"
-      },
-      "Medium": {
-        "calories": 320,
-        "protein": 15,
-        "carbs": 40,
-        "fat": 12,
-        "label": "Medium"
-      },
-      "Large": {
-        "calories": 400,
-        "protein": 19,
-        "carbs": 50,
-        "fat": 15,
-        "label": "Large"
-      }
+      "Small": { "label": "Small (1 Slice)", "calories": 280, "protein": 12, "carbs": 32, "fat": 10 },
+      "Medium": { "label": "Medium (2 Slices)", "calories": 560, "protein": 24, "carbs": 64, "fat": 20 },
+      "Large": { "label": "Large (4 Slices)", "calories": 1120, "protein": 48, "carbs": 128, "fat": 40 }
     }
   },
   "burger": {
-    "name": "Veggie Burger",
-    "category": "Snack",
+    "name": "Burger",
+    "category": "American",
     "portions": {
-      "Small": {
-        "calories": 290,
-        "protein": 12,
-        "carbs": 34,
-        "fat": 11,
-        "label": "Small"
-      },
-      "Medium": {
-        "calories": 380,
-        "protein": 16,
-        "carbs": 44,
-        "fat": 15,
-        "label": "Medium"
-      },
-      "Large": {
-        "calories": 470,
-        "protein": 20,
-        "carbs": 54,
-        "fat": 19,
-        "label": "Large"
-      }
+      "Small": { "label": "Single Slider", "calories": 250, "protein": 13, "carbs": 26, "fat": 9 },
+      "Medium": { "label": "Regular Burger", "calories": 500, "protein": 26, "carbs": 52, "fat": 18 },
+      "Large": { "label": "Double Cheese Burger", "calories": 800, "protein": 42, "carbs": 58, "fat": 34 }
     }
   },
   "sushi": {
-    "name": "Vegetable Sushi Roll",
-    "category": "Lunch",
+    "name": "Sushi",
+    "category": "Japanese",
     "portions": {
-      "Small": {
-        "calories": 180,
-        "protein": 6,
-        "carbs": 36,
-        "fat": 2,
-        "label": "Small"
-      },
-      "Medium": {
-        "calories": 250,
-        "protein": 9,
-        "carbs": 50,
-        "fat": 3,
-        "label": "Medium"
-      },
-      "Large": {
-        "calories": 320,
-        "protein": 12,
-        "carbs": 64,
-        "fat": 4,
-        "label": "Large"
-      }
+      "Small": { "label": "3 Pieces", "calories": 150, "protein": 6, "carbs": 28, "fat": 1.5 },
+      "Medium": { "label": "6 Pieces", "calories": 300, "protein": 12, "carbs": 56, "fat": 3 },
+      "Large": { "label": "12 Pieces", "calories": 600, "protein": 24, "carbs": 112, "fat": 6 }
+    }
+  },
+  "thali": {
+    "name": "Thali",
+    "category": "Indian",
+    "portions": {
+      "Small": { "label": "Mini Thali", "calories": 450, "protein": 13, "carbs": 60, "fat": 15 },
+      "Medium": { "label": "Regular Thali", "calories": 750, "protein": 22, "carbs": 95, "fat": 28 },
+      "Large": { "label": "Grand Thali", "calories": 1100, "protein": 32, "carbs": 140, "fat": 40 }
     }
   },
   "rasgulla": {
     "name": "Rasgulla",
-    "category": "Dessert",
+    "category": "Street Foods",
     "portions": {
-      "Small": {
-        "calories": 120,
-        "protein": 3,
-        "carbs": 24,
-        "fat": 2,
-        "label": "Small"
-      },
-      "Medium": {
-        "calories": 180,
-        "protein": 4,
-        "carbs": 36,
-        "fat": 3,
-        "label": "Medium"
-      },
-      "Large": {
-        "calories": 240,
-        "protein": 6,
-        "carbs": 48,
-        "fat": 4,
-        "label": "Large"
-      }
+      "Small": { "label": "1 Piece", "calories": 93, "protein": 2, "carbs": 19, "fat": 1 },
+      "Medium": { "label": "2 Pieces", "calories": 186, "protein": 4, "carbs": 38, "fat": 2 },
+      "Large": { "label": "4 Pieces", "calories": 372, "protein": 8, "carbs": 76, "fat": 4 }
     }
   },
-  "avocado_toast": {
-    "name": "Avocado Toast with Poached Egg",
-    "category": "Breakfast",
+  "puchka": {
+    "name": "Puchka",
+    "category": "Street Foods",
     "portions": {
-      "Small": {
-        "calories": 280,
-        "protein": 12,
-        "carbs": 24,
-        "fat": 16,
-        "label": "Small"
-      },
-      "Medium": {
-        "calories": 380,
-        "protein": 16,
-        "carbs": 32,
-        "fat": 22,
-        "label": "Medium"
-      },
-      "Large": {
-        "calories": 480,
-        "protein": 20,
-        "carbs": 40,
-        "fat": 28,
-        "label": "Large"
-      }
+      "Small": { "label": "Small Plate (4 pcs)", "calories": 100, "protein": 2, "carbs": 18, "fat": 2 },
+      "Medium": { "label": "Regular Plate (6 pcs)", "calories": 150, "protein": 3, "carbs": 28, "fat": 3 },
+      "Large": { "label": "Large Plate (10 pcs)", "calories": 250, "protein": 5, "carbs": 46, "fat": 5 }
     }
   },
-  "oats": {
-    "name": "Oatmeal Bowl",
-    "category": "Breakfast",
+  "mishti_doi": {
+    "name": "Mishti Doi",
+    "category": "Street Foods",
     "portions": {
-      "Small": {
-        "calories": 210,
-        "protein": 7,
-        "carbs": 38,
-        "fat": 4,
-        "label": "Small"
-      },
-      "Medium": {
-        "calories": 290,
-        "protein": 10,
-        "carbs": 52,
-        "fat": 6,
-        "label": "Medium"
-      },
-      "Large": {
-        "calories": 370,
-        "protein": 13,
-        "carbs": 66,
-        "fat": 8,
-        "label": "Large"
-      }
+      "Small": { "label": "Small Cup (50g)", "calories": 80, "protein": 2.5, "carbs": 11, "fat": 3 },
+      "Medium": { "label": "Medium Cup (100g)", "calories": 160, "protein": 5, "carbs": 22, "fat": 6 },
+      "Large": { "label": "Large Cup (200g)", "calories": 320, "protein": 10, "carbs": 44, "fat": 12 }
     }
   },
-  "fruit_salad": {
-    "name": "Seasonal Fruit Salad",
-    "category": "Breakfast",
+  "momos": {
+    "name": "Momos",
+    "category": "Street Foods",
     "portions": {
-      "Small": {
-        "calories": 90,
-        "protein": 1,
-        "carbs": 22,
-        "fat": 0,
-        "label": "Small"
-      },
-      "Medium": {
-        "calories": 140,
-        "protein": 2,
-        "carbs": 34,
-        "fat": 1,
-        "label": "Medium"
-      },
-      "Large": {
-        "calories": 190,
-        "protein": 3,
-        "carbs": 46,
-        "fat": 1,
-        "label": "Large"
-      }
+      "Small": { "label": "Small Plate (4 pcs)", "calories": 180, "protein": 6, "carbs": 30, "fat": 4 },
+      "Medium": { "label": "Regular Plate (6 pcs)", "calories": 280, "protein": 10, "carbs": 45, "fat": 6 },
+      "Large": { "label": "Large Plate (10 pcs)", "calories": 460, "protein": 16, "carbs": 75, "fat": 10 }
+    }
+  },
+  "samosa": {
+    "name": "Samosa",
+    "category": "Street Foods",
+    "portions": {
+      "Small": { "label": "1 Small Samosa", "calories": 130, "protein": 2.5, "carbs": 16, "fat": 6 },
+      "Medium": { "label": "1 Medium Piece (80g)", "calories": 260, "protein": 5, "carbs": 32, "fat": 12 },
+      "Large": { "label": "2 Large Samosas", "calories": 520, "protein": 10, "carbs": 64, "fat": 24 }
+    }
+  },
+  "chowmein": {
+    "name": "Chowmein",
+    "category": "Chinese",
+    "portions": {
+      "Small": { "label": "Small Portion", "calories": 245, "protein": 6, "carbs": 35, "fat": 9 },
+      "Medium": { "label": "Regular Plate (300g)", "calories": 490, "protein": 12, "carbs": 70, "fat": 18 },
+      "Large": { "label": "Large Shareable", "calories": 980, "protein": 24, "carbs": 140, "fat": 36 }
+    }
+  },
+  "dal": {
+    "name": "Dal",
+    "category": "Indian",
+    "portions": {
+      "Small": { "label": "Small Cup (100g)", "calories": 100, "protein": 6, "carbs": 16, "fat": 1 },
+      "Medium": { "label": "1 Bowl (150g)", "calories": 150, "protein": 9, "carbs": 25, "fat": 2 },
+      "Large": { "label": "Large Bowl (300g)", "calories": 300, "protein": 18, "carbs": 50, "fat": 4 }
+    }
+  },
+  "rice": {
+    "name": "Rice",
+    "category": "Indian",
+    "portions": {
+      "Small": { "label": "Half Bowl (100g)", "calories": 85, "protein": 2, "carbs": 19, "fat": 0 },
+      "Medium": { "label": "1 Bowl (150g)", "calories": 130, "protein": 3, "carbs": 28, "fat": 0 },
+      "Large": { "label": "Large Plate (300g)", "calories": 260, "protein": 6, "carbs": 56, "fat": 0 }
+    }
+  },
+  "roti": {
+    "name": "Roti",
+    "category": "Indian",
+    "portions": {
+      "Small": { "label": "1 Roti (35g)", "calories": 85, "protein": 3, "carbs": 18, "fat": 1 },
+      "Medium": { "label": "2 Rotis (70g)", "calories": 170, "protein": 6, "carbs": 36, "fat": 2 },
+      "Large": { "label": "3 Rotis (105g)", "calories": 255, "protein": 9, "carbs": 54, "fat": 3 }
+    }
+  },
+  "fried_rice": {
+    "name": "Fried Rice",
+    "category": "Chinese",
+    "portions": {
+      "Small": { "label": "Small Bowl", "calories": 190, "protein": 4, "carbs": 38, "fat": 3 },
+      "Medium": { "label": "Regular Plate", "calories": 380, "protein": 8, "carbs": 76, "fat": 6 },
+      "Large": { "label": "Large Plate", "calories": 570, "protein": 12, "carbs": 114, "fat": 9 }
+    }
+  },
+  "spring_roll": {
+    "name": "Spring Roll",
+    "category": "Chinese",
+    "portions": {
+      "Small": { "label": "1 Piece", "calories": 100, "protein": 2, "carbs": 13, "fat": 4.5 },
+      "Medium": { "label": "2 Pieces", "calories": 200, "protein": 4, "carbs": 26, "fat": 9 },
+      "Large": { "label": "4 Pieces", "calories": 400, "protein": 8, "carbs": 52, "fat": 18 }
+    }
+  },
+  "manchurian": {
+    "name": "Manchurian",
+    "category": "Chinese",
+    "portions": {
+      "Small": { "label": "Small Bowl (3 pcs)", "calories": 160, "protein": 3, "carbs": 21, "fat": 8 },
+      "Medium": { "label": "Regular Bowl (6 pcs)", "calories": 320, "protein": 6, "carbs": 42, "fat": 16 },
+      "Large": { "label": "Large Bowl (10 pcs)", "calories": 530, "protein": 10, "carbs": 70, "fat": 26 }
+    }
+  },
+  "dim_sum": {
+    "name": "Dim Sum",
+    "category": "Chinese",
+    "portions": {
+      "Small": { "label": "3 Pieces", "calories": 120, "protein": 5, "carbs": 18, "fat": 3 },
+      "Medium": { "label": "6 Pieces", "calories": 240, "protein": 10, "carbs": 36, "fat": 6 },
+      "Large": { "label": "12 Pieces", "calories": 480, "protein": 20, "carbs": 72, "fat": 12 }
+    }
+  },
+  "hot_sour_soup": {
+    "name": "Hot & Sour Soup",
+    "category": "Chinese",
+    "portions": {
+      "Small": { "label": "Small Cup", "calories": 60, "protein": 3, "carbs": 9, "fat": 1.5 },
+      "Medium": { "label": "Regular Bowl", "calories": 120, "protein": 6, "carbs": 18, "fat": 3 },
+      "Large": { "label": "Large Bowl", "calories": 240, "protein": 12, "carbs": 36, "fat": 6 }
+    }
+  },
+  "kung_pao_chicken": {
+    "name": "Kung Pao Chicken",
+    "category": "Chinese",
+    "portions": {
+      "Small": { "label": "Small Serving", "calories": 210, "protein": 16, "carbs": 10, "fat": 12 },
+      "Medium": { "label": "Regular Plate", "calories": 420, "protein": 32, "carbs": 20, "fat": 24 },
+      "Large": { "label": "Large Serving", "calories": 630, "protein": 48, "carbs": 30, "fat": 36 }
+    }
+  },
+  "mapo_tofu": {
+    "name": "Mapo Tofu",
+    "category": "Chinese",
+    "portions": {
+      "Small": { "label": "Small Bowl", "calories": 145, "protein": 9, "carbs": 8, "fat": 9 },
+      "Medium": { "label": "Regular Plate", "calories": 290, "protein": 18, "carbs": 16, "fat": 18 },
+      "Large": { "label": "Large Serving", "calories": 435, "protein": 27, "carbs": 24, "fat": 27 }
+    }
+  },
+  "ramen": {
+    "name": "Ramen",
+    "category": "Japanese",
+    "portions": {
+      "Small": { "label": "Small Bowl", "calories": 250, "protein": 10, "carbs": 33, "fat": 8 },
+      "Medium": { "label": "Regular Bowl", "calories": 500, "protein": 20, "carbs": 66, "fat": 16 },
+      "Large": { "label": "Mega Bowl", "calories": 800, "protein": 32, "carbs": 105, "fat": 26 }
+    }
+  },
+  "tempura": {
+    "name": "Tempura",
+    "category": "Japanese",
+    "portions": {
+      "Small": { "label": "3 Pieces", "calories": 150, "protein": 4, "carbs": 16, "fat": 8 },
+      "Medium": { "label": "6 Pieces", "calories": 300, "protein": 8, "carbs": 32, "fat": 16 },
+      "Large": { "label": "12 Pieces", "calories": 600, "protein": 16, "carbs": 64, "fat": 32 }
+    }
+  },
+  "gyoza": {
+    "name": "Gyoza",
+    "category": "Japanese",
+    "portions": {
+      "Small": { "label": "3 Pieces", "calories": 115, "protein": 4.5, "carbs": 14, "fat": 4.5 },
+      "Medium": { "label": "6 Pieces", "calories": 230, "protein": 9, "carbs": 28, "fat": 9 },
+      "Large": { "label": "12 Pieces", "calories": 460, "protein": 18, "carbs": 56, "fat": 18 }
+    }
+  },
+  "sashimi": {
+    "name": "Sashimi",
+    "category": "Japanese",
+    "portions": {
+      "Small": { "label": "3 Pieces", "calories": 90, "protein": 14, "carbs": 0, "fat": 3.5 },
+      "Medium": { "label": "6 Pieces", "calories": 180, "protein": 28, "carbs": 0, "fat": 7 },
+      "Large": { "label": "12 Pieces", "calories": 360, "protein": 56, "carbs": 0, "fat": 14 }
+    }
+  },
+  "teriyaki_chicken": {
+    "name": "Teriyaki Chicken",
+    "category": "Japanese",
+    "portions": {
+      "Small": { "label": "Small Portion", "calories": 195, "protein": 18, "carbs": 10, "fat": 6 },
+      "Medium": { "label": "Regular Serving", "calories": 390, "protein": 36, "carbs": 20, "fat": 12 },
+      "Large": { "label": "Large Portion", "calories": 585, "protein": 54, "carbs": 30, "fat": 18 }
+    }
+  },
+  "miso_soup": {
+    "name": "Miso Soup",
+    "category": "Japanese",
+    "portions": {
+      "Small": { "label": "Small Cup", "calories": 40, "protein": 3, "carbs": 5, "fat": 1 },
+      "Medium": { "label": "Standard Bowl", "calories": 80, "protein": 6, "carbs": 10, "fat": 2 },
+      "Large": { "label": "Large Bowl", "calories": 160, "protein": 12, "carbs": 20, "fat": 4 }
+    }
+  },
+  "udon_noodles": {
+    "name": "Udon Noodles",
+    "category": "Japanese",
+    "portions": {
+      "Small": { "label": "Small Bowl", "calories": 190, "protein": 5, "carbs": 39, "fat": 1 },
+      "Medium": { "label": "Regular Bowl", "calories": 380, "protein": 10, "carbs": 78, "fat": 2 },
+      "Large": { "label": "Large Serving", "calories": 570, "protein": 15, "carbs": 117, "fat": 3 }
+    }
+  },
+  "yakitori": {
+    "name": "Yakitori",
+    "category": "Japanese",
+    "portions": {
+      "Small": { "label": "2 Skewers", "calories": 125, "protein": 11, "carbs": 5, "fat": 6 },
+      "Medium": { "label": "4 Skewers", "calories": 250, "protein": 22, "carbs": 10, "fat": 12 },
+      "Large": { "label": "8 Skewers", "calories": 500, "protein": 44, "carbs": 20, "fat": 24 }
+    }
+  },
+  "okonomiyaki": {
+    "name": "Okonomiyaki",
+    "category": "Japanese",
+    "portions": {
+      "Small": { "label": "Half Pancake", "calories": 210, "protein": 9, "carbs": 25, "fat": 8 },
+      "Medium": { "label": "1 Standard Pancake", "calories": 420, "protein": 18, "carbs": 50, "fat": 16 },
+      "Large": { "label": "Double Stack", "calories": 840, "protein": 36, "carbs": 100, "fat": 32 }
+    }
+  },
+  "takoyaki": {
+    "name": "Takoyaki",
+    "category": "Japanese",
+    "portions": {
+      "Small": { "label": "3 Pieces", "calories": 115, "protein": 4, "carbs": 16, "fat": 4 },
+      "Medium": { "label": "6 Pieces", "calories": 230, "protein": 8, "carbs": 32, "fat": 8 },
+      "Large": { "label": "12 Pieces", "calories": 460, "protein": 16, "carbs": 64, "fat": 16 }
+    }
+  },
+  "pasta_carbonara": {
+    "name": "Pasta Carbonara",
+    "category": "Italian",
+    "portions": {
+      "Small": { "label": "Small Portion", "calories": 315, "protein": 11, "carbs": 38, "fat": 13 },
+      "Medium": { "label": "Regular Plate", "calories": 630, "protein": 22, "carbs": 76, "fat": 26 },
+      "Large": { "label": "Large Serving", "calories": 945, "protein": 33, "carbs": 114, "fat": 39 }
+    }
+  },
+  "lasagna": {
+    "name": "Lasagna",
+    "category": "Italian",
+    "portions": {
+      "Small": { "label": "Small Slice", "calories": 290, "protein": 15, "carbs": 22, "fat": 16 },
+      "Medium": { "label": "Regular Slice", "calories": 580, "protein": 30, "carbs": 44, "fat": 32 },
+      "Large": { "label": "Large Platter", "calories": 870, "protein": 45, "carbs": 66, "fat": 48 }
+    }
+  },
+  "spaghetti_bolognese": {
+    "name": "Spaghetti Bolognese",
+    "category": "Italian",
+    "portions": {
+      "Small": { "label": "Small Portion", "calories": 275, "protein": 12, "carbs": 35, "fat": 9 },
+      "Medium": { "label": "Regular Plate", "calories": 550, "protein": 24, "carbs": 70, "fat": 18 },
+      "Large": { "label": "Large Bowl", "calories": 825, "protein": 36, "carbs": 105, "fat": 27 }
+    }
+  },
+  "bruschetta": {
+    "name": "Bruschetta",
+    "category": "Italian",
+    "portions": {
+      "Small": { "label": "1 Piece", "calories": 75, "protein": 2, "carbs": 11, "fat": 2.5 },
+      "Medium": { "label": "2 Pieces", "calories": 150, "protein": 4, "carbs": 22, "fat": 5 },
+      "Large": { "label": "4 Pieces", "calories": 300, "protein": 8, "carbs": 44, "fat": 10 }
+    }
+  },
+  "risotto": {
+    "name": "Risotto",
+    "category": "Italian",
+    "portions": {
+      "Small": { "label": "Small Bowl", "calories": 190, "protein": 4, "carbs": 31, "fat": 6 },
+      "Medium": { "label": "Regular Plate", "calories": 380, "protein": 8, "carbs": 62, "fat": 12 },
+      "Large": { "label": "Large Bowl", "calories": 570, "protein": 12, "carbs": 93, "fat": 18 }
+    }
+  },
+  "ravioli": {
+    "name": "Ravioli",
+    "category": "Italian",
+    "portions": {
+      "Small": { "label": "4 Pieces", "calories": 160, "protein": 6, "carbs": 24, "fat": 4 },
+      "Medium": { "label": "8 Pieces", "calories": 320, "protein": 12, "carbs": 48, "fat": 8 },
+      "Large": { "label": "12 Pieces", "calories": 480, "protein": 18, "carbs": 72, "fat": 12 }
+    }
+  },
+  "gelato": {
+    "name": "Gelato",
+    "category": "Italian",
+    "portions": {
+      "Small": { "label": "1 Scoop", "calories": 100, "protein": 2, "carbs": 16, "fat": 3 },
+      "Medium": { "label": "2 Scoops", "calories": 200, "protein": 4, "carbs": 32, "fat": 6 },
+      "Large": { "label": "Waffle Bowl (3 Scoops)", "calories": 350, "protein": 6, "carbs": 55, "fat": 11 }
+    }
+  },
+  "tiramisu": {
+    "name": "Tiramisu",
+    "category": "Italian",
+    "portions": {
+      "Small": { "label": "Small Square", "calories": 210, "protein": 3.5, "carbs": 24, "fat": 11 },
+      "Medium": { "label": "Regular Square", "calories": 420, "protein": 7, "carbs": 48, "fat": 22 },
+      "Large": { "label": "Large Slice", "calories": 630, "protein": 10.5, "carbs": 72, "fat": 33 }
+    }
+  },
+  "panna_cotta": {
+    "name": "Panna Cotta",
+    "category": "Italian",
+    "portions": {
+      "Small": { "label": "Small Cup", "calories": 140, "protein": 2, "carbs": 17, "fat": 7 },
+      "Medium": { "label": "Regular Cup", "calories": 280, "protein": 4, "carbs": 34, "fat": 14 },
+      "Large": { "label": "Large Plate Serving", "calories": 420, "protein": 6, "carbs": 51, "fat": 21 }
+    }
+  },
+  "taco": {
+    "name": "Taco",
+    "category": "Mexican",
+    "portions": {
+      "Small": { "label": "1 Taco", "calories": 150, "protein": 8, "carbs": 15, "fat": 6 },
+      "Medium": { "label": "2 Tacos", "calories": 300, "protein": 16, "carbs": 30, "fat": 12 },
+      "Large": { "label": "3 Tacos Platter", "calories": 450, "protein": 24, "carbs": 45, "fat": 18 }
+    }
+  },
+  "burrito": {
+    "name": "Burrito",
+    "category": "Mexican",
+    "portions": {
+      "Small": { "label": "Small Burrito", "calories": 290, "protein": 12, "carbs": 35, "fat": 11 },
+      "Medium": { "label": "Regular Burrito", "calories": 580, "protein": 24, "carbs": 70, "fat": 22 },
+      "Large": { "label": "Grand Burrito Bowl", "calories": 870, "protein": 36, "carbs": 105, "fat": 33 }
+    }
+  },
+  "quesadilla": {
+    "name": "Quesadilla",
+    "category": "Mexican",
+    "portions": {
+      "Small": { "label": "2 Wedges", "calories": 175, "protein": 8, "carbs": 16, "fat": 9 },
+      "Medium": { "label": "4 Wedges (Half)", "calories": 350, "protein": 16, "carbs": 32, "fat": 18 },
+      "Large": { "label": "8 Wedges (Full)", "calories": 700, "protein": 32, "carbs": 64, "fat": 36 }
+    }
+  },
+  "nachos": {
+    "name": "Nachos",
+    "category": "Mexican",
+    "portions": {
+      "Small": { "label": "Small Plate", "calories": 230, "protein": 5, "carbs": 29, "fat": 11 },
+      "Medium": { "label": "Regular Plate", "calories": 460, "protein": 10, "carbs": 58, "fat": 22 },
+      "Large": { "label": "Mega Platter", "calories": 920, "protein": 20, "carbs": 116, "fat": 44 }
+    }
+  },
+  "enchiladas": {
+    "name": "Enchiladas",
+    "category": "Mexican",
+    "portions": {
+      "Small": { "label": "1 Enchilada", "calories": 205, "protein": 10, "carbs": 21, "fat": 9 },
+      "Medium": { "label": "2 Enchiladas", "calories": 410, "protein": 20, "carbs": 42, "fat": 18 },
+      "Large": { "label": "3 Enchiladas Platter", "calories": 615, "protein": 30, "carbs": 63, "fat": 27 }
+    }
+  },
+  "guacamole": {
+    "name": "Guacamole",
+    "category": "Mexican",
+    "portions": {
+      "Small": { "label": "2 tbsp (30g)", "calories": 45, "protein": 0.5, "carbs": 2.5, "fat": 4 },
+      "Medium": { "label": "4 tbsp (60g)", "calories": 90, "protein": 1, "carbs": 5, "fat": 8 },
+      "Large": { "label": "1 Cup (240g)", "calories": 360, "protein": 4, "carbs": 20, "fat": 32 }
+    }
+  },
+  "fajitas": {
+    "name": "Fajitas",
+    "category": "Mexican",
+    "portions": {
+      "Small": { "label": "Small Plate", "calories": 215, "protein": 15, "carbs": 18, "fat": 9 },
+      "Medium": { "label": "Regular Sizzler", "calories": 430, "protein": 30, "carbs": 36, "fat": 18 },
+      "Large": { "label": "Family Platter", "calories": 860, "protein": 60, "carbs": 72, "fat": 36 }
+    }
+  },
+  "churros": {
+    "name": "Churros",
+    "category": "Mexican",
+    "portions": {
+      "Small": { "label": "1 Stick", "calories": 110, "protein": 1, "carbs": 15, "fat": 5 },
+      "Medium": { "label": "3 Sticks with Dip", "calories": 330, "protein": 3, "carbs": 45, "fat": 15 },
+      "Large": { "label": "6 Sticks Shareable", "calories": 660, "protein": 6, "carbs": 90, "fat": 30 }
+    }
+  },
+  "tostadas": {
+    "name": "Tostadas",
+    "category": "Mexican",
+    "portions": {
+      "Small": { "label": "1 Tostada", "calories": 165, "protein": 6, "carbs": 18, "fat": 8 },
+      "Medium": { "label": "2 Tostadas", "calories": 330, "protein": 12, "carbs": 36, "fat": 16 },
+      "Large": { "label": "3 Tostadas Platter", "calories": 495, "protein": 18, "carbs": 54, "fat": 24 }
+    }
+  },
+  "elote": {
+    "name": "Elote",
+    "category": "Mexican",
+    "portions": {
+      "Small": { "label": "Half Ear", "calories": 115, "protein": 2.5, "carbs": 16, "fat": 5 },
+      "Medium": { "label": "1 Whole Cob", "calories": 230, "protein": 5, "carbs": 32, "fat": 10 },
+      "Large": { "label": "2 Whole Cobs", "calories": 460, "protein": 10, "carbs": 64, "fat": 20 }
+    }
+  },
+  "french_fries": {
+    "name": "French Fries",
+    "category": "American",
+    "portions": {
+      "Small": { "label": "Small Carton", "calories": 160, "protein": 2, "carbs": 21, "fat": 8 },
+      "Medium": { "label": "Regular Plate", "calories": 320, "protein": 4, "carbs": 42, "fat": 16 },
+      "Large": { "label": "Large Sharing Box", "calories": 480, "protein": 6, "carbs": 63, "fat": 24 }
+    }
+  },
+  "hot_dog": {
+    "name": "Hot Dog",
+    "category": "American",
+    "portions": {
+      "Small": { "label": "Junior Hot Dog", "calories": 145, "protein": 5.5, "carbs": 14, "fat": 7.5 },
+      "Medium": { "label": "Regular Hot Dog", "calories": 290, "protein": 11, "carbs": 28, "fat": 15 },
+      "Large": { "label": "Double Chili Dog", "calories": 580, "protein": 22, "carbs": 56, "fat": 30 }
+    }
+  },
+  "fried_chicken": {
+    "name": "Fried Chicken",
+    "category": "American",
+    "portions": {
+      "Small": { "label": "1 Drumstick", "calories": 160, "protein": 13, "carbs": 5, "fat": 10 },
+      "Medium": { "label": "3 Pieces Basket", "calories": 480, "protein": 39, "carbs": 15, "fat": 30 },
+      "Large": { "label": "6 Pieces Bucket", "calories": 960, "protein": 78, "carbs": 30, "fat": 60 }
+    }
+  },
+  "mac_and_cheese": {
+    "name": "Mac and Cheese",
+    "category": "American",
+    "portions": {
+      "Small": { "label": "Small Cup", "calories": 185, "protein": 6, "carbs": 24, "fat": 7 },
+      "Medium": { "label": "Regular Plate", "calories": 370, "protein": 12, "carbs": 48, "fat": 14 },
+      "Large": { "label": "Large Baking Dish", "calories": 740, "protein": 24, "carbs": 96, "fat": 28 }
+    }
+  },
+  "buffalo_wings": {
+    "name": "Buffalo Wings",
+    "category": "American",
+    "portions": {
+      "Small": { "label": "4 Wings", "calories": 200, "protein": 14, "carbs": 1, "fat": 16 },
+      "Medium": { "label": "8 Wings Basket", "calories": 400, "protein": 28, "carbs": 2, "fat": 32 },
+      "Large": { "label": "16 Wings Feast", "calories": 800, "protein": 56, "carbs": 4, "fat": 64 }
+    }
+  },
+  "pancakes": {
+    "name": "Pancakes",
+    "category": "American",
+    "portions": {
+      "Small": { "label": "1 Pancake", "calories": 115, "protein": 2.5, "carbs": 22, "fat": 2 },
+      "Medium": { "label": "3 Pancakes Stack", "calories": 345, "protein": 7.5, "carbs": 66, "fat": 6 },
+      "Large": { "label": "5 Pancakes Grand Slam", "calories": 575, "protein": 12.5, "carbs": 110, "fat": 10 }
+    }
+  },
+  "waffles": {
+    "name": "Waffles",
+    "category": "American",
+    "portions": {
+      "Small": { "label": "1 Waffle", "calories": 145, "protein": 3.5, "carbs": 24, "fat": 4 },
+      "Medium": { "label": "2 Waffles Plate", "calories": 290, "protein": 7, "carbs": 48, "fat": 8 },
+      "Large": { "label": "4 Waffles Belgian Stack", "calories": 580, "protein": 14, "carbs": 96, "fat": 16 }
+    }
+  },
+  "apple_pie": {
+    "name": "Apple Pie",
+    "category": "American",
+    "portions": {
+      "Small": { "label": "Small Slice", "calories": 150, "protein": 1, "carbs": 23, "fat": 6 },
+      "Medium": { "label": "Regular Slice", "calories": 300, "protein": 2, "carbs": 46, "fat": 12 },
+      "Large": { "label": "Double Slice with Ice Cream", "calories": 600, "protein": 4, "carbs": 92, "fat": 24 }
+    }
+  },
+  "caesar_salad": {
+    "name": "Caesar Salad",
+    "category": "American",
+    "portions": {
+      "Small": { "label": "Side Salad", "calories": 95, "protein": 3, "carbs": 4, "fat": 8 },
+      "Medium": { "label": "Regular Bowl", "calories": 190, "protein": 6, "carbs": 8, "fat": 16 },
+      "Large": { "label": "Large Bowl with Chicken", "calories": 380, "protein": 30, "carbs": 12, "fat": 24 }
+    }
+  },
+  "bbq_ribs": {
+    "name": "BBQ Ribs",
+    "category": "American",
+    "portions": {
+      "Small": { "label": "Half Rack", "calories": 400, "protein": 26, "carbs": 15, "fat": 26 },
+      "Medium": { "label": "Full Rack", "calories": 800, "protein": 52, "carbs": 30, "fat": 52 },
+      "Large": { "label": "Double Feast Plate", "calories": 1200, "protein": 78, "carbs": 45, "fat": 78 }
+    }
+  },
+  "bhel_puri": {
+    "name": "Bhel Puri",
+    "category": "Street Foods",
+    "portions": {
+      "Small": { "label": "Small Cone", "calories": 140, "protein": 3, "carbs": 26, "fat": 3 },
+      "Medium": { "label": "Regular Plate", "calories": 280, "protein": 6, "carbs": 52, "fat": 6 },
+      "Large": { "label": "Large Bowl", "calories": 420, "protein": 9, "carbs": 78, "fat": 9 }
+    }
+  },
+  "sev_puri": {
+    "name": "Sev Puri",
+    "category": "Street Foods",
+    "portions": {
+      "Small": { "label": "Small Plate (4 pcs)", "calories": 110, "protein": 2, "carbs": 19, "fat": 3 },
+      "Medium": { "label": "Regular Plate (6 pcs)", "calories": 220, "protein": 4, "carbs": 38, "fat": 6 },
+      "Large": { "label": "Large Plate (10 pcs)", "calories": 360, "protein": 7, "carbs": 62, "fat": 10 }
+    }
+  },
+  "papdi_chaat": {
+    "name": "Papdi Chaat",
+    "category": "Street Foods",
+    "portions": {
+      "Small": { "label": "Small Plate", "calories": 135, "protein": 3, "carbs": 22, "fat": 4 },
+      "Medium": { "label": "Regular Plate", "calories": 270, "protein": 6, "carbs": 44, "fat": 8 },
+      "Large": { "label": "Large Sharing Plate", "calories": 450, "protein": 10, "carbs": 72, "fat": 14 }
+    }
+  },
+  "dahi_vada": {
+    "name": "Dahi Vada",
+    "category": "Street Foods",
+    "portions": {
+      "Small": { "label": "1 Piece", "calories": 120, "protein": 4, "carbs": 16, "fat": 4 },
+      "Medium": { "label": "2 Pieces", "calories": 240, "protein": 8, "carbs": 32, "fat": 8 },
+      "Large": { "label": "4 Pieces sharing bowl", "calories": 480, "protein": 16, "carbs": 64, "fat": 16 }
+    }
+  },
+  "pani_puri": {
+    "name": "Pani Puri",
+    "category": "Street Foods",
+    "portions": {
+      "Small": { "label": "4 Pieces", "calories": 75, "protein": 1.5, "carbs": 14, "fat": 1.5 },
+      "Medium": { "label": "6 Pieces", "calories": 115, "protein": 2.5, "carbs": 21, "fat": 2.5 },
+      "Large": { "label": "12 Pieces", "calories": 230, "protein": 5, "carbs": 42, "fat": 5 }
+    }
+  },
+  "aloo_tikki": {
+    "name": "Aloo Tikki",
+    "category": "Street Foods",
+    "portions": {
+      "Small": { "label": "1 Piece", "calories": 135, "protein": 2, "carbs": 20, "fat": 5 },
+      "Medium": { "label": "2 Pieces Plate", "calories": 270, "protein": 4, "carbs": 40, "fat": 10 },
+      "Large": { "label": "3 Pieces Platter", "calories": 405, "protein": 6, "carbs": 60, "fat": 15 }
+    }
+  },
+  "kachori": {
+    "name": "Kachori",
+    "category": "Street Foods",
+    "portions": {
+      "Small": { "label": "1 Small Piece", "calories": 150, "protein": 3, "carbs": 18, "fat": 8 },
+      "Medium": { "label": "1 Large Piece", "calories": 300, "protein": 6, "carbs": 36, "fat": 16 },
+      "Large": { "label": "2 Pieces Plate", "calories": 600, "protein": 12, "carbs": 72, "fat": 32 }
+    }
+  },
+  "jalebi": {
+    "name": "Jalebi",
+    "category": "Street Foods",
+    "portions": {
+      "Small": { "label": "1 Piece (25g)", "calories": 75, "protein": 0.5, "carbs": 14, "fat": 2 },
+      "Medium": { "label": "2 Pieces (50g)", "calories": 150, "protein": 1, "carbs": 28, "fat": 4 },
+      "Large": { "label": "4 Pieces (100g)", "calories": 300, "protein": 2, "carbs": 56, "fat": 8 }
+    }
+  },
+  "lassi": {
+    "name": "Lassi",
+    "category": "Street Foods",
+    "portions": {
+      "Small": { "label": "Small Glass (150ml)", "calories": 110, "protein": 3.5, "carbs": 18, "fat": 3 },
+      "Medium": { "label": "Regular Glass (250ml)", "calories": 185, "protein": 6, "carbs": 30, "fat": 5 },
+      "Large": { "label": "Kulhad Lassi (400ml)", "calories": 295, "protein": 9.5, "carbs": 48, "fat": 8 }
+    }
+  },
+  "chole_bhature": {
+    "name": "Chole Bhature",
+    "category": "Indian",
+    "portions": {
+      "Small": { "label": "1 Bhatura + Chole", "calories": 325, "protein": 9, "carbs": 42, "fat": 13 },
+      "Medium": { "label": "2 Bhature + Chole", "calories": 650, "protein": 18, "carbs": 84, "fat": 26 },
+      "Large": { "label": "3 Bhature Feast", "calories": 975, "protein": 27, "carbs": 126, "fat": 39 }
+    }
+  },
+  "pav_bhaji": {
+    "name": "Pav Bhaji",
+    "category": "Street Foods",
+    "portions": {
+      "Small": { "label": "1 Pav + Bhaji", "calories": 200, "protein": 5, "carbs": 30, "fat": 7 },
+      "Medium": { "label": "2 Pav + Bhaji", "calories": 400, "protein": 9, "carbs": 58, "fat": 14 },
+      "Large": { "label": "3 Pav + Double Bhaji", "calories": 650, "protein": 14, "carbs": 92, "fat": 24 }
+    }
+  },
+  "palak_paneer": {
+    "name": "Palak Paneer",
+    "category": "Indian",
+    "portions": {
+      "Small": { "label": "Small Bowl", "calories": 145, "protein": 8, "carbs": 4, "fat": 11 },
+      "Medium": { "label": "Regular Bowl", "calories": 290, "protein": 16, "carbs": 8, "fat": 22 },
+      "Large": { "label": "Large Serving", "calories": 435, "protein": 24, "carbs": 12, "fat": 33 }
+    }
+  },
+  "aloo_gobi": {
+    "name": "Aloo Gobi",
+    "category": "Indian",
+    "portions": {
+      "Small": { "label": "Small Serving", "calories": 90, "protein": 2, "carbs": 13, "fat": 3.5 },
+      "Medium": { "label": "Regular Bowl", "calories": 180, "protein": 4, "carbs": 26, "fat": 7 },
+      "Large": { "label": "Large Serving", "calories": 270, "protein": 6, "carbs": 39, "fat": 10.5 }
+    }
+  },
+  "tandoori_chicken": {
+    "name": "Tandoori Chicken",
+    "category": "Indian",
+    "portions": {
+      "Small": { "label": "1 Quarter", "calories": 135, "protein": 19, "carbs": 2.5, "fat": 5.5 },
+      "Medium": { "label": "Half Chicken", "calories": 270, "protein": 38, "carbs": 5, "fat": 11 },
+      "Large": { "label": "Full Chicken", "calories": 540, "protein": 76, "carbs": 10, "fat": 22 }
+    }
+  },
+  "chicken_tikka": {
+    "name": "Chicken Tikka",
+    "category": "Indian",
+    "portions": {
+      "Small": { "label": "3 Pieces", "calories": 110, "protein": 17, "carbs": 2, "fat": 3.5 },
+      "Medium": { "label": "6 Pieces", "calories": 220, "protein": 34, "carbs": 4, "fat": 7 },
+      "Large": { "label": "12 Pieces Platter", "calories": 440, "protein": 68, "carbs": 8, "fat": 14 }
+    }
+  },
+  "fish_curry": {
+    "name": "Fish Curry",
+    "category": "Indian",
+    "portions": {
+      "Small": { "label": "Small Bowl", "calories": 140, "protein": 12.5, "carbs": 4, "fat": 7.5 },
+      "Medium": { "label": "1 Bowl (250g)", "calories": 280, "protein": 25, "carbs": 8, "fat": 15 },
+      "Large": { "label": "Large Bowl", "calories": 420, "protein": 37.5, "carbs": 12, "fat": 22.5 }
+    }
+  },
+  "chicken_curry": {
+    "name": "Chicken Curry",
+    "category": "Indian",
+    "portions": {
+      "Small": { "label": "Small Bowl", "calories": 160, "protein": 14, "carbs": 6, "fat": 9 },
+      "Medium": { "label": "1 Bowl (250g)", "calories": 320, "protein": 28, "carbs": 12, "fat": 18 },
+      "Large": { "label": "Large Bowl", "calories": 480, "protein": 42, "carbs": 18, "fat": 27 }
+    }
+  },
+  "kadhai_paneer": {
+    "name": "Kadhai Paneer",
+    "category": "Indian",
+    "portions": {
+      "Small": { "label": "Small Bowl", "calories": 175, "protein": 10, "carbs": 5, "fat": 13 },
+      "Medium": { "label": "Regular Bowl", "calories": 350, "protein": 20, "carbs": 10, "fat": 26 },
+      "Large": { "label": "Large Serving", "calories": 525, "protein": 30, "carbs": 15, "fat": 39 }
+    }
+  },
+  "rajma_chawal": {
+    "name": "Rajma Chawal",
+    "category": "Indian",
+    "portions": {
+      "Small": { "label": "Small Bowl", "calories": 200, "protein": 6.5, "carbs": 38, "fat": 2.5 },
+      "Medium": { "label": "Regular Plate", "calories": 400, "protein": 13, "carbs": 76, "fat": 5 },
+      "Large": { "label": "Large Platter", "calories": 600, "protein": 19.5, "carbs": 114, "fat": 7.5 }
+    }
+  },
+  "khichdi": {
+    "name": "Khichdi",
+    "category": "Indian",
+    "portions": {
+      "Small": { "label": "Small Bowl", "calories": 135, "protein": 4.5, "carbs": 24, "fat": 2 },
+      "Medium": { "label": "Regular Bowl", "calories": 270, "protein": 9, "carbs": 48, "fat": 4 },
+      "Large": { "label": "Large Plate", "calories": 405, "protein": 13.5, "carbs": 72, "fat": 6 }
+    }
+  },
+  "dhokla": {
+    "name": "Dhokla",
+    "category": "Street Foods",
+    "portions": {
+      "Small": { "label": "1 Piece (40g)", "calories": 60, "protein": 2, "carbs": 10, "fat": 1.5 },
+      "Medium": { "label": "2 Pieces (80g)", "calories": 120, "protein": 4, "carbs": 20, "fat": 3 },
+      "Large": { "label": "4 Pieces Plate", "calories": 240, "protein": 8, "carbs": 40, "fat": 6 }
+    }
+  },
+  "vada_pav": {
+    "name": "Vada Pav",
+    "category": "Street Foods",
+    "portions": {
+      "Small": { "label": "1 Mini Vada Pav", "calories": 150, "protein": 3, "carbs": 22, "fat": 5 },
+      "Medium": { "label": "1 Standard Vada Pav", "calories": 300, "protein": 6, "carbs": 44, "fat": 10 },
+      "Large": { "label": "2 Vada Pavs Plate", "calories": 600, "protein": 12, "carbs": 88, "fat": 20 }
+    }
+  },
+  "gajar_halwa": {
+    "name": "Gajar Halwa",
+    "category": "Street Foods",
+    "portions": {
+      "Small": { "label": "Small Serving (50g)", "calories": 160, "protein": 3, "carbs": 22, "fat": 6 },
+      "Medium": { "label": "Regular Cup (100g)", "calories": 320, "protein": 6, "carbs": 44, "fat": 12 },
+      "Large": { "label": "Double Dessert bowl", "calories": 640, "protein": 12, "carbs": 88, "fat": 24 }
+    }
+  },
+  "gulab_jamun": {
+    "name": "Gulab Jamun",
+    "category": "Street Foods",
+    "portions": {
+      "Small": { "label": "1 Piece", "calories": 150, "protein": 2.5, "carbs": 28, "fat": 3 },
+      "Medium": { "label": "2 Pieces", "calories": 300, "protein": 5, "carbs": 56, "fat": 6 },
+      "Large": { "label": "4 Pieces Feast", "calories": 600, "protein": 10, "carbs": 112, "fat": 12 }
+    }
+  },
+  "kheer": {
+    "name": "Kheer",
+    "category": "Street Foods",
+    "portions": {
+      "Small": { "label": "Small Cup (100g)", "calories": 140, "protein": 4, "carbs": 21, "fat": 4 },
+      "Medium": { "label": "Regular Cup (150g)", "calories": 210, "protein": 6, "carbs": 31, "fat": 6 },
+      "Large": { "label": "Large Serving (300g)", "calories": 420, "protein": 12, "carbs": 62, "fat": 12 }
+    }
+  },
+  "naan": {
+    "name": "Naan",
+    "category": "Indian",
+    "portions": {
+      "Small": { "label": "1 Plain Naan", "calories": 200, "protein": 6, "carbs": 38, "fat": 3 },
+      "Medium": { "label": "1 Butter Naan", "calories": 310, "protein": 8, "carbs": 44, "fat": 11 },
+      "Large": { "label": "2 Garlic Butter Naans", "calories": 700, "protein": 18, "carbs": 94, "fat": 26 }
+    }
+  },
+  "garlic_bread": {
+    "name": "Garlic Bread",
+    "category": "Italian",
+    "portions": {
+      "Small": { "label": "1 Slice", "calories": 100, "protein": 2.5, "carbs": 15, "fat": 3 },
+      "Medium": { "label": "2 Slices", "calories": 200, "protein": 5, "carbs": 30, "fat": 6 },
+      "Large": { "label": "4 Slices Platter", "calories": 400, "protein": 10, "carbs": 60, "fat": 12 }
+    }
+  },
+  "minestrone_soup": {
+    "name": "Minestrone Soup",
+    "category": "Italian",
+    "portions": {
+      "Small": { "label": "Small Bowl", "calories": 75, "protein": 3, "carbs": 13, "fat": 1 },
+      "Medium": { "label": "Regular Bowl", "calories": 150, "protein": 6, "carbs": 26, "fat": 2 },
+      "Large": { "label": "Large Breadbowl", "calories": 300, "protein": 12, "carbs": 52, "fat": 4 }
+    }
+  },
+  "caprese_salad": {
+    "name": "Caprese Salad",
+    "category": "Italian",
+    "portions": {
+      "Small": { "label": "Small Serving", "calories": 115, "protein": 5.5, "carbs": 3, "fat": 9.5 },
+      "Medium": { "label": "Regular Plate", "calories": 230, "protein": 11, "carbs": 6, "fat": 19 },
+      "Large": { "label": "Large Sharing Platter", "calories": 460, "protein": 22, "carbs": 12, "fat": 38 }
+    }
+  },
+  "queso_fundido": {
+    "name": "Queso Fundido",
+    "category": "Mexican",
+    "portions": {
+      "Small": { "label": "Small Skillet", "calories": 250, "protein": 14, "carbs": 3, "fat": 20 },
+      "Medium": { "label": "Regular Skillet", "calories": 500, "protein": 28, "carbs": 6, "fat": 40 },
+      "Large": { "label": "Mega Feast Skillet", "calories": 750, "protein": 42, "carbs": 9, "fat": 60 }
+    }
+  },
+  "chicken_quesadilla": {
+    "name": "Chicken Quesadilla",
+    "category": "Mexican",
+    "portions": {
+      "Small": { "label": "2 Wedges", "calories": 225, "protein": 15, "carbs": 18, "fat": 10 },
+      "Medium": { "label": "4 Wedges (Half)", "calories": 450, "protein": 30, "carbs": 36, "fat": 20 },
+      "Large": { "label": "8 Wedges (Full)", "calories": 900, "protein": 60, "carbs": 72, "fat": 40 }
+    }
+  },
+  "egg_roll": {
+    "name": "Egg Roll",
+    "category": "Chinese",
+    "portions": {
+      "Small": { "label": "1 Roll", "calories": 110, "protein": 3.5, "carbs": 15, "fat": 4 },
+      "Medium": { "label": "2 Rolls", "calories": 220, "protein": 7, "carbs": 30, "fat": 8 },
+      "Large": { "label": "4 Rolls Basket", "calories": 440, "protein": 14, "carbs": 60, "fat": 16 }
+    }
+  },
+  "sweet_sour_pork": {
+    "name": "Sweet & Sour Pork",
+    "category": "Chinese",
+    "portions": {
+      "Small": { "label": "Small Serving", "calories": 265, "protein": 11.5, "carbs": 26, "fat": 12.5 },
+      "Medium": { "label": "Regular Plate", "calories": 530, "protein": 23, "carbs": 52, "fat": 25 },
+      "Large": { "label": "Large Shareable", "calories": 795, "protein": 34.5, "carbs": 78, "fat": 37.5 }
+    }
+  },
+  "beijing_duck": {
+    "name": "Beijing Duck",
+    "category": "Chinese",
+    "portions": {
+      "Small": { "label": "2 Rolls", "calories": 200, "protein": 12, "carbs": 14, "fat": 11 },
+      "Medium": { "label": "4 Rolls Serving", "calories": 400, "protein": 24, "carbs": 28, "fat": 22 },
+      "Large": { "label": "Half Duck Platter", "calories": 800, "protein": 48, "carbs": 56, "fat": 44 }
+    }
+  },
+  "wonton_soup": {
+    "name": "Wonton Soup",
+    "category": "Chinese",
+    "portions": {
+      "Small": { "label": "Small Cup (3 wontons)", "calories": 100, "protein": 5, "carbs": 13, "fat": 3 },
+      "Medium": { "label": "Regular Bowl (6 wontons)", "calories": 200, "protein": 10, "carbs": 26, "fat": 6 },
+      "Large": { "label": "Meal Bowl (12 wontons)", "calories": 400, "protein": 20, "carbs": 52, "fat": 12 }
+    }
+  },
+  "chicken_katsu": {
+    "name": "Chicken Katsu",
+    "category": "Japanese",
+    "portions": {
+      "Small": { "label": "Small Cutlet", "calories": 215, "protein": 15, "carbs": 15, "fat": 10 },
+      "Medium": { "label": "Regular Piece", "calories": 430, "protein": 30, "carbs": 30, "fat": 20 },
+      "Large": { "label": "Double Cutlet Platter", "calories": 860, "protein": 60, "carbs": 60, "fat": 40 }
+    }
+  },
+  "tonkatsu": {
+    "name": "Tonkatsu",
+    "category": "Japanese",
+    "portions": {
+      "Small": { "label": "Small Cutlet", "calories": 235, "protein": 14, "carbs": 14, "fat": 13.5 },
+      "Medium": { "label": "Regular Piece", "calories": 470, "protein": 28, "carbs": 28, "fat": 27 },
+      "Large": { "label": "Double Cutlet Platter", "calories": 940, "protein": 56, "carbs": 56, "fat": 54 }
+    }
+  },
+  "edamame": {
+    "name": "Edamame",
+    "category": "Japanese",
+    "portions": {
+      "Small": { "label": "Small Cup", "calories": 60, "protein": 6, "carbs": 5, "fat": 2.5 },
+      "Medium": { "label": "Regular Bowl", "calories": 120, "protein": 12, "carbs": 10, "fat": 5 },
+      "Large": { "label": "Large Sharing Bowl", "calories": 240, "protein": 24, "carbs": 20, "fat": 10 }
+    }
+  },
+  "potato_chips": {
+    "name": "Potato Chips",
+    "category": "American",
+    "portions": {
+      "Small": { "label": "Individual Bag (28g)", "calories": 150, "protein": 2, "carbs": 15, "fat": 10 },
+      "Medium": { "label": "Regular Bowl (56g)", "calories": 300, "protein": 4, "carbs": 30, "fat": 20 },
+      "Large": { "label": "Sharing Party Bag", "calories": 600, "protein": 8, "carbs": 60, "fat": 40 }
+    }
+  },
+  "dosa": {
+    "name": "Dosa",
+    "category": "Indian",
+    "portions": {
+      "Small": { "label": "1 Small Dosa", "calories": 120, "protein": 3, "carbs": 24, "fat": 2 },
+      "Medium": { "label": "1 Regular Dosa", "calories": 250, "protein": 6, "carbs": 48, "fat": 4 },
+      "Large": { "label": "2 Large Masala Dosas", "calories": 500, "protein": 12, "carbs": 96, "fat": 8 }
+    }
+  },
+  "idli": {
+    "name": "Idli",
+    "category": "Indian",
+    "portions": {
+      "Small": { "label": "1 Piece", "calories": 60, "protein": 1.5, "carbs": 13, "fat": 0.5 },
+      "Medium": { "label": "2 Pieces with Sambar", "calories": 150, "protein": 4, "carbs": 30, "fat": 1 },
+      "Large": { "label": "4 Pieces Plate", "calories": 300, "protein": 8, "carbs": 60, "fat": 2 }
+    }
+  },
+  "salad": {
+    "name": "Salad",
+    "category": "American",
+    "portions": {
+      "Small": { "label": "Side Salad", "calories": 75, "protein": 2, "carbs": 5, "fat": 5 },
+      "Medium": { "label": "Regular Bowl", "calories": 150, "protein": 4, "carbs": 10, "fat": 10 },
+      "Large": { "label": "Large Meal Bowl", "calories": 300, "protein": 8, "carbs": 20, "fat": 20 }
+    }
+  },
+  "coffee": {
+    "name": "Coffee",
+    "category": "Beverages",
+    "portions": {
+      "Small": { "label": "Small Cup (Black)", "calories": 2, "protein": 0, "carbs": 0, "fat": 0 },
+      "Medium": { "label": "Regular Latte (with Milk)", "calories": 120, "protein": 6, "carbs": 12, "fat": 5 },
+      "Large": { "label": "Large Mocha / Frappe", "calories": 280, "protein": 8, "carbs": 40, "fat": 10 }
     }
   }
 }

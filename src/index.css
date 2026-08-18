@@ -1,22 +1,252 @@
+@import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=Space+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap');
 @import "tailwindcss";
 
+@theme {
+  --font-sans: "Plus Jakarta Sans", ui-sans-serif, system-ui, sans-serif;
+  --font-display: "Space Grotesk", sans-serif;
+  --font-mono: "JetBrains Mono", ui-monospace, SFMono-Regular, monospace;
+
+  --color-midnight-black: #07040A;
+  --color-midnight-plum: #2E1A47;
+  --color-royal-amethyst: #663399;
+  --color-soft-violet: #A3779D;
+  --color-lilac-mist: #FBE4E3;
+  --color-mint-whisper: #D1F2EB;
+  --color-emerald-green: #50C878;
+}
+
 :root {
-  --glass-bg: rgba(23, 31, 51, 0.6);
-  --glass-border: rgba(255, 255, 255, 0.1);
+  --midnight-black: #07040A;
+  --midnight-plum: #2E1A47;
+  --royal-amethyst: #663399;
+  --soft-violet: #A3779D;
+  --lilac-mist: #FBE4E3;
+  --mint-whisper: #D1F2EB;
+  --emerald-green: #50C878;
 }
 
 body {
-  margin: 0;
-  background-color: #0b1326;
-  color: #dae2fd;
-  font-family: Inter, system-ui, -apple-system, sans-serif;
+  background-color: #07040A;
+  color: #FBE4E3;
+  font-family: var(--font-sans);
+  overflow-x: hidden;
+  background-image: 
+    radial-gradient(circle at 50% 0%, rgba(46, 26, 71, 0.45) 0%, transparent 55%),
+    radial-gradient(circle at 85% 30%, rgba(102, 51, 153, 0.20) 0%, transparent 50%),
+    radial-gradient(circle at 15% 70%, rgba(163, 119, 157, 0.10) 0%, transparent 50%),
+    radial-gradient(circle at 50% 100%, rgba(7, 4, 10, 1) 0%, transparent 100%);
+  background-attachment: fixed;
   -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
 }
 
-.glass-card {
-  background: var(--glass-bg);
-  backdrop-filter: blur(24px);
-  -webkit-backdrop-filter: blur(24px);
-  border: 1px solid var(--glass-border);
-  border-radius: 1rem;
+/* 3D Floating Animations & Smooth Springs */
+@keyframes float3d {
+  0%, 100% {
+    transform: translateY(0px) rotateX(0deg) rotateY(0deg);
+  }
+  50% {
+    transform: translateY(-6px) rotateX(2deg) rotateY(-2deg);
+  }
 }
+
+@keyframes pulseGlow3d {
+  0%, 100% {
+    box-shadow: 0 0 20px rgba(102, 51, 153, 0.25), inset 0 1px 1px rgba(251, 228, 227, 0.3);
+  }
+  50% {
+    box-shadow: 0 0 35px rgba(102, 51, 153, 0.5), 0 0 15px rgba(163, 119, 157, 0.3), inset 0 1px 2px rgba(251, 228, 227, 0.5);
+  }
+}
+
+@keyframes aiPulseScan {
+  0%, 100% {
+    opacity: 0.6;
+    transform: scale(0.98);
+    filter: drop-shadow(0 0 10px rgba(102, 51, 153, 0.5));
+  }
+  50% {
+    opacity: 1;
+    transform: scale(1.02);
+    filter: drop-shadow(0 0 22px rgba(163, 119, 157, 0.7));
+  }
+}
+
+.animate-float-3d {
+  animation: float3d 6s ease-in-out infinite;
+}
+
+.animate-pulse-glow-3d {
+  animation: pulseGlow3d 3.5s ease-in-out infinite;
+}
+
+.animate-ai-pulse {
+  animation: aiPulseScan 2.5s ease-in-out infinite;
+}
+
+/* Spatial Vision 3D Card Styling - Midnight Black + Midnight Plum + Royal Amethyst + Lilac Mist */
+.vision-card-3d {
+  background: linear-gradient(135deg, rgba(46, 26, 71, 0.35) 0%, rgba(7, 4, 10, 0.92) 100%);
+  backdrop-filter: blur(32px);
+  -webkit-backdrop-filter: blur(32px);
+  border: 1px solid rgba(163, 119, 157, 0.20);
+  border-top: 1px solid rgba(251, 228, 227, 0.30);
+  border-left: 1px solid rgba(163, 119, 157, 0.25);
+  box-shadow: 
+    0 25px 50px -12px rgba(0, 0, 0, 0.95),
+    0 0 25px rgba(102, 51, 153, 0.15),
+    inset 0 1px 0 rgba(251, 228, 227, 0.25),
+    inset 0 -1px 0 rgba(0, 0, 0, 0.8);
+  border-radius: 28px;
+  position: relative;
+  transition: all 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.vision-card-3d:hover {
+  transform: translateY(-4px) scale(1.01);
+  box-shadow: 
+    0 35px 70px -20px rgba(0, 0, 0, 0.98),
+    0 0 35px rgba(102, 51, 153, 0.35),
+    0 0 15px rgba(163, 119, 157, 0.25),
+    inset 0 1px 2px rgba(251, 228, 227, 0.45);
+  border-color: rgba(163, 119, 157, 0.40);
+}
+
+/* Emerald Accent Spatial Variant */
+.vision-card-emerald {
+  border-top-color: rgba(80, 200, 120, 0.35);
+  box-shadow: 0 20px 40px -15px rgba(0,0,0,0.9), 0 0 20px rgba(80, 200, 120, 0.15), inset 0 1px 0 rgba(251, 228, 227, 0.25);
+}
+.vision-card-emerald:hover {
+  border-color: rgba(80, 200, 120, 0.45);
+  box-shadow: 0 30px 60px -20px rgba(0,0,0,0.98), 0 0 30px rgba(80, 200, 120, 0.30), inset 0 1px 2px rgba(251, 228, 227, 0.4);
+}
+
+/* Royal Amethyst Variant */
+.vision-card-violet {
+  border-top-color: rgba(102, 51, 153, 0.6);
+  box-shadow: 0 20px 40px -15px rgba(0,0,0,0.9), 0 0 25px rgba(102, 51, 153, 0.3), inset 0 1px 0 rgba(251, 228, 227, 0.3);
+}
+.vision-card-violet:hover {
+  border-color: rgba(102, 51, 153, 0.8);
+  box-shadow: 0 30px 60px -20px rgba(0,0,0,0.98), 0 0 40px rgba(102, 51, 153, 0.45), inset 0 1px 2px rgba(251, 228, 227, 0.5);
+}
+
+/* Lilac Mist Vision OS Variant */
+.vision-card-silver {
+  background: linear-gradient(135deg, rgba(46, 26, 71, 0.4) 0%, rgba(7, 4, 10, 0.95) 100%);
+  border-top-color: rgba(251, 228, 227, 0.45);
+  border-left-color: rgba(163, 119, 157, 0.25);
+  box-shadow: 0 20px 40px -15px rgba(0,0,0,0.9), 0 0 25px rgba(251, 228, 227, 0.12), inset 0 1px 0 rgba(251, 228, 227, 0.3);
+}
+.vision-card-silver:hover {
+  border-color: rgba(251, 228, 227, 0.6);
+  box-shadow: 0 30px 60px -20px rgba(0,0,0,0.98), 0 0 35px rgba(251, 228, 227, 0.25), inset 0 1px 2px rgba(251, 228, 227, 0.5);
+}
+
+/* 3D Glass Pill / Button with 100% -> 97% -> 100% Spring Feedback */
+.vision-button-3d {
+  background: linear-gradient(135deg, #663399 0%, #2E1A47 100%);
+  color: #FBE4E3;
+  font-weight: 700;
+  border-top: 1px solid rgba(251, 228, 227, 0.4);
+  border-left: 1px solid rgba(163, 119, 157, 0.3);
+  box-shadow: 
+    0 10px 25px -5px rgba(102, 51, 153, 0.4),
+    0 4px 10px rgba(0, 0, 0, 0.5),
+    inset 0 1px 1px rgba(251, 228, 227, 0.4);
+  transition: transform 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275), box-shadow 0.25s ease;
+  position: relative;
+  overflow: hidden;
+}
+
+.vision-button-3d:hover {
+  transform: translateY(-2px) scale(1.02);
+  box-shadow: 
+    0 15px 35px -5px rgba(102, 51, 153, 0.6),
+    0 0 25px rgba(163, 119, 157, 0.4),
+    inset 0 1px 2px rgba(251, 228, 227, 0.6);
+}
+
+.vision-button-3d:active {
+  transform: translateY(1px) scale(0.97);
+  box-shadow: 
+    0 5px 15px -3px rgba(102, 51, 153, 0.4),
+    inset 0 2px 4px rgba(0, 0, 0, 0.6);
+}
+
+.vision-button-emerald {
+  background: linear-gradient(135deg, #50C878 0%, #0B6E4F 100%);
+  color: #07040A;
+  border-top: 1px solid rgba(251, 228, 227, 0.5);
+  box-shadow: 0 10px 25px -5px rgba(80, 200, 120, 0.35), inset 0 1px 1px rgba(251, 228, 227, 0.5);
+}
+.vision-button-emerald:hover {
+  box-shadow: 0 15px 35px -5px rgba(80, 200, 120, 0.55), inset 0 1px 2px rgba(251, 228, 227, 0.7);
+}
+
+.vision-button-violet {
+  background: linear-gradient(135deg, #663399 0%, #2E1A47 100%);
+  color: #FBE4E3;
+  border-top: 1px solid rgba(251, 228, 227, 0.4);
+  box-shadow: 0 10px 25px -5px rgba(102, 51, 153, 0.4), inset 0 1px 1px rgba(251, 228, 227, 0.3);
+}
+.vision-button-violet:hover {
+  box-shadow: 0 15px 35px -5px rgba(102, 51, 153, 0.65), inset 0 1px 2px rgba(251, 228, 227, 0.5);
+}
+
+.vision-button-silver {
+  background: linear-gradient(135deg, rgba(251, 228, 227, 0.12) 0%, rgba(163, 119, 157, 0.05) 100%);
+  border: 1px solid rgba(163, 119, 157, 0.25);
+  border-top: 1px solid rgba(251, 228, 227, 0.4);
+  color: #FBE4E3;
+  box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.6), inset 0 1px 1px rgba(251, 228, 227, 0.3);
+}
+.vision-button-silver:hover {
+  background: linear-gradient(135deg, rgba(251, 228, 227, 0.22) 0%, rgba(163, 119, 157, 0.10) 100%);
+  box-shadow: 0 15px 35px -5px rgba(251, 228, 227, 0.2), inset 0 1px 2px rgba(251, 228, 227, 0.5);
+}
+
+/* Glossy Icon Box */
+.icon-3d-box {
+  background: linear-gradient(145deg, rgba(102, 51, 153, 0.25) 0%, rgba(46, 26, 71, 0.15) 100%);
+  border: 1px solid rgba(163, 119, 157, 0.25);
+  border-top: 1px solid rgba(251, 228, 227, 0.35);
+  box-shadow: 
+    0 8px 20px rgba(0, 0, 0, 0.6),
+    inset 0 1px 0 rgba(251, 228, 227, 0.25);
+  backdrop-filter: blur(14px);
+  border-radius: 16px;
+}
+
+/* Glass Frame Wrapper - Ultra Luxury Phone Canvas */
+.phone-glass-frame {
+  background: rgba(7, 4, 10, 0.94);
+  backdrop-filter: blur(36px);
+  border: 1px solid rgba(163, 119, 157, 0.18);
+  border-top: 1px solid rgba(251, 228, 227, 0.35);
+  box-shadow: 
+    0 40px 100px -20px rgba(0, 0, 0, 0.98),
+    0 0 60px rgba(102, 51, 153, 0.25),
+    0 0 20px rgba(163, 119, 157, 0.12),
+    inset 0 1px 2px rgba(251, 228, 227, 0.25);
+}
+
+/* Smooth Scrollbars */
+::-webkit-scrollbar {
+  width: 5px;
+  height: 5px;
+}
+::-webkit-scrollbar-track {
+  background: rgba(7, 4, 10, 0.8);
+}
+::-webkit-scrollbar-thumb {
+  background: rgba(163, 119, 157, 0.3);
+  border-radius: 4px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: rgba(102, 51, 153, 0.6);
+}
+
+
+
