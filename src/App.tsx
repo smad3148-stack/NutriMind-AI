@@ -19,6 +19,9 @@ export default function App() {
   const [userProfile, setUserProfile] = useState<{ email: string; name?: string } | null>(null);
 
   const [isResettingPassword, setIsResettingPassword] = useState<boolean>(false);
+  // P0-01: mirrors the server-side admin check so the Clinician Portal is
+  // hidden for non-admins. null = not yet checked / signed out.
+  const [isAdmin, setIsAdmin] = useState<boolean | null>(null);
 
   useEffect(() => {
     const supabase = getSupabase();
@@ -64,6 +67,38 @@ export default function App() {
   };
 
   const isUserAuthenticated = (!!session || bypassAuth) && !isResettingPassword;
+
+  // P0-01: verify admin role against the server before exposing the
+  // Clinician Portal. The /api/admin/* endpoints are the real security
+  // boundary (requireAdminAuth, fail-closed); this only hides the UI.
+  useEffect(() => {
+    let cancelled = false;
+    if (!isUserAuthenticated) {
+      setIsAdmin(null);
+      return;
+    }
+    const token = session?.access_token as string | undefined;
+    fetch('/api/admin/me', {
+      headers: token ? { Authorization: `Bearer ${token}` } : undefined,
+    })
+      .then((res) => {
+        if (!cancelled) setIsAdmin(res.ok);
+      })
+      .catch(() => {
+        // Fail closed: hide the portal on any error.
+        if (!cancelled) setIsAdmin(false);
+      });
+    return () => {
+      cancelled = true;
+    };
+  }, [session, bypassAuth, isResettingPassword, isUserAuthenticated]);
+
+  // Force back to the customer app if admin access is revoked mid-session.
+  useEffect(() => {
+    if (currentMode === 'admin' && isAdmin === false) {
+      setCurrentMode('customer');
+    }
+  }, [currentMode, isAdmin]);
 
   return (
     <div className="min-h-screen bg-[#050505] text-[#D1F2EB] flex flex-col antialiased selection:bg-[#50C878]/30 selection:text-[#D1F2EB]">
@@ -125,17 +160,19 @@ export default function App() {
                   <span>Health App</span>
                 </button>
 
-                <button
-                  onClick={() => setCurrentMode('admin')}
-                  className={`px-4 py-2 rounded-xl text-xs font-bold flex items-center gap-1.5 transition-all duration-300 cursor-pointer ${
-                    currentMode === 'admin'
-                      ? 'bg-gradient-to-r from-[#663399] to-[#3b1960] text-[#D1F2EB] shadow-[0_0_20px_rgba(102,51,153,0.4)] border border-[#D1F2EB]/30 scale-[1.02]'
-                      : 'text-[#D1F2EB]/60 hover:text-[#D1F2EB]'
-                  }`}
-                >
-                  <Monitor size={14} />
-                  <span>Clinician Portal</span>
-                </button>
+                {isAdmin && (
+                  <button
+                    onClick={() => setCurrentMode('admin')}
+                    className={`px-4 py-2 rounded-xl text-xs font-bold flex items-center gap-1.5 transition-all duration-300 cursor-pointer ${
+                      currentMode === 'admin'
+                        ? 'bg-gradient-to-r from-[#663399] to-[#3b1960] text-[#D1F2EB] shadow-[0_0_20px_rgba(102,51,153,0.4)] border border-[#D1F2EB]/30 scale-[1.02]'
+                        : 'text-[#D1F2EB]/60 hover:text-[#D1F2EB]'
+                    }`}
+                  >
+                    <Monitor size={14} />
+                    <span>Clinician Portal</span>
+                  </button>
+                )}
 
               </div>
             </div>

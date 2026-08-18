@@ -69,4 +69,53 @@ describe('server/supabaseUser', () => {
     expect((req as any).supabaseUserClient).not.toBeNull();
     expect(typeof (req as any).supabaseUserClient.from).toBe('function');
   });
+
+  describe('requireAdminAuth (P0-01 fail-closed admin gate)', () => {
+    function makeResSpy() {
+      const spy = { statusCode: 0, jsonCalled: false };
+      const res = {
+        status: (code: number) => {
+          spy.statusCode = code;
+          return {
+            json: () => {
+              spy.jsonCalled = true;
+            },
+          };
+        },
+      };
+      return { res, spy };
+    }
+
+    it('allows through when Supabase is unconfigured (sandbox demo mode)', async () => {
+      const { requireAdminAuth } = await importFresh();
+      const { req, res, next, nextCalled } = makeReqRes();
+      await requireAdminAuth(req as any, res, next as any);
+      expect(nextCalled()).toBe(true);
+      expect((req as any).user).toEqual({ id: 'demo-user' });
+    });
+
+    it('rejects with 401 when Supabase is configured but no token is sent', async () => {
+      process.env.NEXT_PUBLIC_SUPABASE_URL = 'https://real-project.supabase.co';
+      process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.realkey';
+      const { requireAdminAuth } = await importFresh();
+      const { req, next, nextCalled } = makeReqRes();
+      const { res: resSpy, spy } = makeResSpy();
+      await requireAdminAuth(req as any, resSpy as any, next as any);
+      expect(nextCalled()).toBe(false);
+      expect(spy.statusCode).toBe(401);
+      expect(spy.jsonCalled).toBe(true);
+    });
+
+    it('rejects with 401 for an invalid bearer token (verification failure)', async () => {
+      process.env.NEXT_PUBLIC_SUPABASE_URL = 'https://real-project.supabase.co';
+      process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.realkey';
+      const { requireAdminAuth } = await importFresh();
+      const { req, next, nextCalled } = makeReqRes();
+      (req as any).header = () => 'Bearer definitely-not-a-valid-jwt';
+      const { res: resSpy, spy } = makeResSpy();
+      await requireAdminAuth(req as any, resSpy as any, next as any);
+      expect(nextCalled()).toBe(false);
+      expect(spy.statusCode).toBe(401);
+    });
+  });
 });

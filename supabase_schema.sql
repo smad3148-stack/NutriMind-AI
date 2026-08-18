@@ -347,3 +347,28 @@ CREATE TABLE IF NOT EXISTS public.ota_deployments (
     notes TEXT,
     created_at TIMESTAMP WITH TIME ZONE DEFAULT TIMEZONE('utc', NOW())
 );
+
+-- ======================================================================
+-- 13. ADMIN ROLES (user_roles) — P0-01 Admin Authentication & Authorization
+-- ======================================================================
+
+CREATE TABLE IF NOT EXISTS public.user_roles (
+    id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    user_id UUID REFERENCES auth.users(id) ON DELETE CASCADE NOT NULL,
+    role VARCHAR(50) NOT NULL CHECK (role IN ('admin', 'clinician', 'support')),
+    created_at TIMESTAMP WITH TIME ZONE DEFAULT TIMEZONE('utc', NOW()),
+    UNIQUE(user_id, role)
+);
+
+-- RLS: deny ALL direct access. Roles are read server-side only, via the
+-- service-role client (which bypasses RLS) or Prisma (direct connection).
+-- The anon key shipped in the client bundle must never be able to read roles.
+ALTER TABLE public.user_roles ENABLE ROW LEVEL SECURITY;
+CREATE POLICY "No direct access to user roles"
+    ON public.user_roles FOR ALL
+    USING (false) WITH CHECK (false);
+
+-- Promote a user to admin (run once in the Supabase SQL editor):
+-- INSERT INTO public.user_roles (user_id, role)
+-- SELECT id, 'admin' FROM auth.users WHERE email = 'ecovisionfilm@gmail.com'
+-- ON CONFLICT (user_id, role) DO NOTHING;

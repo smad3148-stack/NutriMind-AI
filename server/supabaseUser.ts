@@ -15,6 +15,8 @@
 
 import { Request, Response, NextFunction } from 'express';
 import { createClient, SupabaseClient } from '@supabase/supabase-js';
+import { getPrisma } from './prisma';
+import { getSupabaseAdmin } from './supabaseAdmin';
 
 export interface AuthenticatedUser {
   id: string;
@@ -88,5 +90,111 @@ export async function requireUserAuth(
   // Fallback: demo user + anon client (or null when unconfigured).
   req.user = { id: 'demo-user' };
   req.supabaseUserClient = anonClient;
+  next();
+}
+
+/**
+ * Looks up whether a user holds the 'admin' role in the `user_roles` table.
+ * Queries Prisma first (direct Postgres when DATABASE_URL is set), then the
+ * Supabase service-role client. **Fail-closed**: any lookup error or missing
+ * lookup path denies admin access rather than granting it.
+ */
+async function lookupAdminRole(userId: string): Promise<boolean> {
+  const prisma = getPrisma();
+  if (prisma) {
+    try {
+      const role = await prisma.userRole.findUnique({
+        where: { userId_role: { userId, role: 'admin' } },
+        select: { role: true },
+      });
+      return role !== null;
+    } catch (err: any) {
+      console.warn('[SUPABASE_USER] Admin role lookup (Prisma) failed:', err?.message || err);
+      return false; // Fail closed
+    }
+  }
+
+  const adminClient = getSupabaseAdmin();
+  if (adminClient) {
+    try {
+      const { data, error } = await adminClient
+        .from('user_roles')
+        .select('role')
+        .eq('user_id', userId)
+        .eq('role', 'admin')
+        .maybeSingle();
+      if (error) {
+        console.warn('[SUPABASE_USER] Admin role lookup (Supabase) failed:', error.message);
+        return false; // Fail closed
+      }
+      return data !== null;
+    } catch (err: any) {
+      console.warn('[SUPABASE_USER] Admin role lookup (Supabase) threw:', err?.message || err);
+      return false; // Fail closed
+    }
+  }
+
+  return false; // No lookup path available - deny
+}
+
+/**
+ * Express middleware for admin-only routes. **Fail-closed** - it never falls
+ * open:
+ *
+ * - Supabase not configured (sandbox/demo mode): allowed through, because the
+ *   in-memory fallbacks contain no real data and no real users.
+ * - Configured + missing or malformed token: 401.
+ * - Configured + invalid/expired token: 401.
+ * - Configured + valid token + 'admin' role in `user_roles`: allowed.
+ * - Configured + valid token + no admin role: 403.
+ * - Role lookup failure (DB error): denied (fail closed).
+ */
+export async function requireAdminAuth(
+  req: AuthenticatedRequest,
+  res: Response,
+  next: NextFunction,
+): Promise<void> {
+  const anonClient = buildAnonClient();
+  if (!anonClient) {
+    // Sandbox/demo mode: no Supabase configured, nothing real to protect.
+    req.user = { id: 'demo-user' };
+    req.supabaseUserClient = null;
+    return next();
+  }
+
+  const authHeader = req.header('Authorization') || req.header('authorization');
+  const token = authHeader?.startsWith('Bearer ') ? authHeader.slice(7).trim() : '';
+
+  if (!token) {
+    res.status(401).json({ error: 'Authentication required.' });
+    return;
+  }
+
+  let verifiedUser: { id: string; email?: string | undefined };
+  try {
+    const { data, error } = await anonClient.auth.getUser(token);
+    if (error || !data?.user) {
+      res.status(401).json({ error: 'Invalid or expired authentication token.' });
+      return;
+    }
+    verifiedUser = { id: data.user.id, email: data.user.email };
+  } catch (err: any) {
+    console.warn('[SUPABASE_USER] Admin token verification failed:', err?.message || err);
+    res.status(401).json({ error: 'Authentication verification failed.' });
+    return;
+  }
+
+  const isAdmin = await lookupAdminRole(verifiedUser.id);
+  if (!isAdmin) {
+    res.status(403).json({ error: 'Admin access required.' });
+    return;
+  }
+
+  req.user = { id: verifiedUser.id, email: verifiedUser.email ?? undefined };
+  req.supabaseUserClient = createClient(
+    process.env.NEXT_PUBLIC_SUPABASE_URL || process.env.SUPABASE_URL || '',
+    token,
+    { global: { headers: { Authorization: `Bearer ${token}` } }, auth: { persistSession: false } },
+  );
   next();
 }
