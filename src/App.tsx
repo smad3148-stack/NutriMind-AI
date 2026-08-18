@@ -15,7 +15,11 @@ import { getSupabase } from './lib/supabase';
 export default function App() {
   const [currentMode, setCurrentMode] = useState<'customer' | 'admin'>('customer');
   const [session, setSession] = useState<any>(null);
-  const [bypassAuth, setBypassAuth] = useState<boolean>(false);
+  // P0-03: explicit Demo Mode - only entered via a deliberate button click
+  // when the server reports the auth backend is unconfigured. Never an
+  // automatic fallback on an auth error (bypassAuth was removed).
+  const [demoMode, setDemoMode] = useState<boolean>(false);
+  const [demoModeAvailable, setDemoModeAvailable] = useState<boolean>(false);
   const [userProfile, setUserProfile] = useState<{ email: string; name?: string } | null>(null);
 
   const [isResettingPassword, setIsResettingPassword] = useState<boolean>(false);
@@ -62,11 +66,30 @@ export default function App() {
       await supabase.auth.signOut();
     }
     setSession(null);
-    setBypassAuth(false);
+    setDemoMode(false);
     setIsResettingPassword(false);
   };
 
-  const isUserAuthenticated = (!!session || bypassAuth) && !isResettingPassword;
+  const isUserAuthenticated = (!!session || demoMode) && !isResettingPassword;
+
+  // P0-03: ask the server whether the auth backend is configured. The Demo
+  // Mode entry button is rendered only when demoMode === true, and entering
+  // demo mode is always an explicit user action.
+  useEffect(() => {
+    let cancelled = false;
+    fetch('/api/auth/config')
+      .then((res) => (res.ok ? res.json() : { demoMode: false }))
+      .then((cfg: { demoMode?: boolean }) => {
+        if (!cancelled) setDemoModeAvailable(!!cfg.demoMode);
+      })
+      .catch(() => {
+        // Fail closed: no demo entry when the server cannot be reached.
+        if (!cancelled) setDemoModeAvailable(false);
+      });
+    return () => {
+      cancelled = true;
+    };
+  }, []);
 
   // P0-01: verify admin role against the server before exposing the
   // Clinician Portal. The /api/admin/* endpoints are the real security
@@ -91,7 +114,7 @@ export default function App() {
     return () => {
       cancelled = true;
     };
-  }, [session, bypassAuth, isResettingPassword, isUserAuthenticated]);
+  }, [session, demoMode, isResettingPassword, isUserAuthenticated]);
 
   // Force back to the customer app if admin access is revoked mid-session.
   useEffect(() => {
@@ -199,7 +222,8 @@ export default function App() {
                   setSession(newSession);
                   setIsResettingPassword(false);
                 }} 
-                onBypass={() => setBypassAuth(true)} 
+                onDemoMode={() => setDemoMode(true)}
+                demoModeAvailable={demoModeAvailable}
                 onResetPasswordStateChange={(active) => {
                   setIsResettingPassword(active);
                 }}

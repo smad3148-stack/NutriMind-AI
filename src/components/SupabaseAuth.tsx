@@ -16,21 +16,23 @@ import {
   KeyRound, 
   RefreshCw, 
   XCircle, 
-  Beaker, 
   Timer, 
   ShieldCheck, 
-  AlertCircle 
 } from 'lucide-react';
 
 interface SupabaseAuthProps {
   onAuthSuccess: (session: any) => void;
-  onBypass: () => void;
   onResetPasswordStateChange?: (active: boolean) => void;
+  // P0-03: explicit Demo Mode entry. Available ONLY when the server reports
+  // that the auth backend is unconfigured (/api/auth/config -> demoMode).
+  // It is never an automatic fallback on an auth error.
+  demoModeAvailable?: boolean;
+  onDemoMode?: () => void;
 }
 
 type AuthMode = 'signin' | 'signup' | 'forgot' | 'otp_verify' | 'reset';
 
-export default function SupabaseAuth({ onAuthSuccess, onBypass, onResetPasswordStateChange }: SupabaseAuthProps) {
+export default function SupabaseAuth({ onAuthSuccess, onResetPasswordStateChange, demoModeAvailable = false, onDemoMode }: SupabaseAuthProps) {
   const [authMode, setAuthMode] = useState<AuthMode>('signin');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -44,11 +46,6 @@ export default function SupabaseAuth({ onAuthSuccess, onBypass, onResetPasswordS
   const [otpAttemptsRemaining, setOtpAttemptsRemaining] = useState(5);
   const [otpSentAt, setOtpSentAt] = useState<number>(0);
   const [resendCountdown, setResendCountdown] = useState(0);
-  const [simulatedOtp, setSimulatedOtp] = useState('123456');
-
-  // Active testing status feedback
-  const [activeTest, setActiveTest] = useState<string | null>(null);
-  const [showTestHarness, setShowTestHarness] = useState(true);
 
   // Password requirements state
   const [validation, setValidation] = useState({
@@ -170,11 +167,7 @@ export default function SupabaseAuth({ onAuthSuccess, onBypass, onResetPasswordS
 
   const handleSignIn = async () => {
     if (!supabase) {
-      onAuthSuccess({
-        access_token: 'mock-sandbox-token-xyz-123',
-        user: { email: email || 'sandbox-athlete@nutrimind.ai', user_metadata: { full_name: 'Sandbox Athlete' } }
-      });
-      setMessage({ type: 'success', text: 'Local Preview Bypass: Successfully established simulated secure session.' });
+      setMessage({ type: 'error', text: 'Authentication backend is not configured. Use Demo Mode below, or configure Supabase credentials.' });
       return;
     }
 
@@ -190,23 +183,14 @@ export default function SupabaseAuth({ onAuthSuccess, onBypass, onResetPasswordS
         setMessage({ type: 'success', text: 'Authenticated successfully. Welcome back to NutriChat!' });
       }
     } catch (err: any) {
-      // Direct sign-in fallback if Supabase project keys are unconfigured or disconnected
-      console.warn("Supabase auth error, triggering secure preview bypass:", err);
-      onAuthSuccess({
-        access_token: 'mock-sandbox-token-xyz-123',
-        user: { email: email || 'sandbox-athlete@nutrichat.ai', user_metadata: { full_name: 'Sandbox Athlete' } }
-      });
-      setMessage({ type: 'success', text: 'Simulated connection established successfully.' });
+      // Fail closed: authentication errors are surfaced, never bypassed.
+      setMessage({ type: 'error', text: err?.message || 'Sign-in failed. Please check your credentials.' });
     }
   };
 
   const handleSignUp = async () => {
     if (!supabase) {
-      onAuthSuccess({
-        access_token: 'mock-sandbox-token-xyz-123',
-        user: { email: email || 'sandbox-athlete@nutrimind.ai', user_metadata: { full_name: fullName || 'Athlete' } }
-      });
-      setMessage({ type: 'success', text: 'Local Preview Bypass: Account registered and logged in!' });
+      setMessage({ type: 'error', text: 'Authentication backend is not configured. Use Demo Mode below, or configure Supabase credentials.' });
       return;
     }
 
@@ -234,12 +218,8 @@ export default function SupabaseAuth({ onAuthSuccess, onBypass, onResetPasswordS
         setMessage({ type: 'success', text: 'Verification link sent! Please check your email inbox to activate.' });
       }
     } catch (err: any) {
-      console.warn("Supabase signup exception, activating secure bypass:", err);
-      onAuthSuccess({
-        access_token: 'mock-sandbox-token-xyz-123',
-        user: { email: email || 'sandbox-athlete@nutrimind.ai', user_metadata: { full_name: fullName || 'Athlete' } }
-      });
-      setMessage({ type: 'success', text: 'Account simulated and registered!' });
+      // Fail closed: signup errors are surfaced, never bypassed.
+      setMessage({ type: 'error', text: err?.message || 'Sign-up failed. Please try again.' });
     }
   };
 
@@ -254,48 +234,36 @@ export default function SupabaseAuth({ onAuthSuccess, onBypass, onResetPasswordS
       throw new Error(`Rate limit active. Please wait ${resendCountdown} seconds before requesting another OTP.`);
     }
 
-    // Generate random 6-digit OTP for testing/simulation
-    const generated = Math.floor(100000 + Math.random() * 900000).toString();
-    setSimulatedOtp(generated);
-    setOtpSentAt(Date.now());
-    setOtpAttemptsRemaining(5);
-    setOtpCode('');
+    if (!supabase) {
+      setMessage({ type: 'error', text: 'Authentication backend is not configured. Use Demo Mode below, or configure Supabase credentials.' });
+      return;
+    }
 
     // Trigger Audit Log
     await logAuditPayload('OTP_SENT', { email, system: 'Email-OTP', status: 'delivered' });
-
-    if (!supabase) {
-      changeMode('otp_verify');
-      setResendCountdown(60);
-      setMessage({ 
-        type: 'success', 
-        text: `Secure 6-digit OTP transmitted to ${email}. (Use simulated OTP ${generated} to verify)` 
-      });
-      return;
-    }
 
     try {
       // In Supabase, resetPasswordForEmail triggers the recovery flow which sends an OTP if configured
       const { error } = await supabase.auth.resetPasswordForEmail(email);
 
       if (error) {
-        console.warn("Supabase OTP send error, using secure fallback simulation:", error);
+        // Fail closed: OTP is never "sent" on an error.
+        setMessage({ type: 'error', text: error.message || 'Failed to send the recovery code. Please try again.' });
+        return;
       }
       
       changeMode('otp_verify');
       setResendCountdown(60);
+      setOtpSentAt(Date.now());
+      setOtpAttemptsRemaining(5);
+      setOtpCode('');
       setMessage({ 
         type: 'success', 
-        text: `Secure 6-digit OTP transmitted to ${email}. (Use simulated OTP ${generated} to verify)` 
+        text: `Secure 6-digit OTP transmitted to ${email}. Please check your inbox.` 
       });
     } catch (err: any) {
-      console.warn("Network error during resetPasswordForEmail, using preview fallback:", err);
-      changeMode('otp_verify');
-      setResendCountdown(60);
-      setMessage({ 
-        type: 'success', 
-        text: `Secure 6-digit OTP transmitted to ${email}. (Use simulated OTP ${generated} to verify)` 
-      });
+      // Fail closed: network errors are surfaced, never simulated.
+      setMessage({ type: 'error', text: err?.message || 'Network error while sending the recovery code. Please try again.' });
     }
   };
 
@@ -318,22 +286,7 @@ export default function SupabaseAuth({ onAuthSuccess, onBypass, onResetPasswordS
     }
 
     if (!supabase) {
-      // Local Sandbox mock verification fallback
-      if (cleanOtp === simulatedOtp) {
-        setOtpAttemptsRemaining(5);
-        changeMode('reset');
-        await logAuditPayload('OTP_VERIFIED', { email, success: true });
-        setMessage({ type: 'success', text: 'OTP verified successfully. Please define your new password.' });
-      } else {
-        const nextAttempts = otpAttemptsRemaining - 1;
-        setOtpAttemptsRemaining(nextAttempts);
-        await logAuditPayload('OTP_VERIFIED_FAIL', { email, attempts_left: nextAttempts });
-        if (nextAttempts <= 0) {
-          throw new Error('Invalid OTP. Maximum verification attempts reached. Please request a new OTP.');
-        } else {
-          throw new Error(`Invalid OTP. Verification failed. ${nextAttempts} attempts remaining.`);
-        }
-      }
+      setMessage({ type: 'error', text: 'Authentication backend is not configured. Use Demo Mode below, or configure Supabase credentials.' });
       return;
     }
 
@@ -345,16 +298,7 @@ export default function SupabaseAuth({ onAuthSuccess, onBypass, onResetPasswordS
       });
 
       if (error) {
-        // Fallback option to allow testing even if database is offline or unlinked
-        if (cleanOtp === simulatedOtp) {
-          console.warn("Supabase OTP failed, falling back to simulated OTP pass:", error);
-          setOtpAttemptsRemaining(5);
-          changeMode('reset');
-          await logAuditPayload('OTP_VERIFIED', { email, success: true });
-          setMessage({ type: 'success', text: 'OTP verified (Sandbox Fallback). Please define your new password.' });
-          return;
-        }
-        
+        // Fail closed: OTP is verified only by Supabase, never client-side.
         const nextAttempts = otpAttemptsRemaining - 1;
         setOtpAttemptsRemaining(nextAttempts);
         await logAuditPayload('OTP_VERIFIED_FAIL', { email, error: error.message, attempts_left: nextAttempts });
@@ -370,17 +314,10 @@ export default function SupabaseAuth({ onAuthSuccess, onBypass, onResetPasswordS
       await logAuditPayload('OTP_VERIFIED', { email, success: true });
       setMessage({ type: 'success', text: 'OTP verified successfully! Please define your secure new password.' });
     } catch (err: any) {
-      console.warn("Network error during OTP verify, fallback checklist active:", err);
-      if (cleanOtp === simulatedOtp) {
-        setOtpAttemptsRemaining(5);
-        changeMode('reset');
-        await logAuditPayload('OTP_VERIFIED', { email, success: true });
-        setMessage({ type: 'success', text: 'OTP verified (Sandbox Fallback). Please define your new password.' });
-      } else {
-        const nextAttempts = otpAttemptsRemaining - 1;
-        setOtpAttemptsRemaining(nextAttempts);
-        throw new Error(`Connection offline or Invalid OTP. ${nextAttempts} attempts remaining.`);
-      }
+      console.warn("Network error during OTP verify:", err);
+      const nextAttempts = otpAttemptsRemaining - 1;
+      setOtpAttemptsRemaining(nextAttempts);
+      throw new Error(err?.message || `Connection offline or Invalid OTP. ${nextAttempts} attempts remaining.`);
     }
   };
 
@@ -394,21 +331,13 @@ export default function SupabaseAuth({ onAuthSuccess, onBypass, onResetPasswordS
       throw new Error('Password does not meet all secure parameters. Please satisfy all requirements.');
     }
 
-    // Trigger Audit Log
-    await logAuditPayload('PASSWORD_CHANGED', { email, status: 'success' });
-
     if (!supabase) {
-      setMessage({ 
-        type: 'success', 
-        text: 'Your password has been successfully updated! Secure session initialized.' 
-      });
-      setTimeout(() => {
-        changeMode('signin');
-        setPassword('');
-        setConfirmPassword('');
-      }, 2500);
+      setMessage({ type: 'error', text: 'Authentication backend is not configured. Use Demo Mode below, or configure Supabase credentials.' });
       return;
     }
+
+    // Trigger Audit Log
+    await logAuditPayload('PASSWORD_CHANGED', { email, status: 'success' });
 
     try {
       const { error } = await supabase.auth.updateUser({
@@ -416,7 +345,9 @@ export default function SupabaseAuth({ onAuthSuccess, onBypass, onResetPasswordS
       });
 
       if (error) {
-        console.warn("Supabase password update error, using safe preview fallback:", error);
+        // Fail closed: password changes are never reported as successful on error.
+        setMessage({ type: 'error', text: error.message || 'Failed to update password. Please try again.' });
+        return;
       }
 
       setMessage({ 
@@ -430,31 +361,34 @@ export default function SupabaseAuth({ onAuthSuccess, onBypass, onResetPasswordS
         setConfirmPassword('');
       }, 2500);
     } catch (err: any) {
-      console.warn("Network error during password update, using safe preview fallback:", err);
-      setMessage({ 
-        type: 'success', 
-        text: 'Your password has been successfully updated (Sandbox Fallback)! Redirecting...' 
-      });
-      
-      setTimeout(() => {
-        changeMode('signin');
-        setPassword('');
-        setConfirmPassword('');
-      }, 2500);
+      // Fail closed: network errors are surfaced, never reported as success.
+      setMessage({ type: 'error', text: err?.message || 'Network error while updating the password. Please try again.' });
     }
   };
 
-  const handleGoogleSignIn = () => {
+  const handleGoogleSignIn = async () => {
     setLoading(true);
     setMessage(null);
-    setTimeout(() => {
-      onAuthSuccess({
-        access_token: 'google-sandbox-token-xyz-123',
-        user: { email: 'user@gmail.com', user_metadata: { full_name: 'Google User' } }
-      });
-      setMessage({ type: 'success', text: 'Authenticated with Google.' });
+
+    if (!supabase) {
+      setMessage({ type: 'error', text: 'Authentication backend is not configured. Configure Supabase to enable Google sign-in.' });
       setLoading(false);
-    }, 800);
+      return;
+    }
+
+    try {
+      // Real OAuth flow via Supabase (provider must be enabled in the
+      // Supabase project). No tokens are ever minted client-side.
+      const { error } = await supabase.auth.signInWithOAuth({
+        provider: 'google',
+        options: { redirectTo: window.location.origin },
+      });
+      if (error) throw error;
+    } catch (err: any) {
+      // Fail closed: OAuth errors are surfaced, never bypassed.
+      setMessage({ type: 'error', text: err?.message || 'Google sign-in failed. Please try again.' });
+      setLoading(false);
+    }
   };
 
   const handleAuth = async (e: React.FormEvent) => {
@@ -478,115 +412,6 @@ export default function SupabaseAuth({ onAuthSuccess, onBypass, onResetPasswordS
       setMessage({ type: 'error', text: err.message || 'Authentication error occurred.' });
     } finally {
       setLoading(false);
-    }
-  };
-
-  // Run Test Scenarios via the Live Test Harness
-  const runTestScenario = async (testId: string) => {
-    setActiveTest(testId);
-    setLoading(true);
-    setMessage(null);
-
-    try {
-      switch (testId) {
-        case 'resend_otp':
-          changeMode('forgot');
-          setEmail('active-athlete@nutrimind.ai');
-          await new Promise((resolve) => setTimeout(resolve, 600));
-          
-          const testOtp = '123456';
-          setSimulatedOtp(testOtp);
-          setOtpSentAt(Date.now());
-          setOtpAttemptsRemaining(5);
-          setOtpCode('');
-          setResendCountdown(60);
-          
-          await logAuditPayload('OTP_SENT', { email: 'active-athlete@nutrimind.ai', trigger: 'test_harness_resend' });
-          changeMode('otp_verify');
-          setMessage({
-            type: 'success',
-            text: '[TEST PASS] OTP rate limit verified. A new 6-digit OTP (123456) has been sent to active-athlete@nutrimind.ai.'
-          });
-          break;
-
-        case 'invalid_otp':
-          changeMode('otp_verify');
-          setEmail('active-athlete@nutrimind.ai');
-          setOtpCode('999999'); // Incorrect OTP
-          await new Promise((resolve) => setTimeout(resolve, 600));
-          
-          const decr = otpAttemptsRemaining - 1;
-          setOtpAttemptsRemaining(decr);
-          await logAuditPayload('OTP_VERIFIED_FAIL', { email: 'active-athlete@nutrimind.ai', attempts_left: decr, test: 'invalid_otp' });
-          throw new Error(`[TEST PASS] Invalid OTP assertion passed. Code '999999' rejected. ${decr} attempts remaining.`);
-
-        case 'expired_otp':
-          changeMode('otp_verify');
-          setEmail('active-athlete@nutrimind.ai');
-          setOtpCode('123456');
-          // Manually simulate an expired timestamp (11 minutes ago)
-          setOtpSentAt(Date.now() - 11 * 60 * 1000);
-          await new Promise((resolve) => setTimeout(resolve, 600));
-          
-          await logAuditPayload('OTP_EXPIRED_ALERT', { email: 'active-athlete@nutrimind.ai', test_expired: true });
-          throw new Error('[TEST PASS] OTP Expired assertion passed. The 10-minute validity window has expired.');
-
-        case 'valid_otp':
-          changeMode('otp_verify');
-          setEmail('active-athlete@nutrimind.ai');
-          setOtpCode('123456');
-          setOtpSentAt(Date.now()); // Set to fresh
-          setOtpAttemptsRemaining(5);
-          await new Promise((resolve) => setTimeout(resolve, 600));
-          
-          await logAuditPayload('OTP_VERIFIED', { email: 'active-athlete@nutrimind.ai', success: true });
-          changeMode('reset');
-          setMessage({
-            type: 'success',
-            text: '[TEST PASS] OTP successfully verified. Transferred session to Reset Password state.'
-          });
-          break;
-
-        case 'successful_reset':
-          changeMode('reset');
-          setEmail('active-athlete@nutrimind.ai');
-          const securePass = 'N3wSecur3P@ss!';
-          setPassword(securePass);
-          setConfirmPassword(securePass);
-          checkPasswordRequirements(securePass);
-          await new Promise((resolve) => setTimeout(resolve, 600));
-          
-          await logAuditPayload('PASSWORD_CHANGED', { email: 'active-athlete@nutrimind.ai', status: 'success' });
-          setMessage({
-            type: 'success',
-            text: '[TEST PASS] Password requirements verified. Password successfully updated in master record.'
-          });
-          break;
-
-        case 'login_after_reset':
-          changeMode('signin');
-          setEmail('active-athlete@nutrimind.ai');
-          setPassword('N3wSecur3P@ss!');
-          await new Promise((resolve) => setTimeout(resolve, 600));
-          
-          onAuthSuccess({
-            access_token: 'simulated-newly-reset-token-999',
-            user: { email: 'active-athlete@nutrimind.ai', user_metadata: { full_name: 'Athlete (Reset Pass)' } }
-          });
-          setMessage({
-            type: 'success',
-            text: '[TEST PASS] Login simulation successful. Established highly secure session with new credentials.'
-          });
-          break;
-
-        default:
-          break;
-      }
-    } catch (err: any) {
-      setMessage({ type: 'error', text: err.message || 'Test assertion error.' });
-    } finally {
-      setLoading(false);
-      setActiveTest(null);
     }
   };
 
@@ -695,7 +520,7 @@ export default function SupabaseAuth({ onAuthSuccess, onBypass, onResetPasswordS
               </div>
               <div className="flex items-center justify-between text-[10px] font-mono text-slate-500">
                 <span>Attempts Remaining: <strong className="text-white">{otpAttemptsRemaining}</strong></span>
-                <span>Code Target: <span className="text-cyan-400 font-bold">{simulatedOtp}</span></span>
+                <span>Valid for 10 minutes</span>
               </div>
             </div>
           )}
@@ -845,13 +670,30 @@ export default function SupabaseAuth({ onAuthSuccess, onBypass, onResetPasswordS
               <button
                 type="button"
                 onClick={handleGoogleSignIn}
-                className="w-full py-3.5 bg-slate-900 hover:bg-slate-800 border border-white/10 text-white font-medium text-xs rounded-2xl active:scale-[0.98] transition flex items-center justify-center gap-2.5 cursor-pointer"
+                disabled={loading}
+                className="w-full py-3.5 bg-slate-900 hover:bg-slate-800 border border-white/10 text-white font-medium text-xs rounded-2xl active:scale-[0.98] transition flex items-center justify-center gap-2.5 cursor-pointer disabled:opacity-50"
               >
                 {/* Minimalist Google 'G' icon built via path */}
                 <svg className="w-4 h-4 shrink-0" viewBox="0 0 24 24">
                   <path fill="#EA4335" d="M12.24 10.285V14.4h6.887c-.275 1.565-1.88 4.604-6.887 4.604-4.33 0-7.866-3.577-7.866-8s3.536-8 7.866-8c2.46 0 4.105 1.025 5.047 1.926l3.245-3.123C18.25 1.916 15.39 1 12.24 1 6.133 1 1.155 5.923 1.155 12s4.978 11 11.085 11c6.374 0 10.6-4.437 10.6-10.701 0-.72-.077-1.272-.172-1.714h-10.428z" />
                 </svg>
                 <span>Continue with Google</span>
+              </button>
+            </div>
+          )}
+
+          {/* P0-03: explicit Demo Mode - rendered ONLY when the server reports
+              the auth backend is unconfigured (/api/auth/config -> demoMode).
+              This is a deliberate user choice, never an error fallback. */}
+          {demoModeAvailable && authMode === 'signin' && (
+            <div className="pt-2">
+              <button
+                type="button"
+                onClick={onDemoMode}
+                className="w-full py-3.5 bg-slate-900/60 hover:bg-slate-800 border border-cyan-500/20 text-cyan-400 font-medium text-xs rounded-2xl active:scale-[0.98] transition flex items-center justify-center gap-2 cursor-pointer"
+              >
+                <Play size={14} />
+                <span>Continue in Demo Mode (no account, no real data)</span>
               </button>
             </div>
           )}
