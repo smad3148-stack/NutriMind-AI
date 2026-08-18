@@ -9,7 +9,7 @@ import path from 'path';
 import { createServer as createViteServer } from 'vite';
 import { GoogleGenAI } from '@google/genai';
 import { getSupabaseAdmin } from './server/supabaseAdmin';
-import { requireUserAuth, requireAdminAuth, AuthenticatedRequest } from './server/supabaseUser';
+import { requireUserAuth, requireAdminAuth, isAuthConfigured, AuthenticatedRequest } from './server/supabaseUser';
 import { ChatMessage } from './src/types';
 import { getPrisma, handlePrismaError } from './server/prisma';
 import foodDatabase from './src/food_database.json';
@@ -297,6 +297,12 @@ async function startServer() {
   }
 
   // --- API ROUTING PAIRS FOR SUPABASE POSTGRESQL CRUD ---
+
+  // 0. AUTH CONFIG (public) - lets the client show an explicit Demo Mode
+  // entry point ONLY when the auth backend is genuinely unconfigured.
+  app.get('/api/auth/config', (_req, res) => {
+    res.json({ demoMode: !isAuthConfigured() });
+  });
 
   // 1. MEAL ENDPOINTS
   app.get('/api/meals', requireUserAuth, async (req: AuthenticatedRequest, res) => {

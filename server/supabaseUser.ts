@@ -1,16 +1,16 @@
 /**
  * User-scoped Supabase auth middleware for NutriMind-AI.
  *
- * `requireUserAuth` is intentionally permissive: it never rejects a request.
- * When a `Bearer` access token is present it validates it against Supabase
- * Auth and attaches the resolved user; otherwise it attaches a lightweight
- * demo user (for the no-credentials fallback mode the app already ships
- * with). A per-request anon Supabase client is attached as
- * `req.supabaseUserClient` so routes can read/write RLS-protected tables.
+ * `requireUserAuth` is **fail-closed when Supabase is configured**: a missing,
+ * malformed or invalid Bearer token receives 401 - there is no fallback
+ * identity and no demo-user substitution. When Supabase is NOT configured
+ * (sandbox/demo mode) the middleware passes the request through with a null
+ * client and no identity, so routes serve the in-memory demo data - which
+ * contains no real users or data to protect.
  *
  * `server.ts` route handlers treat a missing `req.supabaseUserClient` /
  * `req.user` as "database not configured" and fall through to in-memory
- * fallbacks, so this middleware must not throw or 401.
+ * fallbacks.
  */
 
 import { Request, Response, NextFunction } from 'express';
@@ -56,41 +56,59 @@ function buildAnonClient(): SupabaseClient | null {
 }
 
 /**
+ * Whether the Supabase auth backend is configured (real URL + non-placeholder
+ * anon key). When false, the server is running in sandbox/demo mode.
+ */
+export function isAuthConfigured(): boolean {
+  return buildAnonClient() !== null;
+}
+
+/**
  * Express middleware that authenticates a request and attaches
- * `req.user` and `req.supabaseUserClient`. Never rejects: missing creds
- * fall back to a demo user so the app keeps working offline.
+ * `req.user` and `req.supabaseUserClient`. Fail-closed when Supabase is
+ * configured: missing/invalid tokens receive 401 and the request is never
+ * allowed through with a substitute identity.
  */
 export async function requireUserAuth(
   req: AuthenticatedRequest,
-  _res: Response,
+  res: Response,
   next: NextFunction,
 ): Promise<void> {
   const anonClient = buildAnonClient();
+  if (!anonClient) {
+    // Sandbox/demo mode: no auth backend, no identities. Routes fall
+    // through to in-memory demo data (req.user stays undefined).
+    req.supabaseUserClient = null;
+    return next();
+  }
+
   const authHeader = req.header('Authorization') || req.header('authorization');
   const token = authHeader?.startsWith('Bearer ') ? authHeader.slice(7).trim() : '';
 
-  if (anonClient && token) {
-    try {
-      const { data, error } = await anonClient.auth.getUser(token);
-      if (!error && data?.user) {
-        req.user = { id: data.user.id, email: data.user.email };
-        // Bearer-token client scopes queries to the authenticated user.
-        req.supabaseUserClient = createClient(
-          process.env.NEXT_PUBLIC_SUPABASE_URL || process.env.SUPABASE_URL || '',
-          token,
-          { global: { headers: { Authorization: `Bearer ${token}` } }, auth: { persistSession: false } },
-        );
-        return next();
-      }
-    } catch (err: any) {
-      console.warn('[SUPABASE_USER] Token validation failed, using fallback user:', err?.message || err);
-    }
+  if (!token) {
+    res.status(401).json({ error: 'Authentication required.' });
+    return;
   }
 
-  // Fallback: demo user + anon client (or null when unconfigured).
-  req.user = { id: 'demo-user' };
-  req.supabaseUserClient = anonClient;
-  next();
+  try {
+    const { data, error } = await anonClient.auth.getUser(token);
+    if (error || !data?.user) {
+      res.status(401).json({ error: 'Invalid or expired authentication token.' });
+      return;
+    }
+    req.user = { id: data.user.id, email: data.user.email };
+    // Bearer-token client scopes queries to the authenticated user.
+    req.supabaseUserClient = createClient(
+      process.env.NEXT_PUBLIC_SUPABASE_URL || process.env.SUPABASE_URL || '',
+      token,
+      { global: { headers: { Authorization: `Bearer ${token}` } }, auth: { persistSession: false } },
+    );
+    next();
+  } catch (err: any) {
+    console.warn('[SUPABASE_USER] Token verification failed:', err?.message || err);
+    res.status(401).json({ error: 'Authentication verification failed.' });
+    return;
+  }
 }
 
 /**

@@ -27,7 +27,7 @@ part of roadmap P0-12 (repository integrity):
   remains committed but is a design library, not part of the build.
 
 Known remaining gaps (tracked in the roadmap, not yet fixed):
-- Auth is still **permissive** on user routes (`requireUserAuth` never rejects) — P0-03.
+- Auth is **fail-closed** on user routes (P0-03 done, 2026-08-18): missing/invalid tokens get 401 when Supabase is configured; all client bypasses removed (mock tokens, fake Google login, client-generated OTP, `bypassAuth`); Demo Mode is an explicit, server-confirmed button (`/api/auth/config` → demoMode), never an error fallback.
 - Admin endpoints are now guarded by `requireAdminAuth` (P0-01 done, 2026-08-18): fail-closed when Supabase is configured (401/403), sandbox-allowed only when Supabase is unconfigured. Admins are granted via the `user_roles` table (supabase_schema.sql §13); the client hides the Clinician Portal via `GET /api/admin/me`.
 - RLS is now enabled on **all** tables (P0-02 done, 2026-08-18): the 8 admin/ops tables carry deny-all policies (server-side service-role / Prisma only — never the anon key); the 4 user tables keep per-user policies; `user_roles` stays deny-all. Enforced by `server/supabaseSchema.test.ts`.
 - Payments, wearables and telemetry are **simulated** — P0-05/P0-06.
@@ -74,10 +74,7 @@ supabase_schema.sql               # Canonical Supabase Postgres schema (RLS + tr
 - **Null-safe DB helpers**: `getPrisma()` and `getSupabaseAdmin()` return
   `null` when credentials are absent/placeholder so routes fall through to
   in-memory fallbacks. NEVER make these throw on missing config.
-- **Permissive auth**: `requireUserAuth` never rejects; it attaches a demo user
-  + anon client (or null). Routes use `req.user?.id` and
-  `req.supabaseUserClient` defensively. ⚠ This is a known security gap (P0-03),
-  do not extend it; keep behaviour unchanged until the P0 fixes are approved.
+- **Fail-closed auth**: `requireUserAuth` rejects (401) on any missing/invalid token **when Supabase is configured** — there is no fallback identity. When Supabase is NOT configured (sandbox/demo mode) it passes through with no identity and a null client so routes serve in-memory demo data. `requireAdminAuth` (P0-01) enforces the same fail-closed rule plus an `admin` role check on `user_roles`. Routes use `req.user?.id` and `req.supabaseUserClient` defensively.
 - **Simulated subsystems**: payments (`/api/payments/checkout`), wearable sync
   (hardcoded metrics), admin OTA/plugins (DB rows only) are prototypes. Do not
   build new features on them; the roadmap replaces them (P0-05/P0-06, P1).

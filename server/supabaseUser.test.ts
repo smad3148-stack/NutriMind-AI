@@ -49,25 +49,59 @@ describe('server/supabaseUser', () => {
     }
   });
 
-  it('attaches demo user and null client when unconfigured (never rejects)', async () => {
+  it('passes through with no identity and null client when unconfigured (sandbox demo mode)', async () => {
     const { requireUserAuth } = await importFresh();
     const { req, res, next, nextCalled } = makeReqRes();
     await requireUserAuth(req as any, res, next as any);
     expect(nextCalled()).toBe(true);
-    expect((req as any).user).toEqual({ id: 'demo-user' });
+    expect((req as any).user).toBeUndefined();
     expect((req as any).supabaseUserClient).toBeNull();
   });
 
-  it('attaches an anon client when real Supabase creds are present', async () => {
+  it('rejects with 401 when Supabase is configured but no token is sent (fail closed)', async () => {
     process.env.NEXT_PUBLIC_SUPABASE_URL = 'https://real-project.supabase.co';
     process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.realkey';
     const { requireUserAuth } = await importFresh();
     const { req, res, next, nextCalled } = makeReqRes();
-    await requireUserAuth(req as any, res, next as any);
-    expect(nextCalled()).toBe(true);
-    expect((req as any).user).toEqual({ id: 'demo-user' });
-    expect((req as any).supabaseUserClient).not.toBeNull();
-    expect(typeof (req as any).supabaseUserClient.from).toBe('function');
+    const spy = { statusCode: 0, jsonCalled: false };
+    const resSpy = {
+      status: (code: number) => {
+        spy.statusCode = code;
+        return {
+          json: () => {
+            spy.jsonCalled = true;
+          },
+        };
+      },
+    };
+    await requireUserAuth(req as any, resSpy as any, next as any);
+    expect(nextCalled()).toBe(false);
+    expect(spy.statusCode).toBe(401);
+    expect(spy.jsonCalled).toBe(true);
+    expect((req as any).user).toBeUndefined();
+  });
+
+  it('rejects with 401 for an invalid bearer token (no fallback identity)', async () => {
+    process.env.NEXT_PUBLIC_SUPABASE_URL = 'https://real-project.supabase.co';
+    process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.realkey';
+    const { requireUserAuth } = await importFresh();
+    const { req, res, next, nextCalled } = makeReqRes();
+    (req as any).header = () => 'Bearer definitely-not-a-valid-jwt';
+    const spy = { statusCode: 0, jsonCalled: false };
+    const resSpy = {
+      status: (code: number) => {
+        spy.statusCode = code;
+        return {
+          json: () => {
+            spy.jsonCalled = true;
+          },
+        };
+      },
+    };
+    await requireUserAuth(req as any, resSpy as any, next as any);
+    expect(nextCalled()).toBe(false);
+    expect(spy.statusCode).toBe(401);
+    expect((req as any).user).toBeUndefined();
   });
 
   describe('requireAdminAuth (P0-01 fail-closed admin gate)', () => {
