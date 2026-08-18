@@ -29,6 +29,7 @@ part of roadmap P0-12 (repository integrity):
 Known remaining gaps (tracked in the roadmap, not yet fixed):
 - Auth is still **permissive** on user routes (`requireUserAuth` never rejects) — P0-03.
 - Admin endpoints are now guarded by `requireAdminAuth` (P0-01 done, 2026-08-18): fail-closed when Supabase is configured (401/403), sandbox-allowed only when Supabase is unconfigured. Admins are granted via the `user_roles` table (supabase_schema.sql §13); the client hides the Clinician Portal via `GET /api/admin/me`.
+- RLS is now enabled on **all** tables (P0-02 done, 2026-08-18): the 8 admin/ops tables carry deny-all policies (server-side service-role / Prisma only — never the anon key); the 4 user tables keep per-user policies; `user_roles` stays deny-all. Enforced by `server/supabaseSchema.test.ts`.
 - Payments, wearables and telemetry are **simulated** — P0-05/P0-06.
 - `prisma/migrations/0001_init` covers only the 8 admin tables; the schema has
   12 models (Profile/Meal/FamilyMember/Wearable are managed via

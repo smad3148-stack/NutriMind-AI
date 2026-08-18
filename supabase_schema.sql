@@ -372,3 +372,45 @@ CREATE POLICY "No direct access to user roles"
 -- INSERT INTO public.user_roles (user_id, role)
 -- SELECT id, 'admin' FROM auth.users WHERE email = 'ecovisionfilm@gmail.com'
 -- ON CONFLICT (user_id, role) DO NOTHING;
+
+-- ======================================================================
+-- 14. RLS LOCKDOWN — ADMIN / OPERATIONS TABLES (P0-02)
+-- ======================================================================
+-- These tables were previously readable/writable with the anon key that
+-- ships in the client bundle (RLS was enabled on only 4 of 12 tables).
+-- All server-side access to them goes through the service-role client or
+-- Prisma, both of which bypass RLS, so a deny-all policy is safe and
+-- correct: clients can never touch them directly — the application is the
+-- only access path. (User-scoped tables keep their per-user policies.)
+
+ALTER TABLE public.feature_flags ENABLE ROW LEVEL SECURITY;
+CREATE POLICY "feature_flags_admin_only" ON public.feature_flags
+    FOR ALL USING (false) WITH CHECK (false);
+
+ALTER TABLE public.system_plugins ENABLE ROW LEVEL SECURITY;
+CREATE POLICY "system_plugins_admin_only" ON public.system_plugins
+    FOR ALL USING (false) WITH CHECK (false);
+
+ALTER TABLE public.revenue_metrics ENABLE ROW LEVEL SECURITY;
+CREATE POLICY "revenue_metrics_admin_only" ON public.revenue_metrics
+    FOR ALL USING (false) WITH CHECK (false);
+
+ALTER TABLE public.revenue_by_month ENABLE ROW LEVEL SECURITY;
+CREATE POLICY "revenue_by_month_admin_only" ON public.revenue_by_month
+    FOR ALL USING (false) WITH CHECK (false);
+
+ALTER TABLE public.transactions ENABLE ROW LEVEL SECURITY;
+CREATE POLICY "transactions_admin_only" ON public.transactions
+    FOR ALL USING (false) WITH CHECK (false);
+
+ALTER TABLE public.system_logs ENABLE ROW LEVEL SECURITY;
+CREATE POLICY "system_logs_admin_only" ON public.system_logs
+    FOR ALL USING (false) WITH CHECK (false);
+
+ALTER TABLE public.ota_updates ENABLE ROW LEVEL SECURITY;
+CREATE POLICY "ota_updates_admin_only" ON public.ota_updates
+    FOR ALL USING (false) WITH CHECK (false);
+
+ALTER TABLE public.ota_deployments ENABLE ROW LEVEL SECURITY;
+CREATE POLICY "ota_deployments_admin_only" ON public.ota_deployments
+    FOR ALL USING (false) WITH CHECK (false);
