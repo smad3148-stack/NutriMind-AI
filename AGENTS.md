@@ -27,8 +27,8 @@ part of roadmap P0-12 (repository integrity):
   remains committed but is a design library, not part of the build.
 
 Known remaining gaps (tracked in the roadmap, not yet fixed):
-- Auth is still **permissive** (`requireUserAuth` never rejects) — P0-03.
-- All `/api/admin/*` endpoints are **unauthenticated** — P0-01.
+- Auth is still **permissive** on user routes (`requireUserAuth` never rejects) — P0-03.
+- Admin endpoints are now guarded by `requireAdminAuth` (P0-01 done, 2026-08-18): fail-closed when Supabase is configured (401/403), sandbox-allowed only when Supabase is unconfigured. Admins are granted via the `user_roles` table (supabase_schema.sql §13); the client hides the Clinician Portal via `GET /api/admin/me`.
 - Payments, wearables and telemetry are **simulated** — P0-05/P0-06.
 - `prisma/migrations/0001_init` covers only the 8 admin tables; the schema has
   12 models (Profile/Meal/FamilyMember/Wearable are managed via
@@ -41,7 +41,7 @@ Known remaining gaps (tracked in the roadmap, not yet fixed):
 ```
 server.ts                         # Express app + all routes (inline)
 ├── server/supabaseAdmin.ts       # getSupabaseAdmin() — service-role client | null
-├── server/supabaseUser.ts       # requireUserAuth middleware, AuthenticatedRequest
+├── server/supabaseUser.ts       # requireUserAuth + requireAdminAuth middleware, AuthenticatedRequest
 ├── server/prisma.ts              # getPrisma() singleton | null, handlePrismaError
 src/
 ├── App.tsx                       # mode shell: auth | customer | admin
@@ -63,7 +63,7 @@ src-tauri/
 docs/
 └── PRODUCTION_READINESS.md       # ⚠ self-assessment; outdated claims (see note)
 prisma/
-├── schema.prisma                 # 12 models mirroring supabase_schema.sql
+├── schema.prisma                 # 13 models mirroring supabase_schema.sql
 ├── migrations/0001_init/        # SQL migration (admin tables only)
 └── seed.ts                       # idempotent seed (npm run db:seed)
 supabase_schema.sql               # Canonical Supabase Postgres schema (RLS + triggers)

@@ -9,7 +9,7 @@ import path from 'path';
 import { createServer as createViteServer } from 'vite';
 import { GoogleGenAI } from '@google/genai';
 import { getSupabaseAdmin } from './server/supabaseAdmin';
-import { requireUserAuth, AuthenticatedRequest } from './server/supabaseUser';
+import { requireUserAuth, requireAdminAuth, AuthenticatedRequest } from './server/supabaseUser';
 import { ChatMessage } from './src/types';
 import { getPrisma, handlePrismaError } from './server/prisma';
 import foodDatabase from './src/food_database.json';
@@ -1448,7 +1448,7 @@ CRITICAL PERSONALITY & STYLE RULES:
 
 
   // Admin AI Companion Endpoint
-  app.post('/api/admin/chat-assistant', requireUserAuth, async (req: AuthenticatedRequest, res) => {
+  app.post('/api/admin/chat-assistant', requireAdminAuth, async (req: AuthenticatedRequest, res) => {
     const { assistantType, messages, systemContext } = req.body;
     if (!messages || !Array.isArray(messages)) {
       return res.status(400).json({ error: 'Messages array is required.' });
@@ -2012,7 +2012,11 @@ CRITICAL PERSONALITY & STYLE RULES:
   });
 
   // 6. ADMIN CONSOLE MANAGEMENT (Feature Flags, Plugins, Revenue Metrics, System Logs)
-  app.get('/api/admin/flags', async (req, res) => {
+  app.get('/api/admin/me', requireAdminAuth, (req: AuthenticatedRequest, res) => {
+    res.json({ user: req.user, role: 'admin' });
+  });
+
+  app.get('/api/admin/flags', requireAdminAuth, async (req, res) => {
     const prisma = getPrisma();
     if (prisma) {
       try {
@@ -2047,7 +2051,7 @@ CRITICAL PERSONALITY & STYLE RULES:
     }
   });
 
-  app.put('/api/admin/flags/:key', async (req, res) => {
+  app.put('/api/admin/flags/:key', requireAdminAuth, async (req, res) => {
     const { key } = req.params;
     const { enabled } = req.body;
 
@@ -2226,7 +2230,7 @@ CRITICAL PERSONALITY & STYLE RULES:
   let pluginsStore: any[] = [...MARKETPLACE_PLUGINS];
 
   // 1. GET ALL PLUGINS (Seeded dynamically from Marketplace)
-  app.get('/api/admin/plugins', async (req, res) => {
+  app.get('/api/admin/plugins', requireAdminAuth, async (req, res) => {
     const prisma = getPrisma();
     if (prisma) {
       try {
@@ -2319,7 +2323,7 @@ CRITICAL PERSONALITY & STYLE RULES:
   });
 
   // 2. TOGGLE PLUGIN STATUS (With strict dependency checking & unmount blocks)
-  app.post('/api/admin/plugins/toggle', async (req, res) => {
+  app.post('/api/admin/plugins/toggle', requireAdminAuth, async (req, res) => {
     const { id } = req.body;
     if (!id) return res.status(400).json({ error: 'Missing plugin ID.' });
 
@@ -2413,7 +2417,7 @@ CRITICAL PERSONALITY & STYLE RULES:
   });
 
   // 3. INSTALL MARKETPLACE PLUGIN
-  app.post('/api/admin/plugins/install', async (req, res) => {
+  app.post('/api/admin/plugins/install', requireAdminAuth, async (req, res) => {
     const { id } = req.body;
     if (!id) return res.status(400).json({ error: 'Missing plugin ID.' });
 
@@ -2479,7 +2483,7 @@ CRITICAL PERSONALITY & STYLE RULES:
   });
 
   // 4. UPDATE PLUGIN VERSION
-  app.post('/api/admin/plugins/update', async (req, res) => {
+  app.post('/api/admin/plugins/update', requireAdminAuth, async (req, res) => {
     const { id, nextVersion } = req.body;
     if (!id || !nextVersion) return res.status(400).json({ error: 'Missing plugin ID or nextVersion.' });
 
@@ -2512,7 +2516,7 @@ CRITICAL PERSONALITY & STYLE RULES:
   });
 
   // 5. UNINSTALL / REMOVE PLUGIN
-  app.post('/api/admin/plugins/remove', async (req, res) => {
+  app.post('/api/admin/plugins/remove', requireAdminAuth, async (req, res) => {
     const { id } = req.body;
     if (!id) return res.status(400).json({ error: 'Missing plugin ID.' });
 
@@ -2571,7 +2575,7 @@ CRITICAL PERSONALITY & STYLE RULES:
   });
 
   // 6. GET ALL OTA UPDATES & DEPLOYMENT HISTORY
-  app.get('/api/admin/ota', async (req, res) => {
+  app.get('/api/admin/ota', requireAdminAuth, async (req, res) => {
     const prisma = getPrisma();
     if (prisma) {
       try {
@@ -2698,7 +2702,7 @@ CRITICAL PERSONALITY & STYLE RULES:
   });
 
   // 7. DEPLOY OTA UPDATE
-  app.post('/api/admin/ota/deploy', async (req, res) => {
+  app.post('/api/admin/ota/deploy', requireAdminAuth, async (req, res) => {
     const { version, channel, description, bundleUrl, deployedBy } = req.body;
     if (!version || !channel || !bundleUrl) {
       return res.status(400).json({ error: 'Missing version, channel, or bundleUrl.' });
@@ -2790,7 +2794,7 @@ CRITICAL PERSONALITY & STYLE RULES:
   });
 
   // 8. EMERGENCY OTA SYSTEM ROLLBACK
-  app.post('/api/admin/ota/rollback', async (req, res) => {
+  app.post('/api/admin/ota/rollback', requireAdminAuth, async (req, res) => {
     const { otaUpdateId, deployedBy, notes } = req.body;
     if (!otaUpdateId) {
       return res.status(400).json({ error: 'Missing target otaUpdateId for rollback.' });
@@ -2928,7 +2932,7 @@ CRITICAL PERSONALITY & STYLE RULES:
     });
   });
 
-  app.get('/api/admin/revenue', async (req, res) => {
+  app.get('/api/admin/revenue', requireAdminAuth, async (req, res) => {
     const prisma = getPrisma();
     if (prisma) {
       try {
@@ -3036,7 +3040,7 @@ CRITICAL PERSONALITY & STYLE RULES:
     }
   });
 
-  app.get('/api/admin/logs', async (req, res) => {
+  app.get('/api/admin/logs', requireAdminAuth, async (req, res) => {
     const prisma = getPrisma();
     if (prisma) {
       try {
@@ -3071,7 +3075,7 @@ CRITICAL PERSONALITY & STYLE RULES:
     }
   });
 
-  app.post('/api/admin/logs/clear', async (req, res) => {
+  app.post('/api/admin/logs/clear', requireAdminAuth, async (req, res) => {
     const prisma = getPrisma();
     if (prisma) {
       try {

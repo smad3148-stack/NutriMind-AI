@@ -166,3 +166,13 @@ model Wearable {
   @@unique([userId, device])
   @@map("wearables")
 }
+
+model UserRole {
+  id        String   @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
+  userId    String   @map("user_id") @db.Uuid
+  role      String   @db.VarChar(50)
+  createdAt DateTime @default(now()) @map("created_at") @db.Timestamptz
+
+  @@unique([userId, role])
+  @@map("user_roles")
+}
