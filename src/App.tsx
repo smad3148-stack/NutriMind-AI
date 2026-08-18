@@ -11,6 +11,7 @@ import AdminDashboard from './components/AdminDashboard';
 import SupabaseAuth from './components/SupabaseAuth';
 import { ErrorBoundary } from './components/ErrorBoundary';
 import { getSupabase } from './lib/supabase';
+import { setSessionToken } from './lib/sessionToken';
 
 export default function App() {
   const [currentMode, setCurrentMode] = useState<'customer' | 'admin'>('customer');
@@ -34,6 +35,7 @@ export default function App() {
     // Retrieve active session
     supabase.auth.getSession().then(({ data: { session } }) => {
       setSession(session);
+      setSessionToken(session?.access_token); // P0-04: shared token for diagnostics
       if (session?.user) {
         setUserProfile({
           email: session.user.email || '',
@@ -45,6 +47,7 @@ export default function App() {
     // Listen for auth state changes
     const { data: { subscription } } = supabase.auth.onAuthStateChange((event, newSession) => {
       setSession(newSession);
+      setSessionToken(newSession?.access_token); // P0-04: keep in sync
       if (newSession?.user) {
         setUserProfile({
           email: newSession.user.email || '',
@@ -66,6 +69,7 @@ export default function App() {
       await supabase.auth.signOut();
     }
     setSession(null);
+    setSessionToken(undefined); // P0-04: clear shared token
     setDemoMode(false);
     setIsResettingPassword(false);
   };
