@@ -42,10 +42,12 @@ describe('src/food_database.json', () => {
     }
   });
 
-  it('portion label matches its size identifier', () => {
+  it('portion label is a non-empty display string', () => {
     for (const item of Object.values(foodDatabase)) {
       for (const size of PORTION_SIZES) {
-        expect(item.portions[size].label).toBe(size);
+        // Labels are user-facing portion descriptions (e.g. "Half Pack",
+        // "100g") in the real 106-item database, not size identifiers.
+        expect(item.portions[size].label.length).toBeGreaterThan(0);
       }
     }
   });

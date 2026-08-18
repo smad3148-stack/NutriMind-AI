@@ -1,0 +1,41 @@
+{
+  "short_name": "NutriMind",
+  "name": "NutriMind AI - Clinical Metabolic Coach",
+  "description": "Enterprise clinical metabolic wellness companion with unified wearable biometrics and clinical AI insights.",
+  "icons": [
+    {
+      "src": "/assets/icon-192.png",
+      "type": "image/png",
+      "sizes": "192x192",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "/assets/icon-512.png",
+      "type": "image/png",
+      "sizes": "512x512",
+      "purpose": "any maskable"
+    }
+  ],
+  "start_url": "/",
+  "background_color": "#020617",
+  "theme_color": "#020617",
+  "display": "standalone",
+  "orientation": "portrait-primary",
+  "categories": [
+    "health",
+    "medical",
+    "productivity"
+  ],
+  "shortcuts": [
+    {
+      "name": "Dashboard",
+      "url": "/?shortcut=dashboard",
+      "description": "View metabolic telemetry dashboard"
+    },
+    {
+      "name": "AI Assistant",
+      "url": "/?shortcut=ai",
+      "description": "Chat with clinical metabolic coach"
+    }
+  ]
+}

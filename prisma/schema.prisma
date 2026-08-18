@@ -1,116 +1,168 @@
-// NutriMind-AI Prisma schema
-// Mirrors the Supabase Postgres schema in supabase_schema.sql so that the
-// server can use Prisma Client against the same database when DATABASE_URL
-// is configured. Generated client output is committed for zero-build deploys.
-
-generator client {
-  provider = "prisma-client-js"
-  // Default output (node_modules/.prisma/client) so `@prisma/client`
-  // re-exports the generated client without extra wiring.
-  binaryTargets = ["native"]
-}
-
 datasource db {
   provider = "postgresql"
   url      = env("DATABASE_URL")
 }
 
+generator client {
+  provider = "prisma-client-js"
+}
+
 model FeatureFlag {
-  id          String   @id @default(uuid())
-  name        String
-  key         String   @unique
-  description String?
-  enabled     Boolean  @default(true)
-  createdAt   DateTime @default(now()) @map("created_at")
+  id          String   @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
+  name        String   @db.VarChar(255)
+  key         String   @unique @db.VarChar(255)
+  description String?  @db.Text
+  enabled     Boolean? @default(true)
+  createdAt   DateTime @default(now()) @map("created_at") @db.Timestamptz
 
   @@map("feature_flags")
 }
 
-model SystemLog {
-  id        String   @id @default(uuid())
-  level     String
-  service   String
-  message   String
-  timestamp DateTime @default(now())
-
-  @@map("system_logs")
-}
-
 model SystemPlugin {
-  id           String   @id @default(uuid())
-  name         String
-  description  String?
-  version      String
-  status       String   @default("inactive")
-  category     String
-  isInstalled  Boolean  @default(true) @map("is_installed")
-  permissions  String?
-  dependencies String?
-  author       String?
-  rating       Float?
-  installCount Int      @default(0) @map("install_count")
+  id           String   @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
+  name         String   @db.VarChar(255)
+  description  String?  @db.Text
+  version      String   @db.VarChar(50)
+  status       String   @db.VarChar(50)
+  category     String   @db.VarChar(50)
+  isInstalled  Boolean  @default(true) @map("is_installed") @db.Boolean
+  permissions  String?  @db.Text
+  dependencies String?  @db.Text
+  author       String?  @default("NutriMind Core") @db.VarChar(255)
+  rating       Decimal? @default(5.0) @db.Decimal(3, 2)
+  installCount Int?     @default(100) @map("install_count") @db.Integer
+  createdAt    DateTime @default(now()) @map("created_at") @db.Timestamptz
 
   @@map("system_plugins")
 }
 
 model OtaUpdate {
-  id         String   @id @default(uuid())
-  version    String   @unique
-  channel    String
-  description String?
-  bundleUrl  String?  @map("bundle_url")
-  status     String   @default("draft")
-  createdAt  DateTime @default(now()) @map("created_at")
-  deployedAt DateTime? @map("deployed_at")
-
+  id          String          @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
+  version     String          @unique @db.VarChar(50)
+  channel     String          @db.VarChar(50)
+  description String?         @db.Text
+  bundleUrl   String          @map("bundle_url") @db.Text
+  status      String          @default("published") @db.VarChar(50)
+  createdAt   DateTime        @default(now()) @map("created_at") @db.Timestamptz
+  deployedAt  DateTime        @default(now()) @map("deployed_at") @db.Timestamptz
   deployments OtaDeployment[]
 
   @@map("ota_updates")
 }
 
 model OtaDeployment {
-  id          String   @id @default(uuid())
-  otaUpdateId String   @map("ota_update_id")
-  version     String
-  channel     String
-  action      String
-  deployedBy  String?  @map("deployed_by")
-  status      String
-  notes       String?
-  createdAt   DateTime @default(now()) @map("created_at")
-
-  otaUpdate OtaUpdate @relation(fields: [otaUpdateId], references: [id], onDelete: Cascade)
+  id          String    @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
+  otaUpdateId String    @map("ota_update_id") @db.Uuid
+  otaUpdate   OtaUpdate @relation(fields: [otaUpdateId], references: [id], onDelete: Cascade)
+  version     String    @db.VarChar(50)
+  channel     String    @db.VarChar(50)
+  action      String    @db.VarChar(50)
+  deployedBy  String    @map("deployed_by") @db.VarChar(255)
+  status      String    @db.VarChar(50)
+  notes       String?   @db.Text
+  createdAt   DateTime  @default(now()) @map("created_at") @db.Timestamptz
 
   @@map("ota_deployments")
 }
 
 model RevenueMetric {
-  id                String   @id @default(uuid())
-  mrr               Decimal
-  arr               Decimal
-  activeSubscribers Int      @map("active_subscribers")
-  conversionRate    Decimal  @map("conversion_rate")
+  id                String   @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
+  mrr               Decimal  @default(0.00) @db.Decimal(12, 2)
+  arr               Decimal  @default(0.00) @db.Decimal(12, 2)
+  activeSubscribers Int      @default(0) @map("active_subscribers")
+  conversionRate    Decimal  @default(0.00) @map("conversion_rate") @db.Decimal(5, 2)
+  updatedAt         DateTime @default(now()) @map("updated_at") @db.Timestamptz
 
   @@map("revenue_metrics")
 }
 
 model RevenueByMonth {
-  id        String   @id @default(uuid())
-  month     String
-  amount    Decimal
-  target    Decimal
-  createdAt DateTime @default(now()) @map("created_at")
+  id        String   @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
+  month     String   @unique @db.VarChar(20)
+  amount    Decimal  @default(0.00) @db.Decimal(12, 2)
+  target    Decimal  @default(0.00) @db.Decimal(12, 2)
+  createdAt DateTime @default(now()) @map("created_at") @db.Timestamptz
 
   @@map("revenue_by_month")
 }
 
 model Transaction {
-  id        String   @id @default(uuid())
-  userEmail String   @map("user_email")
-  plan      String
-  amount    Decimal
-  status    String
-  timestamp DateTime @default(now())
+  id        String   @id @db.VarChar(100)
+  userEmail String   @map("user_email") @db.VarChar(255)
+  plan      String   @db.VarChar(100)
+  amount    Decimal  @db.Decimal(10, 2)
+  status    String   @db.VarChar(50)
+  timestamp DateTime @default(now()) @db.Timestamptz
 
   @@map("transactions")
+}
+
+model SystemLog {
+  id        String   @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
+  level     String   @db.VarChar(20)
+  service   String   @db.VarChar(100)
+  message   String   @db.Text
+  timestamp DateTime @default(now()) @db.Timestamptz
+
+  @@map("system_logs")
+}
+
+model Profile {
+  id                String   @id @db.Uuid
+  email             String   @unique @db.VarChar(255)
+  fullName          String?  @map("full_name") @db.VarChar(255)
+  dailyCalorieGoal  Int?     @default(2000) @map("daily_calorie_goal")
+  waterGoalMl       Int?     @default(2000) @map("water_goal_ml")
+  avatarEmoji       String?  @default("👤") @map("avatar_emoji") @db.VarChar(10)
+  createdAt         DateTime @default(now()) @map("created_at") @db.Timestamptz
+
+  @@map("profiles")
+}
+
+model Meal {
+  id        String   @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
+  userId    String?  @map("user_id") @db.Uuid
+  name      String   @db.VarChar(255)
+  calories  Int
+  protein   Decimal? @default(0.00) @db.Decimal(6, 2)
+  carbs     Decimal? @default(0.00) @db.Decimal(6, 2)
+  fat       Decimal? @default(0.00) @db.Decimal(6, 2)
+  score     Int      @default(80)
+  category  String   @db.VarChar(50)
+  imageUrl  String?  @map("image_url") @db.Text
+  analysis  String?  @db.Text
+  timestamp DateTime @default(now()) @db.Timestamptz
+
+  @@map("meals")
+}
+
+model FamilyMember {
+  id                String   @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
+  parentUserId      String?  @map("parent_user_id") @db.Uuid
+  name              String   @db.VarChar(255)
+  role              String   @db.VarChar(100)
+  dailyCalorieGoal  Int?     @default(2000) @map("daily_calorie_goal")
+  caloriesConsumed  Int?     @default(0) @map("calories_consumed")
+  waterGoalMl       Int?     @default(2000) @map("water_goal_ml")
+  waterConsumedMl   Int?     @default(0) @map("water_consumed_ml")
+  avatarUrl         String?  @default("👤") @map("avatar_url") @db.VarChar(10)
+  statusMessage     String?  @default("Ready to log healthy meals!") @map("status_message") @db.VarChar(255)
+  createdAt         DateTime @default(now()) @map("created_at") @db.Timestamptz
+
+  @@map("family_members")
+}
+
+model Wearable {
+  id             String    @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
+  userId         String?   @map("user_id") @db.Uuid
+  device         String    @db.VarChar(50)
+  connected      Boolean?  @default(false)
+  heartRateBpm   Int?      @default(0) @map("heart_rate_bpm")
+  steps          Int?      @default(0)
+  caloriesBurned Int?      @default(0) @map("calories_burned")
+  sleepHours     Decimal?  @default(0.00) @map("sleep_hours") @db.Decimal(4, 2)
+  lastSynced     DateTime? @default(now()) @map("last_synced") @db.Timestamptz
+
+  @@unique([userId, device])
+  @@map("wearables")
 }
