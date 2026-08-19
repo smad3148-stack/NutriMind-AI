@@ -18,72 +18,39 @@ export const ReportsScreen: React.FC<ReportsScreenProps> = ({
 }) => {
   const [calorieView, setCalorieView] = useState<'daily' | 'weekly' | 'monthly'>('daily');
 
-  // 1. BMI (Body Mass Index)
-  const currentBMI = 21.5;
-  const bmiStatus = 'Healthy Weight';
+  // 1. BMI (Body Mass Index) — P0-05: honest empty state until real data.
+  const currentBMI = null as number | null;
+  const bmiStatus = 'No data yet — log your weight to calculate BMI.';
   const minBmi = 15;
   const maxBmi = 35;
-  const bmiPct = Math.min(100, Math.max(0, ((currentBMI - minBmi) / (maxBmi - minBmi)) * 100));
+  const bmiPct = currentBMI ? Math.min(100, Math.max(0, ((currentBMI - minBmi) / (maxBmi - minBmi)) * 100)) : 0;
 
   // 2. Weight Readings
-  const currentWeight = 55;
-  const goalWeight = 65; // User Mitrabha is gaining weight from 55kg to 65kg
-  const weightHistory = [
-    { date: '10 Jul', weight: 53.8 },
-    { date: '12 Jul', weight: 54.2 },
-    { date: '14 Jul', weight: 54.5 },
-    { date: '16 Jul', weight: 54.7 },
-    { date: '18 Jul', weight: 54.9 },
-    { date: '20 Jul', weight: 55.0 }
-  ];
+  const currentWeight = null as number | null;
+  const goalWeight = null as number | null;
+  const weightHistory: { date: string; weight: number }[] = [];
 
   // 3. Calorie Intake Graph
-  const caloriesData = {
-    daily: [
-      { label: 'Breakfast', val: 580 },
-      { label: 'Lunch', val: 820 },
-      { label: 'Dinner', val: 740 },
-      { label: 'Snacks', val: 510 }
-    ],
-    weekly: [
-      { label: 'Mon', val: 2450 },
-      { label: 'Tue', val: 2600 },
-      { label: 'Wed', val: 2550 },
-      { label: 'Thu', val: 2700 },
-      { label: 'Fri', val: 2680 },
-      { label: 'Sat', val: 2590 },
-      { label: 'Sun', val: 2650 }
-    ],
-    monthly: [
-      { label: 'Week 1', val: 17200 },
-      { label: 'Week 2', val: 18100 },
-      { label: 'Week 3', val: 17900 },
-      { label: 'Week 4', val: 18550 }
-    ]
+  const caloriesData: Record<'daily' | 'weekly' | 'monthly', { label: string; val: number }[]> = {
+    daily: [],
+    weekly: [],
+    monthly: []
   };
 
-  // 4. Average Macros
+  // 4. Average Macros — targets are goals (kept); current starts at 0.
   const averageMacros = {
-    protein: { current: 98, target: 110, color: 'bg-emerald-400', textColor: 'text-emerald-400' },
-    carbs: { current: 310, target: 350, color: 'bg-amber-400', textColor: 'text-amber-400' },
-    fat: { current: 82, target: 95, color: 'bg-rose-400', textColor: 'text-rose-400' },
-    fiber: { current: 28, target: 35, color: 'bg-sky-400', textColor: 'text-sky-400' }
+    protein: { current: 0, target: 110, color: 'bg-emerald-400', textColor: 'text-emerald-400' },
+    carbs: { current: 0, target: 350, color: 'bg-amber-400', textColor: 'text-amber-400' },
+    fat: { current: 0, target: 95, color: 'bg-rose-400', textColor: 'text-rose-400' },
+    fiber: { current: 0, target: 35, color: 'bg-sky-400', textColor: 'text-sky-400' }
   };
 
   // 5. Meditation
-  const meditationHistory = [
-    { date: 'Mon', mins: 15 },
-    { date: 'Tue', mins: 10 },
-    { date: 'Wed', mins: 20 },
-    { date: 'Thu', mins: 15 },
-    { date: 'Fri', mins: 0 },
-    { date: 'Sat', mins: 12 },
-    { date: 'Sun', mins: 15 }
-  ];
-  const meditationStreak = 3;
-  const averageMeditationMins = 12.4;
+  const meditationHistory: { date: string; mins: number }[] = [];
+  const meditationStreak = 0;
+  const averageMeditationMins = 0;
 
-  // 6. Supplement Window
+  // 6. Supplement Window (user-maintained checklist — not telemetry; kept)
   const [supplements, setSupplements] = useState([
     { id: 1, name: 'CoQ10 (Mitochondrial Energy)', dosage: '100mg', time: 'With Breakfast', checked: true },
     { id: 2, name: 'Omega-3 Fish Oil (Anti-inflammatory)', dosage: '1000mg', time: 'With Lunch', checked: true },
@@ -96,18 +63,10 @@ export const ReportsScreen: React.FC<ReportsScreenProps> = ({
   };
 
   // 7. Tweak Frequency
-  const tweakComplianceScore = 92;
-  const tweaksThisWeek = 14;
-  const averageTweakDelta = '+21%';
-  const tweakHistory = [
-    { label: 'Mon', count: 2 },
-    { label: 'Tue', count: 3 },
-    { label: 'Wed', count: 2 },
-    { label: 'Thu', count: 2 },
-    { label: 'Fri', count: 1 },
-    { label: 'Sat', count: 2 },
-    { label: 'Sun', count: 2 }
-  ];
+  const tweakComplianceScore = 0;
+  const tweaksThisWeek = 0;
+  const averageTweakDelta = 'No data';
+  const tweakHistory: { label: string; count: number }[] = [];
 
   return (
     <div className="space-y-5 font-sans animate-fadeIn">
@@ -134,7 +93,7 @@ export const ReportsScreen: React.FC<ReportsScreenProps> = ({
           <span className="text-[10px] font-mono text-cyan-400 uppercase tracking-wider font-bold flex items-center gap-1">
             <Layers size={11} /> Body Mass Index (BMI)
           </span>
-          <span className="text-[8px] text-slate-400 font-mono">Updated: Today</span>
+          <span className="text-[8px] text-slate-400 font-mono">Updated: Never</span>
         </div>
 
         <div className="flex items-center gap-4">
@@ -161,7 +120,7 @@ export const ReportsScreen: React.FC<ReportsScreenProps> = ({
               />
             </svg>
             <div className="text-center z-10">
-              <span className="text-lg font-black font-mono text-white">{currentBMI}</span>
+              <span className="text-lg font-black font-mono text-white">{currentBMI ?? 'No data'}</span>
               <span className="text-[8px] text-slate-400 block font-mono">Index</span>
             </div>
           </div>
@@ -172,7 +131,7 @@ export const ReportsScreen: React.FC<ReportsScreenProps> = ({
               <h4 className="font-bold text-white text-xs">{bmiStatus}</h4>
             </div>
             <p className="text-[9.5px] text-slate-300 leading-relaxed">
-              Your BMI is optimal. Standard range indicates highly resilient glycemic clearance efficiency.
+              Log your weight readings to calculate and track your BMI here.
             </p>
           </div>
         </div>
@@ -257,7 +216,7 @@ export const ReportsScreen: React.FC<ReportsScreenProps> = ({
                 <div className="flex justify-between text-[9px] font-mono">
                   <span className="capitalize text-slate-200 font-bold">{key} Intake</span>
                   <span className="text-white">
-                    <span className={item.textColor}>{item.current}g</span> / {item.target}g <span className="text-slate-500">({pct}%)</span>
+                    <span className={item.textColor}>{item.current > 0 ? `${item.current}g` : 'No data'}</span> / {item.target}g <span className="text-slate-500">{item.current > 0 ? `(${pct}%)` : '(no data)'}</span>
                   </span>
                 </div>
                 <div className="w-full h-1.5 bg-white/5 rounded-full overflow-hidden">
@@ -281,13 +240,13 @@ export const ReportsScreen: React.FC<ReportsScreenProps> = ({
         <div className="grid grid-cols-2 gap-3 bg-slate-950/60 p-3 rounded-2xl border border-white/5">
           <div className="text-center border-r border-white/10">
             <span className="text-[8.5px] font-mono text-cyan-400 block font-bold">TARGET WEIGHT</span>
-            <span className="text-base font-black text-white font-mono mt-0.5 block">{goalWeight} KG</span>
-            <span className="text-[7.5px] text-slate-500 block">Requires +10.0 kg gain</span>
+            <span className="text-base font-black text-white font-mono mt-0.5 block">{goalWeight !== null ? `${goalWeight} KG` : 'No data'}</span>
+            <span className="text-[7.5px] text-slate-500 block">—</span>
           </div>
           <div className="text-center">
             <span className="text-[8.5px] font-mono text-emerald-400 block font-bold">CURRENT WEIGHT</span>
-            <span className="text-base font-black text-white font-mono mt-0.5 block">{currentWeight} KG</span>
-            <span className="text-[7.5px] text-emerald-400/60 block">Logged today</span>
+            <span className="text-base font-black text-white font-mono mt-0.5 block">{currentWeight !== null ? `${currentWeight} KG` : 'No data'}</span>
+            <span className="text-[7.5px] text-emerald-400/60 block">—</span>
           </div>
         </div>
 
@@ -319,19 +278,19 @@ export const ReportsScreen: React.FC<ReportsScreenProps> = ({
           <span className="text-[10px] font-mono text-cyan-400 uppercase tracking-wider font-bold flex items-center gap-1">
             <Smile size={12} className="text-cyan-400" /> Meditation & HRV Recovery
           </span>
-          <span className="text-[8px] text-emerald-400 font-mono font-bold">{meditationStreak} Day Streak 🔥</span>
+          <span className="text-[8px] text-emerald-400 font-mono font-bold">{meditationStreak > 0 ? `${meditationStreak} Day Streak 🔥` : 'No streak yet'}</span>
         </div>
 
         <div className="grid grid-cols-2 gap-3 bg-slate-950/60 p-3 rounded-2xl border border-white/5">
           <div className="text-center border-r border-white/10">
             <span className="text-[8.5px] font-mono text-cyan-400 block font-bold">DAILY AVERAGE</span>
-            <span className="text-base font-black text-white font-mono mt-0.5 block">{averageMeditationMins} MINS</span>
-            <span className="text-[7.5px] text-slate-500 block">Optimal cortical defense</span>
+            <span className="text-base font-black text-white font-mono mt-0.5 block">{averageMeditationMins > 0 ? `${averageMeditationMins} MINS` : 'No data'}</span>
+            <span className="text-[7.5px] text-slate-500 block">—</span>
           </div>
           <div className="text-center">
             <span className="text-[8.5px] font-mono text-indigo-400 block font-bold">VAGUS NERVE STABILIZATION</span>
-            <span className="text-base font-black text-indigo-300 font-mono mt-0.5 block">64ms HRV</span>
-            <span className="text-[7.5px] text-slate-500 block">Parasympathetic active</span>
+            <span className="text-base font-black text-indigo-300 font-mono mt-0.5 block">No data</span>
+            <span className="text-[7.5px] text-slate-500 block">—</span>
           </div>
         </div>
 
@@ -405,17 +364,17 @@ export const ReportsScreen: React.FC<ReportsScreenProps> = ({
           <span className="text-[10px] font-mono text-cyan-400 uppercase tracking-wider font-bold flex items-center gap-1">
             <Calendar size={11} /> Tweak Scan Frequency
           </span>
-          <span className="text-[8px] text-emerald-400 font-mono font-bold">{tweakComplianceScore}% Compliance</span>
+          <span className="text-[8px] text-emerald-400 font-mono font-bold">{tweakComplianceScore > 0 ? `${tweakComplianceScore}% Compliance` : 'No data'}</span>
         </div>
 
         <div className="grid grid-cols-3 gap-2 text-center">
           <div className="bg-slate-950/60 p-2.5 rounded-2xl border border-white/5">
             <span className="text-[8px] font-mono text-slate-500 block uppercase">TOTAL SCANS</span>
-            <span className="text-sm font-black text-white font-mono mt-1 block">{tweaksThisWeek}</span>
+            <span className="text-sm font-black text-white font-mono mt-1 block">{tweaksThisWeek > 0 ? tweaksThisWeek : 'No data'}</span>
           </div>
           <div className="bg-slate-950/60 p-2.5 rounded-2xl border border-white/5">
             <span className="text-[8px] font-mono text-slate-500 block uppercase">DAILY AVERAGE</span>
-            <span className="text-sm font-black text-white font-mono mt-1 block">2.0 / Day</span>
+            <span className="text-sm font-black text-white font-mono mt-1 block">No data</span>
           </div>
           <div className="bg-slate-950/60 p-2.5 rounded-2xl border border-white/5">
             <span className="text-[8px] font-mono text-slate-500 block uppercase">METRIC DELTA</span>

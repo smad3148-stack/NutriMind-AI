@@ -142,7 +142,7 @@ export const AIHub: React.FC<AIHubProps> = ({
 
             <p className="text-xs text-slate-300 font-medium leading-relaxed">
               {hasConnectedDevices 
-                ? "Your autonomic nervous system is balanced with high recovery (89%). HRV is 88ms. Deep sleep hit 2h 15m window." 
+                ? "Your health twin is waiting for real data. Connect a wearable and log your meals for an automated health report." 
                 : "Connect your smartwatch to generate an automated morning health report based on continuous overnight sensors."}
             </p>
           </div>
@@ -159,7 +159,7 @@ export const AIHub: React.FC<AIHubProps> = ({
                   <HeartPulse size={12} className="text-rose-400" /> Heart Rate
                 </span>
                 <span className="text-sm font-black text-white block">
-                  {metrics.avgHeartRateBpm > 0 ? `${metrics.avgHeartRateBpm} BPM` : '62 BPM'}
+                  {metrics.avgHeartRateBpm > 0 ? `${metrics.avgHeartRateBpm} BPM` : 'No data'}
                 </span>
               </div>
 
@@ -168,7 +168,7 @@ export const AIHub: React.FC<AIHubProps> = ({
                   <Radio size={12} className="text-purple-400" /> Oxygen (SpO2)
                 </span>
                 <span className="text-sm font-black text-white block">
-                  {metrics.avgSpO2Percent !== undefined ? `${metrics.avgSpO2Percent}%` : '98%'}
+                  {metrics.avgSpO2Percent !== undefined ? `${metrics.avgSpO2Percent}%` : 'No data'}
                 </span>
               </div>
 
@@ -177,7 +177,7 @@ export const AIHub: React.FC<AIHubProps> = ({
                   <Activity size={12} className="text-amber-400" /> Stress Level
                 </span>
                 <span className="text-sm font-black text-white block">
-                  {metrics.avgStressLevel !== undefined ? `${metrics.avgStressLevel}% (Low)` : '18% (Low)'}
+                  {metrics.avgStressLevel !== undefined ? `${metrics.avgStressLevel}% (Low)` : 'No data'}
                 </span>
               </div>
 
@@ -186,7 +186,7 @@ export const AIHub: React.FC<AIHubProps> = ({
                   <Flame size={12} className="text-amber-400" /> Active Burn
                 </span>
                 <span className="text-sm font-black text-white block">
-                  {metrics.totalActiveCalories > 0 ? `${metrics.totalActiveCalories} kcal` : '420 kcal'}
+                  {metrics.totalActiveCalories > 0 ? `${metrics.totalActiveCalories} kcal` : 'No data'}
                 </span>
               </div>
 
@@ -195,7 +195,7 @@ export const AIHub: React.FC<AIHubProps> = ({
                   <Scale size={12} className="text-cyan-400" /> Smart Scale
                 </span>
                 <span className="text-sm font-black text-white block">
-                  {metrics.latestWeightKg !== undefined ? `${metrics.latestWeightKg} kg` : '72.5 kg'}
+                  {metrics.latestWeightKg !== undefined ? `${metrics.latestWeightKg} kg` : 'No data'}
                 </span>
               </div>
 
@@ -259,11 +259,11 @@ export const AIHub: React.FC<AIHubProps> = ({
 
             <div className="space-y-2 pt-1">
               <div className="flex items-center justify-between text-xs font-mono">
-                <span className="text-slate-300">7-Day Trajectory: <strong className="text-emerald-400">+12% Peak Improvement</strong></span>
-                <span className="text-slate-400">7-Day Avg: 88%</span>
+                <span className="text-slate-300">7-Day Trajectory: <strong className="text-emerald-400">No data</strong></span>
+                <span className="text-slate-400">7-Day Avg: No data</span>
               </div>
               <div className="grid grid-cols-7 gap-1.5 h-20 items-end pt-2">
-                {[78, 82, 85, 88, 91, 89, 93].map((val, i) => (
+                {[].map((val, i) => (
                   <div key={i} className="flex flex-col items-center gap-1">
                     <span className="text-[8px] font-mono text-slate-400">{val}%</span>
                     <div 
@@ -303,21 +303,21 @@ export const AIHub: React.FC<AIHubProps> = ({
               <Calendar size={14} className="text-cyan-400" /> Monthly Reports & Health Timeline
             </h3>
             <p className="text-xs text-slate-300 leading-relaxed">
-              Your 30-day longevity score has increased by 4.2 points due to consistent deep sleep and optimal hydration.
+              Connect real data to see your 30-day health trends here.
             </p>
 
             <div className="bg-slate-900 p-4 rounded-2xl border border-white/5 space-y-2 text-xs font-mono">
               <div className="flex items-center justify-between text-slate-300">
                 <span>Longevity Milestone Index</span>
-                <span className="text-emerald-400 font-bold">Top 5% Cohort</span>
+                <span className="text-emerald-400 font-bold">No data</span>
               </div>
               <div className="flex items-center justify-between text-slate-300">
                 <span>Monthly Muscle Mass Retention</span>
-                <span className="text-cyan-300 font-bold">+1.2 kg</span>
+                <span className="text-cyan-300 font-bold">No data</span>
               </div>
               <div className="flex items-center justify-between text-slate-300">
                 <span>Monthly Average Resting HR</span>
-                <span className="text-rose-400 font-bold">58 BPM</span>
+                <span className="text-rose-400 font-bold">No data</span>
               </div>
             </div>
           </div>
@@ -337,7 +337,7 @@ export const AIHub: React.FC<AIHubProps> = ({
               </span>
             </div>
             <AIHealthTwin
-              userAge={28}
+              userAge={0}
               userWeight={72}
               userHeight={175}
               userGoal={userGoal}

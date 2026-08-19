@@ -34,61 +34,25 @@ export const AIHealthTwin: React.FC<AIHealthTwinProps> = ({
   const hasConnectedDevices = connectedWearables.length > 0;
   const metrics = aggregateHealthMetrics(wearables);
 
-  // Proactive AI Companion Insights
-  const proactiveInsights = [
-    {
-      id: 'p1',
-      tag: 'Sleep & Recovery',
-      role: 'Recovery Coach ⚡',
-      hinglish: 'Kal tum sirf 5 ghante soye the. Aaj 20 min power nap aur deep sleep prioratize karo.',
-      english: 'You only slept 5 hours last night. Prioritize a 20-min power nap today.',
-      type: 'warning',
-      actionPrompt: 'Mujhe meri poor sleep fixed karne ke liye routine suggest karo'
-    },
-    {
-      id: 'p2',
-      tag: 'Protein & Macro',
-      role: 'Nutrition Coach 🥗',
-      hinglish: 'Tum pichle 3 din se protein 25g kam consume kar rahe ho (Target 120g vs 95g achieved).',
-      english: 'Your protein intake has been 25g below target for 3 consecutive days.',
-      type: 'alert',
-      actionPrompt: 'Mera daily protein intake complete karne ke liye quick high-protein snacks batao'
-    },
-    {
-      id: 'p3',
-      tag: 'Daily Workout',
-      role: 'Personal Trainer 🏋️‍♂️',
-      hinglish: 'Aaj tumhari recovery score 88% hai! Aaj heavy compound workout/lifting kar sakte ho.',
-      english: 'Your recovery score is 88%! Perfect day for a heavy workout session.',
-      type: 'success',
-      actionPrompt: 'Aaj ke heavy workout ke liye optimal exercise routine suggest karo'
-    },
-    {
-      id: 'p4',
-      tag: 'Hydration Target',
-      role: 'Personal Doctor 🩺',
-      hinglish: 'Tumhari hydration pichle hafte se 35% kam ho gayi hai (Current: 1.8L vs Goal: 3.0L).',
-      english: 'Your hydration dropped 35% compared to last week (1.8L vs 3.0L goal).',
-      type: 'warning',
-      actionPrompt: '3L water hydration maintain karne ki easy tips batao'
-    },
-    {
-      id: 'p5',
-      tag: 'Sleep Cumulative',
-      role: 'AI Health Friend 🤖',
-      hinglish: 'Tumhari sleep continuously 4 din se poor hai. Main tumhare stress levels monitor kar raha hu.',
-      english: 'Your sleep quality has been low for 4 consecutive days.',
-      type: 'alert',
-      actionPrompt: 'Continuous poor sleep se recovery aur stress control kaise kare?'
-    }
-  ];
+  // P0-05: only devices carrying real telemetry count as synced. Bio-age,
+  // "21 wearables", BP/glucose claims and hardcoded scores were fabricated
+  // and have been removed.
+  const hasRealData =
+    metrics.totalSteps > 0 ||
+    metrics.avgHeartRateBpm > 0 ||
+    metrics.totalSleepHours > 0 ||
+    metrics.totalActiveCalories > 0 ||
+    (metrics.avgHrvMs ?? 0) > 0 ||
+    (metrics.latestWeightKg ?? 0) > 0 ||
+    (metrics.latestGlucoseMgDl ?? 0) > 0;
+  const dataDeviceCount = hasRealData ? connectedWearables.length : 0;
 
   const handleReSyncTwin = () => {
     setIsSyncing(true);
-    if (onTriggerToast) onTriggerToast('🔄 Re-syncing AI Health Twin with 21 Wearables & Biometric Sensor Mesh...');
+    if (onTriggerToast) onTriggerToast(hasRealData ? '🔄 Re-syncing AI Health Twin…' : 'No wearable data to sync yet. Connect a device first.');
     setTimeout(() => {
       setIsSyncing(false);
-      if (onTriggerToast) onTriggerToast('✨ Digital Health Twin updated with 100% Real-Time Accuracy!');
+      if (onTriggerToast) onTriggerToast(hasRealData ? '✨ Digital Health Twin updated.' : 'Still waiting for real wearable data.');
     }, 1200);
   };
 
@@ -132,9 +96,9 @@ export const AIHealthTwin: React.FC<AIHealthTwinProps> = ({
                 </span>
               </div>
               <p className="text-[10px] text-slate-300 mt-0.5 flex items-center gap-2 font-mono">
-                <span>Real-Time Biometric Replication Active</span>
+                <span>{hasRealData ? 'Real-Time Biometric Replication Active' : 'Waiting for real device data'}</span>
                 <span>•</span>
-                <span className="text-emerald-400 font-bold">21 Wearables Synced</span>
+                <span className="text-emerald-400 font-bold">{hasRealData ? `${dataDeviceCount} Wearable${dataDeviceCount === 1 ? '' : 's'} Synced` : 'No Wearables Synced'}</span>
               </p>
             </div>
           </div>
@@ -153,17 +117,13 @@ export const AIHealthTwin: React.FC<AIHealthTwinProps> = ({
         <div className="mt-3 pt-3 border-t border-white/10 grid grid-cols-2 gap-2 text-center font-mono">
           <div className="bg-slate-950/80 p-2.5 rounded-xl border border-white/10">
             <span className="text-[9px] text-slate-400 uppercase block">Chronological Age</span>
-            <span className="text-base font-bold text-slate-200 mt-0.5 block">{userAge} Years</span>
+            <span className="text-base font-bold text-slate-200 mt-0.5 block">{userAge > 0 ? `${userAge} Years` : 'No data'}</span>
           </div>
 
           <div className="bg-gradient-to-r from-emerald-950/60 to-cyan-950/60 p-2.5 rounded-xl border border-emerald-500/40">
             <span className="text-[9px] text-emerald-400 uppercase font-bold block">Biological Age Score</span>
-            <span className="text-xs sm:text-sm font-black text-emerald-300 mt-0.5 block flex items-center justify-center gap-1">
-              {hasConnectedDevices ? (
-                <>🧬 {(userAge - 3.8).toFixed(1)} <span className="text-[9px] text-emerald-400 font-bold">(-3.8 Yrs Younger)</span></>
-              ) : (
-                <span className="text-amber-400 text-xs">Device required</span>
-              )}
+            <span className="text-xs sm:text-sm font-black text-amber-300 mt-0.5 block">
+              {hasRealData ? 'Calculating…' : 'No data — requires real biometrics'}
             </span>
           </div>
         </div>
@@ -173,7 +133,7 @@ export const AIHealthTwin: React.FC<AIHealthTwinProps> = ({
       <div className="space-y-1.5">
         <span className="text-[10px] font-mono uppercase font-bold text-cyan-400 tracking-wider block flex items-center justify-between">
           <span>AI Health Twin Biometric Scores</span>
-          <span className="text-slate-400 font-normal">{hasConnectedDevices ? 'Synced via Device Mesh' : 'Waiting for Device'}</span>
+          <span className="text-slate-400 font-normal">{hasRealData ? 'Synced via Device Mesh' : 'No data synced'}</span>
         </span>
 
         <div className="grid grid-cols-4 gap-2 text-center font-mono">
@@ -181,7 +141,7 @@ export const AIHealthTwin: React.FC<AIHealthTwinProps> = ({
           <div className="bg-slate-900/80 border border-white/10 p-2 rounded-xl">
             <span className="text-[8px] text-slate-400 uppercase block">Daily Score</span>
             <span className="text-xs font-black text-cyan-300 block mt-0.5">
-              {hasConnectedDevices ? `${Math.min(100, Math.round((metrics.avgRecoveryScore || 75) * 1.1))}/100` : 'Device required'}
+              {metrics.avgRecoveryScore ? `${Math.min(100, metrics.avgRecoveryScore)}/100` : 'No data'}
             </span>
           </div>
 
@@ -189,7 +149,7 @@ export const AIHealthTwin: React.FC<AIHealthTwinProps> = ({
           <div className="bg-slate-900/80 border border-white/10 p-2 rounded-xl">
             <span className="text-[8px] text-slate-400 uppercase block">Weekly Score</span>
             <span className="text-xs font-black text-blue-300 block mt-0.5">
-              {hasConnectedDevices ? '88/100' : 'Device required'}
+              No data
             </span>
           </div>
 
@@ -197,7 +157,7 @@ export const AIHealthTwin: React.FC<AIHealthTwinProps> = ({
           <div className="bg-slate-900/80 border border-white/10 p-2 rounded-xl">
             <span className="text-[8px] text-slate-400 uppercase block">Monthly Score</span>
             <span className="text-xs font-black text-indigo-300 block mt-0.5">
-              {hasConnectedDevices ? '89/100' : 'Device required'}
+              No data
             </span>
           </div>
 
@@ -205,7 +165,7 @@ export const AIHealthTwin: React.FC<AIHealthTwinProps> = ({
           <div className="bg-slate-900/80 border border-emerald-500/30 p-2 rounded-xl">
             <span className="text-[8px] text-emerald-400 uppercase block font-bold">Recovery</span>
             <span className="text-xs font-black text-emerald-300 block mt-0.5">
-              {metrics.avgRecoveryScore !== undefined ? `${metrics.avgRecoveryScore}%` : 'Waiting for sync'}
+              {metrics.avgRecoveryScore !== undefined ? `${metrics.avgRecoveryScore}%` : 'No data'}
             </span>
           </div>
 
@@ -213,7 +173,7 @@ export const AIHealthTwin: React.FC<AIHealthTwinProps> = ({
           <div className="bg-slate-900/80 border border-amber-500/30 p-2 rounded-xl">
             <span className="text-[8px] text-amber-400 uppercase block font-bold">Fitness</span>
             <span className="text-xs font-black text-amber-300 block mt-0.5">
-              {metrics.totalWorkoutTimeMins !== undefined ? `${metrics.totalWorkoutTimeMins} min` : 'Device required'}
+              {metrics.totalWorkoutTimeMins !== undefined ? `${metrics.totalWorkoutTimeMins} min` : 'No data'}
             </span>
           </div>
 
@@ -221,7 +181,7 @@ export const AIHealthTwin: React.FC<AIHealthTwinProps> = ({
           <div className="bg-slate-900/80 border border-purple-500/30 p-2 rounded-xl">
             <span className="text-[8px] text-purple-400 uppercase block font-bold">Stress Index</span>
             <span className="text-xs font-black text-purple-300 block mt-0.5">
-              {metrics.avgStressLevel !== undefined ? `${metrics.avgStressLevel}%` : 'Device required'}
+              {metrics.avgStressLevel !== undefined ? `${metrics.avgStressLevel}%` : 'No data'}
             </span>
           </div>
 
@@ -229,7 +189,7 @@ export const AIHealthTwin: React.FC<AIHealthTwinProps> = ({
           <div className="bg-slate-900/80 border border-yellow-500/30 p-2 rounded-xl">
             <span className="text-[8px] text-yellow-400 uppercase block font-bold">Longevity</span>
             <span className="text-xs font-black text-yellow-300 block mt-0.5">
-              {hasConnectedDevices ? '95/100' : 'Device required'}
+              No data
             </span>
           </div>
 
@@ -237,7 +197,7 @@ export const AIHealthTwin: React.FC<AIHealthTwinProps> = ({
           <div className="bg-slate-900/80 border border-cyan-500/30 p-2 rounded-xl">
             <span className="text-[8px] text-cyan-400 uppercase block font-bold">Bio-Age</span>
             <span className="text-xs font-black text-cyan-300 block mt-0.5">
-              {hasConnectedDevices ? `${(userAge - 3.8).toFixed(1)} Yrs` : 'Device required'}
+              No data
             </span>
           </div>
         </div>
@@ -304,7 +264,7 @@ export const AIHealthTwin: React.FC<AIHealthTwinProps> = ({
                 <Sparkles size={14} /> AI Personal Health Companion
               </h5>
               <p className="text-slate-300 text-xs mt-1 leading-relaxed">
-                "Hello! I'm NutriChat AI, your personal health twin. I've verified your sleep, hydration, and workout patterns. Focus on proper recovery today and let me know how you're feeling!"
+                "Hi! I'm NutriChat AI, your health companion. Once you connect a wearable and log your meals, I can personalise everything for you. For now, ask me any nutrition, fitness or wellness question!"
               </p>
             </div>
           )}
@@ -315,7 +275,7 @@ export const AIHealthTwin: React.FC<AIHealthTwinProps> = ({
                 <Stethoscope size={14} /> Personal Doctor Insights
               </h5>
               <p className="text-slate-300 text-xs mt-1 leading-relaxed">
-                "Blood pressure (118/76) and resting HR (62 bpm) are in optimal athletic range. Blood glucose levels are stable at 92 mg/dL. Allergies recorded: Peanut & Lactose. No critical cardiovascular anomalies detected."
+                "No biometric readings are connected yet. Connect a wearable (Apple Health, Health Connect, Fitbit…) or log your vitals for personalised insights — and always consult a qualified doctor for medical advice."
               </p>
             </div>
           )}
@@ -326,7 +286,7 @@ export const AIHealthTwin: React.FC<AIHealthTwinProps> = ({
                 <Dumbbell size={14} /> Personal Fitness Trainer
               </h5>
               <p className="text-slate-300 text-xs mt-1 leading-relaxed">
-                "Recovery Score is 88%! Your HRV is high and central nervous system is primed. Today is ideal for a heavy compound strength workout (Deadlifts/Squats or Upper Body Hypertrophy)."
+                "Once activity data is synced, I can tailor workout intensity to your recovery. Until then: consistency, progressive overload and proper form build the foundation."
               </p>
             </div>
           )}
@@ -337,7 +297,7 @@ export const AIHealthTwin: React.FC<AIHealthTwinProps> = ({
                 <Utensils size={14} /> Nutrition & Macro Coach
               </h5>
               <p className="text-slate-300 text-xs mt-1 leading-relaxed">
-                "Macronutrient Partitioning: Protein target is 120g/day. You consumed 95g yesterday (25g gap). Recommend 250g paneer, 3 boiled eggs, or a scoops of whey protein before bedtime."
+                "Share what you ate today and I'll help you hit your macro targets. Use the meal scanner for instant calorie and protein estimates."
               </p>
             </div>
           )}
@@ -348,7 +308,7 @@ export const AIHealthTwin: React.FC<AIHealthTwinProps> = ({
                 <Zap size={14} /> Recovery & Sleep Specialist
               </h5>
               <p className="text-slate-300 text-xs mt-1 leading-relaxed">
-                "Deep Sleep: 1h 45m (Good). REM Sleep: 1h 20m. Stress index is low at 22/100. Hydration needs attention (1.8L logged out of 3.0L goal)."
+                "Sleep and recovery tracking need connected data. Use the manual sleep log to start building your recovery picture."
               </p>
             </div>
           )}
@@ -363,35 +323,17 @@ export const AIHealthTwin: React.FC<AIHealthTwinProps> = ({
         </span>
 
         <div className="space-y-2">
-          {proactiveInsights.map((insight) => (
-            <div 
-              key={insight.id}
-              onClick={() => handleSelectPrompt(insight.actionPrompt)}
-              className="bg-slate-900/80 hover:bg-slate-900 border border-white/10 hover:border-cyan-500/40 p-3 rounded-2xl transition cursor-pointer group"
-            >
-              <div className="flex items-center justify-between">
-                <span className="text-[8px] font-mono font-bold uppercase bg-cyan-500/10 text-cyan-300 border border-cyan-500/30 px-1.5 py-0.2 rounded">
-                  {insight.role}
-                </span>
-                <span className="text-[9px] text-cyan-400 font-bold group-hover:underline flex items-center gap-1 font-mono">
-                  Ask NutriChat <ChevronRight size={11} />
-                </span>
-              </div>
-
-              <p className="text-xs text-white font-medium mt-1.5 leading-snug">
-                "{insight.hinglish}"
-              </p>
-              <p className="text-[10px] text-slate-400 mt-0.5 italic">
-                {insight.english}
-              </p>
-            </div>
-          ))}
+          <p className="text-xs text-slate-400 leading-relaxed p-3 bg-slate-900/60 border border-white/10 rounded-2xl">
+            {hasRealData
+              ? 'Insights will appear here as more data streams in.'
+              : 'No health insights yet — connect a wearable or log your meals for personalised alerts.'}
+          </p>
         </div>
       </div>
 
       {/* Global Bottom CTA to Chat with Health Twin */}
       <button
-        onClick={() => handleSelectPrompt('Hey NutriChat, analyze my AI Health Twin data and give me my overall daily recommendations')}
+        onClick={() => handleSelectPrompt('Hey NutriChat, help me understand my current health and nutrition goals')}
         className="w-full py-2.5 bg-gradient-to-r from-cyan-500 via-blue-600 to-indigo-600 hover:from-cyan-400 hover:to-indigo-500 text-slate-950 font-black rounded-2xl text-xs uppercase tracking-wider transition shadow-lg shadow-cyan-500/20 flex items-center justify-center gap-2 cursor-pointer"
       >
         <MessageCircle size={15} />

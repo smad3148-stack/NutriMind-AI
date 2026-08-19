@@ -1177,19 +1177,11 @@ To help me fine-tune this weight gain strategy: **Do you prefer vegetarian prote
     const memories = req.body.memories || [];
     const contextSnapshot = req.body.contextSnapshot || {};
 
-    let wearableContext = '';
-    if (wearableData && wearableData.activeDeviceCount > 0) {
-      wearableContext = `\n\nLIVE WEARABLE TELEMETRY SYNCED:
+      let wearableContext = '';
+      if (wearableData && wearableData.activeDeviceCount > 0) {
+        wearableContext = `\n\nLIVE WEARABLE TELEMETRY SYNCED:
 Connected Brands: ${wearableData.connectedBrands ? wearableData.connectedBrands.join(', ') : 'Wearables'}
-Steps Today: ${wearableData.totalSteps}
-Heart Rate: ${wearableData.avgHeartRateBpm} BPM
-Sleep Logged: ${wearableData.totalSleepHours} hours
-Active Calories Burned: ${wearableData.totalActiveCalories} kcal
-HRV Index: ${wearableData.avgHrvMs} ms
-Latest Body Weight: ${wearableData.latestWeightKg} kg
-Blood Glucose: ${wearableData.latestGlucoseMgDl} mg/dL
-Blood Pressure: ${wearableData.latestBloodPressure ? `${wearableData.latestBloodPressure.systolic}/${wearableData.latestBloodPressure.diastolic}` : '118/76'}
-Automatically weave these real-time biometric metrics into your coaching recommendations when relevant!`;
+${wearableData.totalSteps > 0 ? `Steps Today: ${wearableData.totalSteps}\n` : ''}${wearableData.avgHeartRateBpm > 0 ? `Heart Rate: ${wearableData.avgHeartRateBpm} BPM\n` : ''}${wearableData.totalSleepHours > 0 ? `Sleep Logged: ${wearableData.totalSleepHours} hours\n` : ''}${wearableData.totalActiveCalories > 0 ? `Active Calories Burned: ${wearableData.totalActiveCalories} kcal\n` : ''}${wearableData.avgHrvMs ? `HRV Index: ${wearableData.avgHrvMs} ms\n` : ''}${wearableData.latestWeightKg ? `Latest Body Weight: ${wearableData.latestWeightKg} kg\n` : ''}${wearableData.latestGlucoseMgDl ? `Blood Glucose: ${wearableData.latestGlucoseMgDl} mg/dL\n` : ''}${wearableData.latestBloodPressure ? `Blood Pressure: ${wearableData.latestBloodPressure.systolic}/${wearableData.latestBloodPressure.diastolic}\n` : ''}Only reference metrics listed above. Never invent or assume health values that are not present.`;
     }
 
     let memoryContext = '';
@@ -1205,8 +1197,8 @@ Use these Second Brain memories naturally to personalize your answers (e.g. favo
 Current Goal: ${contextSnapshot.userGoal || 'Health & Longevity'}
 Calories Today: ${contextSnapshot.totalCaloriesToday || 0} kcal
 Water Intake: ${contextSnapshot.waterIntakeToday || 0} ml
-Sleep Score: ${contextSnapshot.sleepScore || 0}
-Stress Score: ${contextSnapshot.stressScore || 0}`;
+Sleep Score: ${typeof contextSnapshot.sleepScore === 'number' && contextSnapshot.sleepScore > 0 ? contextSnapshot.sleepScore : 'No data'}
+Stress Score: ${typeof contextSnapshot.stressScore === 'number' && contextSnapshot.stressScore > 0 ? contextSnapshot.stressScore : 'No data'}`;
     }
 
     const systemInstruction = `You are NutriChat, an intelligent, human-like, friendly, caring, and natural AI health, nutrition, and fitness assistant operating as the user's Second Brain & Life OS companion. You behave and converse like ChatGPT, Gemini, or Claude. You talk warmly, naturally, and conversationally like a supportive friend!
@@ -1847,15 +1839,10 @@ CRITICAL PERSONALITY & STYLE RULES:
       const device = localWearables.find(w => w.id === id);
       if (device) {
         device.connected = !device.connected;
-        device.lastSynced = new Date().toISOString();
-        if (device.connected) {
-          // Sync live diagnostics sensor metrics only when connected
-          device.steps = 9480;
-          device.heartRateBpm = 72;
-          device.caloriesBurned = 460;
-          device.sleepHours = 7.4;
-        } else {
-          // STRICT RULE: DO NOT generate fake steps, heart rate, sleep, calories when unavailable/disconnected
+        // P0-05: connecting a device NEVER fabricates biometrics - real
+        // telemetry arrives only via an actual sync, which does not exist
+        // yet. Metrics stay 0 and lastSynced stays null ("never").
+        if (!device.connected) {
           device.steps = 0;
           device.heartRateBpm = 0;
           device.caloriesBurned = 0;
@@ -1880,17 +1867,12 @@ CRITICAL PERSONALITY & STYLE RULES:
 
       const nextConnected = !current.connected;
       const updateData: any = {
-        connected: nextConnected,
-        last_synced: new Date().toISOString()
+        connected: nextConnected
+        // P0-05: connecting NEVER fabricates biometrics. Metrics stay 0 and
+        // last_synced stays null until a real sync exists.
       };
 
-      if (nextConnected) {
-        updateData.steps = 9480;
-        updateData.heart_rate_bpm = 72;
-        updateData.calories_burned = 460;
-        updateData.sleep_hours = 7.4;
-      } else {
-        // STRICT RULE: DO NOT generate fake steps, heart rate, sleep, calories when unavailable/disconnected
+      if (!nextConnected) {
         updateData.steps = 0;
         updateData.heart_rate_bpm = 0;
         updateData.calories_burned = 0;

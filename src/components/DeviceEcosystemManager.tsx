@@ -530,7 +530,9 @@ export const DeviceEcosystemManager: React.FC<DeviceEcosystemManagerProps> = ({
                         <div>
                           <h5 className="font-bold text-white text-xs">{w.device}</h5>
                           <p className="text-[9px] text-slate-400 font-mono">
-                            {w.connected ? `HR: ${w.heartRateBpm} BPM • Steps: ${w.steps.toLocaleString()} • Sleep: ${w.sleepHours}h` : 'Disconnected'}
+                            {w.connected && (w.heartRateBpm > 0 || w.steps > 0 || w.sleepHours > 0)
+                              ? `HR: ${w.heartRateBpm} BPM • Steps: ${w.steps.toLocaleString()} • Sleep: ${w.sleepHours}h`
+                              : w.connected ? 'Connected — waiting for data' : 'Disconnected'}
                           </p>
                         </div>
                       </div>

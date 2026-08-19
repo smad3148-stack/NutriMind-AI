@@ -266,7 +266,7 @@ export const CleanHomeDashboard: React.FC<CleanHomeDashboardProps> = ({
               <span className="text-xs font-bold text-slate-400 font-mono">/ 100</span>
             </div>
             <p className="text-[10.5px] text-emerald-400 font-semibold flex items-center gap-1">
-              <CheckCircle2 size={12} /> Health score improved +17% this month →
+              <CheckCircle2 size={12} /> Health score: No data this month →
             </p>
           </div>
 
@@ -290,10 +290,10 @@ export const CleanHomeDashboard: React.FC<CleanHomeDashboardProps> = ({
               <Moon size={16} />
             </div>
             <span className="text-2xl font-black text-white font-mono block">
-              {metrics.totalSleepHours > 0 ? `${metrics.totalSleepHours} hrs` : '7.4 hrs'}
+              {metrics.totalSleepHours > 0 ? `${metrics.totalSleepHours} hrs` : 'No data'}
             </span>
             <span className="text-[10px] text-indigo-300 font-medium block flex items-center justify-between">
-              <span>91% Quality</span>
+              <span>No data</span>
               <ChevronRight size={12} className="text-slate-500" />
             </span>
           </motion.div>
@@ -310,7 +310,7 @@ export const CleanHomeDashboard: React.FC<CleanHomeDashboardProps> = ({
               <Zap size={16} />
             </div>
             <span className="text-2xl font-black text-white font-mono block">
-              {metrics.avgRecoveryScore !== undefined ? `${metrics.avgRecoveryScore}%` : '89%'}
+              {metrics.avgRecoveryScore !== undefined ? `${metrics.avgRecoveryScore}%` : 'No data'}
             </span>
             <span className="text-[10px] text-emerald-300 font-medium block flex items-center justify-between">
               <span>Prime CNS Stamina</span>
@@ -531,7 +531,7 @@ export const CleanHomeDashboard: React.FC<CleanHomeDashboardProps> = ({
                         </span>
                         <div className="grid grid-cols-2 gap-1.5 text-[10px] text-slate-200">
                           <div className="p-1.5 bg-slate-950/60 rounded-lg">+ Deep Sleep (2h 10m)</div>
-                          <div className="p-1.5 bg-slate-950/60 rounded-lg">+ Recovery (89% CNS)</div>
+                          <div className="p-1.5 bg-slate-950/60 rounded-lg">+ Recovery (No data)</div>
                           <div className="p-1.5 bg-slate-950/60 rounded-lg">+ Hydration (2.8L/day)</div>
                           <div className="p-1.5 bg-slate-950/60 rounded-lg">+ Calories (Optimal Target)</div>
                           <div className="p-1.5 bg-slate-950/60 rounded-lg">+ Workout (4x/week)</div>
@@ -559,7 +559,7 @@ export const CleanHomeDashboard: React.FC<CleanHomeDashboardProps> = ({
                     <button
                       onClick={() => {
                         setActiveLevel2Modal(null);
-                        onOpenNutriChat("Provide a complete breakdown of why my Health Score improved by 17% this month.");
+                        onOpenNutriChat("Why is my Health Score showing no data yet?");
                       }}
                       className="w-full py-3 bg-gradient-to-r from-cyan-400 to-blue-500 text-slate-950 font-black rounded-2xl text-xs uppercase tracking-wider cursor-pointer"
                     >
@@ -628,7 +628,7 @@ export const CleanHomeDashboard: React.FC<CleanHomeDashboardProps> = ({
                       </div>
                       <div className="bg-slate-900 p-3 rounded-2xl border border-white/10">
                         <span className="text-[9px] text-emerald-400 uppercase block font-bold">Sleep Efficiency</span>
-                        <span className="text-base font-black text-white">92%</span>
+                        <span className="text-base font-black text-white">No data</span>
                       </div>
                       <div className="bg-slate-900 p-3 rounded-2xl border border-white/10">
                         <span className="text-[9px] text-emerald-400 uppercase block font-bold">Sleep Debt</span>
@@ -640,7 +640,7 @@ export const CleanHomeDashboard: React.FC<CleanHomeDashboardProps> = ({
                       </div>
                       <div className="bg-slate-900 p-3 rounded-2xl border border-white/10 col-span-2 sm:col-span-3">
                         <span className="text-[9px] text-indigo-300 uppercase block font-bold">Average Sleep Time</span>
-                        <span className="text-base font-black text-white">7 hrs 24 mins</span>
+                        <span className="text-base font-black text-white">No data</span>
                       </div>
                     </div>
 
@@ -666,10 +666,10 @@ export const CleanHomeDashboard: React.FC<CleanHomeDashboardProps> = ({
                       {/* CHART BARS */}
                       <div className="grid grid-cols-7 gap-1 h-20 items-end pt-2">
                         {(sleepGraphMode === 'weekly' 
-                          ? [7.2, 7.5, 6.8, 7.8, 7.4, 8.1, 7.6] 
+                          ? [] 
                           : sleepGraphMode === 'monthly'
-                          ? [7.1, 7.4, 7.6, 7.8, 7.5, 7.2, 7.9]
-                          : [7.0, 7.2, 7.3, 7.5, 7.6, 7.8, 7.7]
+                          ? []
+                          : []
                         ).map((val, idx) => (
                           <div key={idx} className="flex flex-col items-center gap-1">
                             <span className="text-[8px] text-indigo-300 font-bold">{val}h</span>
@@ -738,34 +738,34 @@ export const CleanHomeDashboard: React.FC<CleanHomeDashboardProps> = ({
                     <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
                       <div className="bg-slate-900 p-3 rounded-2xl border border-white/10">
                         <span className="text-[9px] text-emerald-400 uppercase block font-bold">Recovery</span>
-                        <span className="text-base font-black text-white">89%</span>
+                        <span className="text-base font-black text-white">No data</span>
                       </div>
                       <div className="bg-slate-900 p-3 rounded-2xl border border-white/10">
                         <span className="text-[9px] text-emerald-400 uppercase block font-bold">Readiness</span>
-                        <span className="text-base font-black text-white">92%</span>
+                        <span className="text-base font-black text-white">No data</span>
                       </div>
                       <div className="bg-slate-900 p-3 rounded-2xl border border-white/10">
                         <span className="text-[9px] text-amber-400 uppercase block font-bold">Stress</span>
-                        <span className="text-base font-black text-white">18% (Low)</span>
+                        <span className="text-base font-black text-white">No data</span>
                       </div>
                       <div className="bg-slate-900 p-3 rounded-2xl border border-white/10">
                         <span className="text-[9px] text-emerald-400 uppercase block font-bold">HRV</span>
-                        <span className="text-base font-black text-white">88 ms</span>
+                        <span className="text-base font-black text-white">No data</span>
                       </div>
                       <div className="bg-slate-900 p-3 rounded-2xl border border-white/10">
                         <span className="text-[9px] text-rose-400 uppercase block font-bold">Resting HR</span>
-                        <span className="text-base font-black text-white">58 BPM</span>
+                        <span className="text-base font-black text-white">No data</span>
                       </div>
                       <div className="bg-slate-900 p-3 rounded-2xl border border-white/10">
                         <span className="text-[9px] text-indigo-300 uppercase block font-bold">Body Temp</span>
-                        <span className="text-base font-black text-white">36.5 °C</span>
+                        <span className="text-base font-black text-white">No data</span>
                       </div>
                     </div>
 
                     <button
                       onClick={() => {
                         setActiveLevel2Modal(null);
-                        onOpenNutriChat("How does my 88ms HRV recovery affect today's workout capacity?");
+                        onOpenNutriChat("How can I improve my recovery without connected HRV data yet?");
                       }}
                       className="w-full py-3 bg-emerald-500 text-slate-950 font-black rounded-2xl text-xs uppercase tracking-wider cursor-pointer"
                     >
@@ -851,7 +851,7 @@ export const CleanHomeDashboard: React.FC<CleanHomeDashboardProps> = ({
                       </div>
                       <div className="bg-slate-900 p-3 rounded-2xl border border-white/10 col-span-2">
                         <span className="text-[9px] text-emerald-400 uppercase block font-bold">Hydration Target Score</span>
-                        <span className="text-xs font-black text-emerald-300">92 / 100 (Optimal Cell Osmolality)</span>
+                        <span className="text-xs font-black text-emerald-300">No data</span>
                       </div>
                     </div>
 
@@ -915,12 +915,12 @@ export const CleanHomeDashboard: React.FC<CleanHomeDashboardProps> = ({
 
                       <div className="bg-slate-900 p-3.5 rounded-2xl border border-white/10 space-y-1">
                         <span className="text-[9.5px] text-emerald-400 uppercase block font-bold">Muscle Growth Prediction</span>
-                        <span className="text-xs font-black text-emerald-300">+1.2 kg Lean Mass / month</span>
+                        <span className="text-xs font-black text-emerald-300">No data</span>
                       </div>
 
                       <div className="bg-slate-900 p-3.5 rounded-2xl border border-white/10 space-y-1">
                         <span className="text-[9.5px] text-amber-400 uppercase block font-bold">Protein Streaks</span>
-                        <span className="text-xs font-black text-amber-300">27 Days Continuous Streak 🔥</span>
+                        <span className="text-xs font-black text-amber-300">No streak yet</span>
                       </div>
                     </div>
 
@@ -968,11 +968,11 @@ export const CleanHomeDashboard: React.FC<CleanHomeDashboardProps> = ({
                       </div>
                       <div className="bg-slate-900 p-3 rounded-2xl border border-white/10">
                         <span className="text-[9px] text-rose-400 uppercase block font-bold">Workout Calories</span>
-                        <span className="text-base font-black text-white">520 kcal</span>
+                        <span className="text-base font-black text-white">No data</span>
                       </div>
                       <div className="bg-slate-900 p-3 rounded-2xl border border-white/10">
                         <span className="text-[9px] text-emerald-400 uppercase block font-bold">Total Burn (BMR)</span>
-                        <span className="text-base font-black text-white">2,350 kcal</span>
+                        <span className="text-base font-black text-white">No data</span>
                       </div>
                     </div>
 
@@ -1070,13 +1070,13 @@ export const CleanHomeDashboard: React.FC<CleanHomeDashboardProps> = ({
                           </div>
                           <div className="bg-slate-900 p-3 rounded-2xl border border-white/5 space-y-1">
                             <span className="text-slate-400 font-bold uppercase block">Body Fat Prediction</span>
-                            <span className="text-xs font-bold text-cyan-400">14.2% Body Fat</span>
+                            <span className="text-xs font-bold text-cyan-400">No data</span>
                           </div>
                         </div>
 
                         <div className="bg-slate-900 p-3.5 rounded-2xl border border-white/10 space-y-1">
                           <span className="text-[10px] text-slate-400 uppercase font-bold block">Weekly Deficit Targets</span>
-                          <span className="text-xs font-bold text-slate-200 block">75 kg → 71.8 kg target reached by Day 30</span>
+                          <span className="text-xs font-bold text-slate-200 block">No weight data yet</span>
                         </div>
                       </div>
                     ) : (
@@ -1095,7 +1095,7 @@ export const CleanHomeDashboard: React.FC<CleanHomeDashboardProps> = ({
                         <div className="grid grid-cols-2 sm:grid-cols-3 gap-2 text-[10.5px]">
                           <div className="bg-slate-900 p-3 rounded-2xl border border-white/5 space-y-1">
                             <span className="text-slate-400 font-bold uppercase block">Muscle Gain</span>
-                            <span className="text-base font-black text-emerald-400">+1.2 kg Lean / mo</span>
+                            <span className="text-base font-black text-emerald-400">No data</span>
                           </div>
                           <div className="bg-slate-900 p-3 rounded-2xl border border-white/5 space-y-1">
                             <span className="text-slate-400 font-bold uppercase block">Protein Targets</span>
@@ -1107,7 +1107,7 @@ export const CleanHomeDashboard: React.FC<CleanHomeDashboardProps> = ({
                           </div>
                           <div className="bg-slate-900 p-3 rounded-2xl border border-white/5 space-y-1">
                             <span className="text-slate-400 font-bold uppercase block">Recovery Target</span>
-                            <span className="text-xs font-bold text-emerald-400">90%+ CNS Recovery</span>
+                            <span className="text-xs font-bold text-emerald-400">No data</span>
                           </div>
                           <div className="bg-slate-900 p-3 rounded-2xl border border-white/5 space-y-1">
                             <span className="text-slate-400 font-bold uppercase block">Strength Progression</span>
@@ -1121,7 +1121,7 @@ export const CleanHomeDashboard: React.FC<CleanHomeDashboardProps> = ({
 
                         <div className="bg-slate-900 p-3.5 rounded-2xl border border-white/10 space-y-1">
                           <span className="text-[10px] text-slate-400 uppercase font-bold block">Weekly Growth Targets</span>
-                          <span className="text-xs font-bold text-slate-200 block">75 kg → 79.8 kg lean muscle mass trajectory</span>
+                          <span className="text-xs font-bold text-slate-200 block">No body composition data yet</span>
                         </div>
                       </div>
                     )}
