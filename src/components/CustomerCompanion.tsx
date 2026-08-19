@@ -103,8 +103,10 @@ export default function CustomerCompanion({ token, userId }: CustomerCompanionPr
   const [familyMembers, setFamilyMembers] = useState<FamilyMember[]>([]);
   const [wearables, setWearables] = useState<WearableMetrics[]>([]);
   const [showDeviceManager, setShowDeviceManager] = useState<boolean>(false);
-  const [isPremium, setIsPremium] = useState<boolean>(true);
-  const [selectedTier, setSelectedTier] = useState<'FREE' | 'PRO' | 'ELITE'>('PRO');
+  // P0-06: premium is NEVER granted by default — only a verified, server-side
+  // payment entitlement can unlock it. No client path sets this anymore.
+  const [isPremium, setIsPremium] = useState<boolean>(false);
+  const [selectedTier, setSelectedTier] = useState<'FREE' | 'PRO' | 'ELITE'>('FREE');
 
   // Chat/Coach Threads states with persistent local storage
   const [threads, setThreads] = useState<ChatThread[]>(() => {
