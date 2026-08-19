@@ -4,6 +4,7 @@
  */
 
 import { platform } from './platform';
+import { getSessionToken } from './sessionToken';
 
 export interface CrashReport {
   id: string;
@@ -133,9 +134,13 @@ class CrashReporter {
 
   private async sendCrashReport(report: CrashReport): Promise<boolean> {
     try {
+      const token = getSessionToken(); // P0-04: diagnostics endpoints are authenticated
       const res = await fetch('/api/diagnostics/crash', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: {
+          'Content-Type': 'application/json',
+          ...(token ? { Authorization: `Bearer ${token}` } : {}),
+        },
         body: JSON.stringify(report)
       });
       return res.ok;

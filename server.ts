@@ -10,6 +10,7 @@ import { createServer as createViteServer } from 'vite';
 import { GoogleGenAI } from '@google/genai';
 import { getSupabaseAdmin } from './server/supabaseAdmin';
 import { requireUserAuth, requireAdminAuth, isAuthConfigured, AuthenticatedRequest } from './server/supabaseUser';
+import { createAiRateLimiter, createAiDailyBudget, aiRequestKey } from './server/rateLimit';
 import { ChatMessage } from './src/types';
 import { getPrisma, handlePrismaError } from './server/prisma';
 import foodDatabase from './src/food_database.json';
@@ -243,6 +244,33 @@ async function isFeatureEnabled(key: string): Promise<boolean> {
   }
 
   return true; // Default to true if database is unconfigured
+}
+
+// --- AI COST PROTECTION (P0-04) ---
+// In-memory fixed-window + daily budget guards for every Gemini-triggering
+// route. Per-user when authenticated, per-IP in sandbox/demo mode. Tune via
+// AI_RATE_LIMIT_PER_MIN and AI_DAILY_BUDGET env vars.
+const aiMinuteLimiter = createAiRateLimiter({
+  windowMs: 60_000,
+  max: parseInt(process.env.AI_RATE_LIMIT_PER_MIN || '20', 10),
+  message: 'AI request rate limit exceeded. Please wait a minute and try again.',
+});
+const aiDailyBudget = createAiDailyBudget(parseInt(process.env.AI_DAILY_BUDGET || '300', 10));
+
+/** Validates chat payloads to bound per-request token cost. */
+function validateChatMessages(messages: any[]): string | null {
+  if (!Array.isArray(messages)) {
+    return 'Messages array is required.';
+  }
+  if (messages.length > 60) {
+    return 'Message history too long (max 60 messages per request).';
+  }
+  for (const m of messages) {
+    if (m && typeof m.text === 'string' && m.text.length > 4000) {
+      return 'Message too long (max 4000 characters per message).';
+    }
+  }
+  return null;
 }
 
 
@@ -583,6 +611,14 @@ async function startServer() {
     console.log("[LOG] Incoming request to Food Scanner");
     const { imageBase64, imageUrl, description, category, userGoal } = req.body;
     const supabase = req.supabaseUserClient;
+
+    // Cost protection: reject oversized images before they reach Gemini.
+    if (imageBase64 && typeof imageBase64 === 'string') {
+      const approxBytes = Math.ceil((imageBase64.length * 3) / 4);
+      if (approxBytes > 5 * 1024 * 1024) {
+        return res.status(413).json({ error: 'Image too large (max 5 MB).' });
+      }
+    }
     
     const scannerEnabled = await isFeatureEnabled('enableMealScanner');
     if (!scannerEnabled) {
@@ -747,9 +783,9 @@ Return a clean, valid JSON object matching this schema EXACTLY:
     }
   }
 
-  app.post('/api/meals/scan', requireUserAuth, handleMealOrImageAnalysis);
-  app.post('/api/meal-analysis', requireUserAuth, handleMealOrImageAnalysis);
-  app.post('/api/image-analysis', requireUserAuth, handleMealOrImageAnalysis);
+  app.post('/api/meals/scan', requireUserAuth, aiMinuteLimiter.middleware(aiRequestKey), aiDailyBudget.middleware(aiRequestKey), handleMealOrImageAnalysis);
+  app.post('/api/meal-analysis', requireUserAuth, aiMinuteLimiter.middleware(aiRequestKey), aiDailyBudget.middleware(aiRequestKey), handleMealOrImageAnalysis);
+  app.post('/api/image-analysis', requireUserAuth, aiMinuteLimiter.middleware(aiRequestKey), aiDailyBudget.middleware(aiRequestKey), handleMealOrImageAnalysis);
 
   // Stateful Greeting Rotation Engine
   const recentEnIndices: number[] = [];
@@ -1090,12 +1126,13 @@ To help me fine-tune this weight gain strategy: **Do you prefer vegetarian prote
   }
 
   // 3. AI HEALTH COACH (Direct Conversational Integration)
-  app.post('/api/coach/chat', requireUserAuth, async (req: AuthenticatedRequest, res) => {
+  app.post('/api/coach/chat', requireUserAuth, aiMinuteLimiter.middleware(aiRequestKey), aiDailyBudget.middleware(aiRequestKey), async (req: AuthenticatedRequest, res) => {
     console.log("[LOG] Incoming request to /api/coach/chat");
     const { messages } = req.body;
 
-    if (!messages || !Array.isArray(messages)) {
-      return res.status(400).json({ error: 'Messages array is required.' });
+    const chatError = validateChatMessages(messages);
+    if (chatError) {
+      return res.status(400).json({ error: chatError });
     }
 
     const coachEnabled = await isFeatureEnabled('enablePremiumCoach');
@@ -1318,146 +1355,16 @@ CRITICAL PERSONALITY & STYLE RULES:
     }
   });
 
-  // Public test endpoint for live multilingual verification
-  app.post('/api/coach/chat-test', async (req, res) => {
-    console.log("[LOG] Incoming request to /api/coach/chat-test");
-    const { messages } = req.body;
-    if (!messages || !Array.isArray(messages)) {
-      return res.status(400).json({ error: 'Messages array is required.' });
-    }
 
-    const currentKey = (process.env.GEMINI_API_KEY || '').trim();
-    let cleanedKey = currentKey;
-    if (cleanedKey.startsWith('"') && cleanedKey.endsWith('"')) cleanedKey = cleanedKey.slice(1, -1);
-    if (cleanedKey.startsWith("'") && cleanedKey.endsWith("'")) cleanedKey = cleanedKey.slice(1, -1);
-    cleanedKey = cleanedKey.trim();
-    console.log("[LOG] GEMINI_API_KEY found?", !!cleanedKey);
-    
-    const systemInstruction = `You are NutriChat, an intelligent, human-like, friendly, caring, and natural AI health, nutrition, and fitness assistant. You behave and converse like ChatGPT, Gemini, or Claude. You talk warmly, naturally, and conversationally like a supportive friend!
-
-CRITICAL PERSONALITY & STYLE RULES:
-1. HUMAN-LIKE, NATURAL & FRIENDLY:
-   - Speak naturally like a real human friend and helpful AI.
-   - Be funny sometimes, friendly, motivating, caring, and empathetic.
-   - NEVER sound robotic, overly professional, like a research paper, doctor report, or medical thesis.
-   - Strictly avoid unnecessary scientific/medical/professional jargon (DO NOT say "metabolic pipeline", "cellular bio-harmony", "macronutrient partitioning matrix", "biological longevity calibration", "metabolic vectors", "cellular healing recommendation").
-
-2. DYNAMIC ANSWER LENGTH BASED ON QUESTION COMPLEXITY:
-   - Simple Questions (e.g. "Hi", "Hello", "Protein kitna khana chaiye?", "Meri height nahi badh rahi"):
-     → Reply in 1 to 4 lines MAXIMUM. Be simple, direct, and conversational.
-   - Medium Questions (e.g. "Suggest a 7-day Indian meal plan"):
-     → Reply in 5 to 10 lines with clean, scannable points.
-   - Very Complex Questions:
-     → Provide a detailed, easy-to-understand explanation.
-
-3. CHAT STYLE BALANCE:
-   - 70% Simple, natural human language
-   - 20% Detailed explanations
-   - 10% Professional advice (only when strictly required)
-
-4. DYNAMIC LANGUAGE & DIALECT MIRRORING PROTOCOL:
-   - AI NEVER ASSUMES USER LANGUAGE.
-   - DEFAULT INITIAL GREETING MUST ALWAYS BE ONLY IN ENGLISH: "Hello! I'm NutriChat AI. I'm your personal AI health companion. How are you feeling today?"
-   - NEVER auto-translate or use localized greetings for initial messages (NO "Hii! Main NutriChat hu", NO "Namaste", NO "Assalamualaikum", NO "শুভ সকাল").
-   - AUTOMATICALLY DETECT & MIRROR USER LANGUAGE ON EVERY MESSAGE:
-     * User speaks Hindi → NutriChat responds in warm natural Hindi.
-     * User speaks Bengali → NutriChat responds in natural Bengali (e.g. "Ami tomar sathe achi.").
-     * User speaks Hinglish → NutriChat responds in natural Hinglish (e.g. "Bilkul Mitrabha! Main tumhari help karunga.").
-     * User speaks English → NutriChat responds in natural English (e.g. "I'm here with you.").
-   - 100x SEAMLESS AUTOMATIC LANGUAGE SWITCHING: If user switches language 100 times, switch 100 times automatically WITHOUT EVER asking "Please select your language" or "Which language do you prefer?".
-   - NEVER FEEL LIKE GOOGLE TRANSLATE: Speak with natural human understanding, warmth, and high empathy ("AI UNDERSTANDS ME").
-
-5. AI DIGITAL HEALTH TWIN & COMPANION PERSONA:
-   - You act as the user's AI Health Twin (combining Personal Doctor, Personal Trainer, Nutrition Coach, Recovery Coach, and AI Friend).
-   - Proactively reference user biometric twin data (e.g., "Kal tum sirf 5 ghante soye the", "Tum pichle 3 din se protein kam consume kar rahe ho", "Aaj tumhari recovery score 88% hai, aaj heavy workout kar sakte ho", "Tumhari hydration pichle hafte se kam ho gayi hai").
-   - Offer empathetic, proactive, and human-like health advice.`;
-
-    const activeAi = ai || new GoogleGenAI({
-      apiKey: cleanedKey,
-      httpOptions: { headers: { 'User-Agent': 'aistudio-build' } }
-    });
-
-    const lastMessageText = (messages[messages.length - 1]?.text || '').trim();
-
-    const presetResponse = handlePresetAcceptanceTests(messages, lastMessageText);
-    if (presetResponse) {
-      return res.json(presetResponse);
-    }
-
-    const greetLang = isGreeting(lastMessageText);
-    if (greetLang) {
-      const greetingText = getUniqueGreeting(greetLang);
-      return res.json({
-        id: 'test_msg_greet_' + Date.now(),
-        sender: 'assistant',
-        text: greetingText,
-        timestamp: new Date().toISOString(),
-        source: "gemini"
-      });
-    }
-
-    const normText = lastMessageText.toLowerCase();
-
-    console.log("[LOG] Gemini model used: gemini-3.6-flash");
-
-    const contents = messages.map(m => ({
-      role: m.sender === 'user' ? 'user' : 'model',
-      parts: [{ text: m.text }]
-    }));
-
-    console.log("[LOG] Prompt sent:", JSON.stringify(contents));
-
-    try {
-      console.log("[LOG] Gemini request sent?");
-      let responseText = '';
-      try {
-        const response = await activeAi.models.generateContent({
-          model: 'gemini-3.6-flash',
-          contents: contents as any,
-          config: { systemInstruction }
-        });
-        responseText = response.text || '';
-      } catch (e: any) {
-        try {
-          const response = await activeAi.models.generateContent({
-            model: 'gemini-3.1-pro-preview',
-            contents: contents as any,
-            config: { systemInstruction }
-          });
-          responseText = response.text || '';
-        } catch (err: any) {
-          responseText = "I am currently analyzing your health metrics. Please maintain your recommended water and protein targets today.";
-        }
-      }
-      console.log("[LOG] Gemini response received?");
-      console.log("[LOG] Raw Gemini response:", responseText);
-
-      return res.json({
-        id: 'test_msg_' + Date.now(),
-        sender: 'assistant',
-        text: responseText || '',
-        timestamp: new Date().toISOString(),
-        source: "gemini"
-      });
-    } catch (err: any) {
-      console.warn("[LOG] Gemini test conversation warning (handled):", err.message || err);
-      const recoveryText = getSmartRecoveryResponse(lastMessageText);
-      return res.json({
-        id: 'test_msg_recovery_' + Date.now(),
-        sender: 'assistant',
-        text: recoveryText,
-        timestamp: new Date().toISOString(),
-        source: "gemini"
-      });
-    }
-  });
 
 
   // Admin AI Companion Endpoint
-  app.post('/api/admin/chat-assistant', requireAdminAuth, async (req: AuthenticatedRequest, res) => {
+  app.post('/api/admin/chat-assistant', requireAdminAuth, aiMinuteLimiter.middleware(aiRequestKey), aiDailyBudget.middleware(aiRequestKey), async (req: AuthenticatedRequest, res) => {
     const { assistantType, messages, systemContext } = req.body;
-    if (!messages || !Array.isArray(messages)) {
-      return res.status(400).json({ error: 'Messages array is required.' });
+
+    const chatError = validateChatMessages(messages);
+    if (chatError) {
+      return res.status(400).json({ error: chatError });
     }
 
     const assistantProfiles: Record<string, { role: string; instructions: string }> = {
@@ -3119,37 +3026,48 @@ CRITICAL PERSONALITY & STYLE RULES:
   });
 
   // 9. DIAGNOSTICS AND OPERATIONS ENDPOINTS
-  app.post('/api/diagnostics/event', async (req, res) => {
+  app.post('/api/diagnostics/event', requireUserAuth, async (req, res) => {
     const { events } = req.body;
-    if (!events || !Array.isArray(events)) {
+    if (!events || !Array.isArray(events) || events.length === 0) {
       return res.status(400).json({ error: 'Missing or invalid events payload.' });
+    }
+    if (events.length > 50) {
+      return res.status(400).json({ error: 'Too many events in a single payload (max 50).' });
     }
 
     try {
-      for (const event of events) {
+      for (const event of events.slice(0, 50)) {
+        // Bound every logged field so the endpoint cannot be used to flood logs.
+        const name = String(event?.name || 'unknown').slice(0, 200);
+        const props = JSON.stringify(event?.properties || {}).slice(0, 2000);
         await addSystemAudit(
           'info',
           'DIAGNOSTICS_ANALYTICS',
-          `Event: "${event.name}" | Properties: ${JSON.stringify(event.properties || {})}`
+          `Event: "${name}" | Properties: ${props}`
         );
       }
-      res.json({ success: true, count: events.length });
+      res.json({ success: true, count: Math.min(events.length, 50) });
     } catch (err: any) {
       res.status(500).json({ error: err.message });
     }
   });
 
-  app.post('/api/diagnostics/crash', async (req, res) => {
+  app.post('/api/diagnostics/crash', requireUserAuth, async (req, res) => {
     const report = req.body;
     if (!report || !report.message) {
       return res.status(400).json({ error: 'Invalid crash report payload.' });
     }
 
     try {
+      // Bound every logged field so crash reports cannot flood the log store.
+      const message = String(report.message).slice(0, 2000);
+      const stack = String(report.stack || 'No Stack').slice(0, 10000);
+      const breadcrumbs = Array.isArray(report.breadcrumbs) ? report.breadcrumbs.slice(0, 100) : [];
+      const metadata = JSON.stringify(report.metadata || {}).slice(0, 5000);
       await addSystemAudit(
         'error',
         'CRASH_REPORTER',
-        `Crash: "${report.message}" | Stack: ${report.stack || 'No Stack'} | Breadcrumbs: ${JSON.stringify(report.breadcrumbs || [])} | Metadata: ${JSON.stringify(report.metadata || {})}`
+        `Crash: "${message}" | Stack: ${stack} | Breadcrumbs: ${JSON.stringify(breadcrumbs)} | Metadata: ${metadata}`
       );
       res.json({ success: true, id: report.id });
     } catch (err: any) {
@@ -3157,17 +3075,25 @@ CRITICAL PERSONALITY & STYLE RULES:
     }
   });
 
-  app.post('/api/user/push-token', async (req, res) => {
+  app.post('/api/user/push-token', requireUserAuth, async (req, res) => {
     const { token, platform } = req.body;
-    if (!token) {
+    if (!token || typeof token !== 'string') {
       return res.status(400).json({ error: 'Missing registration token.' });
     }
+    if (token.length > 500) {
+      return res.status(400).json({ error: 'Registration token too long.' });
+    }
+    const allowedPlatforms = ['ios', 'android', 'web'];
+    const cleanPlatform =
+      typeof platform === 'string' && allowedPlatforms.includes(platform.toLowerCase())
+        ? platform.toLowerCase()
+        : 'unknown';
 
     try {
       await addSystemAudit(
         'info',
         'PUSH_SERVICE',
-        `Registered push token for platform [${platform || 'unknown'}]: "${token.substring(0, 30)}..."`
+        `Registered push token for platform [${cleanPlatform}]: "${token.slice(0, 30)}..."`
       );
       res.json({ success: true });
     } catch (err: any) {

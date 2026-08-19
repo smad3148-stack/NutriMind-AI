@@ -4,6 +4,7 @@
  */
 
 import { platform } from './platform';
+import { getSessionToken } from './sessionToken';
 
 export interface AnalyticsEvent {
   name: string;
@@ -103,9 +104,13 @@ class AnalyticsManager {
   private async sendToDiagnosticsProvider(event: AnalyticsEvent): Promise<boolean> {
     try {
       // Real enterprise integration to server-side diagnostics collector
+      const token = getSessionToken(); // P0-04: diagnostics endpoints are authenticated
       const response = await fetch('/api/diagnostics/event', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: {
+          'Content-Type': 'application/json',
+          ...(token ? { Authorization: `Bearer ${token}` } : {}),
+        },
         body: JSON.stringify({ events: [event] })
       });
       return response.ok;
@@ -128,9 +133,13 @@ class AnalyticsManager {
         const batch = this.offlineQueue.slice(0, this.batchSize);
         
         // Push batch to production analytics endpoint
+        const token = getSessionToken(); // P0-04: diagnostics endpoints are authenticated
         const response = await fetch('/api/diagnostics/event', {
           method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
+          headers: {
+            'Content-Type': 'application/json',
+            ...(token ? { Authorization: `Bearer ${token}` } : {}),
+          },
           body: JSON.stringify({ events: batch })
         });
 
