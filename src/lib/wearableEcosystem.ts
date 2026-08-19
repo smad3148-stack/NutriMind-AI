@@ -419,6 +419,21 @@ export function aggregateHealthMetrics(wearables: WearableMetrics[]): Aggregated
 
   const connectedBrands = Array.from(new Set(connected.map(w => w.brand || w.device)));
 
+  // P0-05: only devices that actually carry data count as active, so the AI
+  // prompt is never told "LIVE TELEMETRY SYNCED" for connected-but-empty
+  // devices.
+  const dataDevices = connected.filter(
+    w =>
+      (w.steps || 0) > 0 ||
+      (w.heartRateBpm || 0) > 0 ||
+      (w.caloriesBurned || 0) > 0 ||
+      (w.sleepHours || 0) > 0 ||
+      (w.hrvMs || 0) > 0 ||
+      (w.weightKg || 0) > 0 ||
+      (w.glucoseMgDl || 0) > 0 ||
+      (w.recoveryScore || 0) > 0,
+  );
+
   return {
     totalSteps,
     avgHeartRateBpm,
@@ -436,7 +451,7 @@ export function aggregateHealthMetrics(wearables: WearableMetrics[]): Aggregated
     totalDistanceKm,
     avgReadinessScore,
     syncedWaterMl,
-    activeDeviceCount: connected.length,
+    activeDeviceCount: dataDevices.length,
     connectedBrands,
     primarySource: connectedBrands.join(' + ')
   };

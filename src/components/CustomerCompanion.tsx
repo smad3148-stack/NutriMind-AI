@@ -72,21 +72,22 @@ export default function CustomerCompanion({ token, userId }: CustomerCompanionPr
   const [loading, setLoading] = useState(false);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const [userGoal, setUserGoal] = useState<'Weight Loss' | 'Weight Gain' | 'Maintain'>('Weight Loss');
-  const [waterIntakeToday, setWaterIntakeToday] = useState<number>(1250);
+  const [waterIntakeToday, setWaterIntakeToday] = useState<number>(0);
 
-  // Scores
-  const [sleepScore, setSleepScore] = useState(82);
-  const [sleepHistory, setSleepHistory] = useState([78, 80, 85, 76, 82, 80, 84]);
-  const [sleepStart, setSleepStart] = useState('11:00 PM');
-  const [sleepEnd, setSleepEnd] = useState('6:30 AM');
-  const [stressScore, setStressScore] = useState(68);
-  const [stressHistory, setStressHistory] = useState([60, 58, 70, 65, 68, 62, 65]);
-  const [cardioScore, setCardioScore] = useState(88);
-  const [cardioHistory, setCardioHistory] = useState([85, 87, 86, 88, 89, 87, 88]);
-  const [activityScore, setActivityScore] = useState(75);
-  const [activityHistory, setActivityHistory] = useState([70, 75, 72, 78, 80, 74, 75]);
-  const [nutritionScore, setNutritionScore] = useState(85);
-  const [nutritionHistory, setNutritionHistory] = useState([80, 85, 78, 84, 86, 80, 82]);
+  // Scores — P0-05: all zeroed until real data exists. Manual logs (sleep /
+  // stress / cardio / activity modals) populate them; nothing is hardcoded.
+  const [sleepScore, setSleepScore] = useState(0);
+  const [sleepHistory, setSleepHistory] = useState<number[]>([]);
+  const [sleepStart, setSleepStart] = useState('');
+  const [sleepEnd, setSleepEnd] = useState('');
+  const [stressScore, setStressScore] = useState(0);
+  const [stressHistory, setStressHistory] = useState<number[]>([]);
+  const [cardioScore, setCardioScore] = useState(0);
+  const [cardioHistory, setCardioHistory] = useState<number[]>([]);
+  const [activityScore, setActivityScore] = useState(0);
+  const [activityHistory, setActivityHistory] = useState<number[]>([]);
+  const [nutritionScore, setNutritionScore] = useState(0);
+  const [nutritionHistory, setNutritionHistory] = useState<number[]>([]);
 
   // Tab selections inside indicators
   const [nutritionTab, setNutritionTab] = useState<'PREV' | 'CURRENT' | 'NEXT'>('CURRENT');
@@ -289,22 +290,24 @@ export default function CustomerCompanion({ token, userId }: CustomerCompanionPr
       if (id.startsWith('new_')) {
         const nameToUse = customDeviceName || 'New Health Sensor';
         const brandToUse = nameToUse.split(' ')[0] || 'Generic';
+        // P0-05: a newly connected device has NO data - never fabricate
+        // telemetry. Metrics stay 0 until a real sync exists.
         const newDevice: WearableMetrics = {
           id: `w_${Date.now()}`,
           device: nameToUse,
           brand: brandToUse,
           connected: true,
-          heartRateBpm: 72,
-          steps: 9480,
-          caloriesBurned: 520,
-          sleepHours: 7.8,
-          hrvMs: 68,
-          weightKg: 68.5,
-          recoveryScore: 88,
-          lastSynced: new Date().toISOString()
+          heartRateBpm: 0,
+          steps: 0,
+          caloriesBurned: 0,
+          sleepHours: 0,
+          hrvMs: 0,
+          weightKg: undefined,
+          recoveryScore: undefined,
+          lastSynced: null
         };
         setWearables(prev => [...prev, newDevice]);
-        triggerToast(`Connected ${nameToUse}! Live health telemetry streaming active.`);
+        triggerToast(`Connected ${nameToUse}! Waiting for data sync…`);
         return;
       }
 
@@ -314,12 +317,12 @@ export default function CustomerCompanion({ token, userId }: CustomerCompanionPr
         const updated = wearables.map(w => w.id === id ? {
           ...w,
           connected: nextState,
-          lastSynced: new Date().toISOString(),
-          heartRateBpm: nextState ? 72 : 0,
-          steps: nextState ? 9480 : 0,
-          caloriesBurned: nextState ? 520 : 0,
-          sleepHours: nextState ? 7.8 : 0,
-          hrvMs: nextState ? 68 : 0
+          lastSynced: null, // P0-05: no real sync has happened
+          heartRateBpm: nextState ? w.heartRateBpm : 0,
+          steps: nextState ? w.steps : 0,
+          caloriesBurned: nextState ? w.caloriesBurned : 0,
+          sleepHours: nextState ? w.sleepHours : 0,
+          hrvMs: nextState ? w.hrvMs : 0
         } : w);
         setWearables(updated);
 

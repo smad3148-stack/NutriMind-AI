@@ -501,8 +501,8 @@ export const LifeOsSecondBrain: React.FC<LifeOsSecondBrainProps> = ({
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 font-mono text-xs">
               <div className="bg-slate-900 p-3.5 rounded-2xl border border-white/10 space-y-1">
                 <span className="text-[9px] text-slate-400 uppercase font-bold block">Weight Trajectory</span>
-                <span className="text-sm font-black text-emerald-300 block">+1.2 kg / month</span>
-                <span className="text-[8.5px] text-slate-400 block">Healthy Lean Mass</span>
+                <span className="text-sm font-black text-emerald-300 block">No data</span>
+                <span className="text-[8.5px] text-slate-400 block">—</span>
               </div>
 
               <div className="bg-slate-900 p-3.5 rounded-2xl border border-white/10 space-y-1">

@@ -12,83 +12,45 @@ interface ReportsPanelProps {
 export const ReportsPanel: React.FC<ReportsPanelProps> = ({ userGoal, totalCaloriesToday }) => {
   const [calorieView, setCalorieView] = useState<'daily' | 'weekly' | 'monthly'>('daily');
 
-  // Static reports metrics
-  const currentBMI = 21.5;
-  const bmiStatus = 'Healthy Weight';
+  // P0-05: reports start honest — empty until real data exists. Log meals,
+  // weight readings and connect devices to populate them.
+  const currentBMI = null as number | null;
+  const bmiStatus = 'No data yet — log your weight to calculate BMI.';
   const bmiRangeLabel = 'Healthy (18.5 - 24.9)';
   
   // Weights
-  const currentWeight = 55;
-  const goalWeight = 45;
-  const weightHistory = [
-    { date: '10 Jul', weight: 57.2 },
-    { date: '12 Jul', weight: 56.5 },
-    { date: '14 Jul', weight: 56.0 },
-    { date: '16 Jul', weight: 55.8 },
-    { date: '18 Jul', weight: 55.3 },
-    { date: '20 Jul', weight: 55.0 }
-  ];
+  const currentWeight = null as number | null;
+  const goalWeight = null as number | null;
+  const weightHistory: { date: string; weight: number }[] = [];
 
   // Calories history
-  const caloriesData = {
-    daily: [
-      { label: 'Breakfast', val: 420 },
-      { label: 'Lunch', val: 780 },
-      { label: 'Dinner', val: 490 },
-      { label: 'Snacks', val: 119 }
-    ],
-    weekly: [
-      { label: 'Mon', val: 1780 },
-      { label: 'Tue', val: 1850 },
-      { label: 'Wed', val: 1910 },
-      { label: 'Thu', val: 1690 },
-      { label: 'Fri', val: 1809 },
-      { label: 'Sat', val: 1720 },
-      { label: 'Sun', val: 1809 }
-    ],
-    monthly: [
-      { label: 'Week 1', val: 12500 },
-      { label: 'Week 2', val: 11800 },
-      { label: 'Week 3', val: 12900 },
-      { label: 'Week 4', val: 12660 }
-    ]
+  const caloriesData: Record<'daily' | 'weekly' | 'monthly', { label: string; val: number }[]> = {
+    daily: [],
+    weekly: [],
+    monthly: []
   };
 
   // Previous Tweaks logs
-  const previousTweaks = [
-    {
-      food: 'Cheese Sandwich',
-      date: '19th July, 2026',
-      improvement: 15,
-      recommendation: 'Swapped processed cheddar for organic paneer; lowered sodium intake.'
-    },
-    {
-      food: 'White Sauce Pasta',
-      date: '18th July, 2026',
-      improvement: 28,
-      recommendation: 'Swapped refined wheat pasta for chickpea high-fiber fusilli & broccoli.'
-    },
-    {
-      food: 'Pepperoni Pizza',
-      date: '17th July, 2026',
-      improvement: 20,
-      recommendation: 'Replaced thin-crust base with sourdough, topped with arugula & chicken breast.'
-    }
-  ];
+  const previousTweaks: { food: string; date: string; improvement: number; recommendation: string }[] = [];
 
   // BMI Gauge Arc parameters
   const minBmi = 15;
   const maxBmi = 35;
-  const bmiPct = Math.min(100, Math.max(0, ((currentBMI - minBmi) / (maxBmi - minBmi)) * 100));
+  const bmiPct = currentBMI ? Math.min(100, Math.max(0, ((currentBMI - minBmi) / (maxBmi - minBmi)) * 100)) : 0;
 
   return (
     <div className="space-y-5 font-sans">
+
+      {/* P0-05: honest empty-state banner */}
+      <p className="text-[10px] text-slate-400 bg-slate-900/60 border border-white/10 rounded-2xl px-3 py-2">
+        No data yet — log meals and connect devices to populate these reports.
+      </p>
       
       {/* BMI Section */}
       <div className="bg-slate-900/80 border border-white/10 backdrop-blur-xl p-4 rounded-3xl space-y-4 shadow-xl">
         <div className="flex justify-between items-center border-b border-white/10 pb-2">
           <span className="text-[10px] font-mono text-cyan-400 uppercase tracking-wider">Metabolic Body Mass Index (BMI)</span>
-          <span className="text-[9px] text-slate-400">Updated: 20th July, 2026</span>
+          <span className="text-[9px] text-slate-400">Updated: Never</span>
         </div>
 
         <div className="flex items-center gap-4">
@@ -118,7 +80,7 @@ export const ReportsPanel: React.FC<ReportsPanelProps> = ({ userGoal, totalCalor
               />
             </svg>
             <div className="text-center z-10">
-              <span className="text-xl font-bold font-display text-white">{currentBMI}</span>
+              <span className="text-xl font-bold font-display text-white">{currentBMI ?? 'No data'}</span>
               <span className="text-[8px] text-slate-400 block font-mono">index</span>
             </div>
           </div>
@@ -129,7 +91,7 @@ export const ReportsPanel: React.FC<ReportsPanelProps> = ({ userGoal, totalCalor
               <h4 className="font-bold text-white text-xs">{bmiStatus}</h4>
             </div>
             <p className="text-[10px] text-slate-300 leading-relaxed">
-              Your BMI is within the optimal range. Keep maintaining your portion controls to preserve metabolic insulin efficiency.
+              Your BMI analysis will appear here once you log your weight readings.
             </p>
           </div>
         </div>
@@ -161,12 +123,12 @@ export const ReportsPanel: React.FC<ReportsPanelProps> = ({ userGoal, totalCalor
         <div className="grid grid-cols-2 gap-3 bg-slate-950/60 p-3 rounded-2xl border border-white/5">
           <div className="text-center border-r border-white/10">
             <span className="text-[9px] font-mono text-cyan-400 block">GOAL WEIGHT</span>
-            <span className="text-xl font-bold text-white font-mono mt-0.5 block">{goalWeight} KG</span>
+            <span className="text-xl font-bold text-white font-mono mt-0.5 block">{goalWeight !== null ? `${goalWeight} KG` : 'No data'}</span>
             <span className="text-[8px] text-slate-500 block">Target deficit</span>
           </div>
           <div className="text-center">
             <span className="text-[9px] font-mono text-emerald-400 block">CURRENT WEIGHT</span>
-            <span className="text-xl font-bold text-white font-mono mt-0.5 block">{currentWeight} KG</span>
+            <span className="text-xl font-bold text-white font-mono mt-0.5 block">{currentWeight !== null ? `${currentWeight} KG` : 'No data'}</span>
             <span className="text-[8px] text-emerald-400/60 block">Logged today</span>
           </div>
         </div>

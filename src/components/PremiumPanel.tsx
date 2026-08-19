@@ -265,14 +265,14 @@ export const PremiumPanel: React.FC<PremiumPanelProps> = ({
   ];
 
   const healthImprovements = [
-    { label: 'RECOVERY SCORE', val: '+18%', percent: 98, icon: BatteryCharging, color: 'from-emerald-400 to-teal-500', textCol: 'text-emerald-400' },
-    { label: 'PROTEIN GOAL', val: '96%', percent: 96, icon: Target, color: 'from-cyan-400 to-blue-500', textCol: 'text-cyan-400' },
-    { label: 'SLEEP QUALITY', val: '+20%', percent: 95, icon: Clock, color: 'from-indigo-400 to-purple-500', textCol: 'text-indigo-400' },
-    { label: 'HYDRATION', val: '+19%', percent: 94, icon: Zap, color: 'from-blue-400 to-cyan-400', textCol: 'text-blue-400' },
-    { label: 'WORKOUT GOAL', val: '93%', percent: 93, icon: FlameIcon, color: 'from-amber-400 to-rose-500', textCol: 'text-amber-400' },
-    { label: 'BODY RECOVERY', val: '+15%', percent: 88, icon: Cpu, color: 'from-teal-400 to-emerald-400', textCol: 'text-teal-400' },
-    { label: 'HEART HEALTH', val: '98%', percent: 98, icon: HeartPulse, color: 'from-rose-500 to-red-600', textCol: 'text-rose-400' },
-    { label: 'CALORIE TARGET', val: '92%', percent: 92, icon: TrendingUp, color: 'from-purple-400 to-indigo-500', textCol: 'text-purple-400' },
+    { label: 'RECOVERY SCORE', val: 'No data', percent: 0, icon: BatteryCharging, color: 'from-emerald-400 to-teal-500', textCol: 'text-emerald-400' },
+    { label: 'PROTEIN GOAL', val: 'No data', percent: 0, icon: Target, color: 'from-cyan-400 to-blue-500', textCol: 'text-cyan-400' },
+    { label: 'SLEEP QUALITY', val: 'No data', percent: 0, icon: Clock, color: 'from-indigo-400 to-purple-500', textCol: 'text-indigo-400' },
+    { label: 'HYDRATION', val: 'No data', percent: 0, icon: Zap, color: 'from-blue-400 to-cyan-400', textCol: 'text-blue-400' },
+    { label: 'WORKOUT GOAL', val: 'No data', percent: 0, icon: FlameIcon, color: 'from-amber-400 to-rose-500', textCol: 'text-amber-400' },
+    { label: 'BODY RECOVERY', val: 'No data', percent: 0, icon: Cpu, color: 'from-teal-400 to-emerald-400', textCol: 'text-teal-400' },
+    { label: 'HEART HEALTH', val: 'No data', percent: 0, icon: HeartPulse, color: 'from-rose-500 to-red-600', textCol: 'text-rose-400' },
+    { label: 'CALORIE TARGET', val: 'No data', percent: 0, icon: TrendingUp, color: 'from-purple-400 to-indigo-500', textCol: 'text-purple-400' },
   ];
 
   const handleFinishPayment = () => {
@@ -453,23 +453,23 @@ export const PremiumPanel: React.FC<PremiumPanelProps> = ({
                     <div className="grid grid-cols-2 sm:grid-cols-3 gap-3 font-mono text-left max-w-lg mx-auto pt-2">
                       <div className="bg-slate-900/90 border border-slate-800 p-3.5 rounded-2xl">
                         <div className="text-[10px] text-slate-400 font-bold uppercase">TOTAL HEALTH SCORE</div>
-                        <div className="text-xl font-black text-cyan-400">94 / 100</div>
+                        <div className="text-xl font-black text-cyan-400">No data</div>
                       </div>
                       <div className="bg-slate-900/90 border border-slate-800 p-3.5 rounded-2xl">
                         <div className="text-[10px] text-slate-400 font-bold uppercase">RECOVERY SCORE</div>
-                        <div className="text-xl font-black text-emerald-400">98%</div>
+                        <div className="text-xl font-black text-emerald-400">No data</div>
                       </div>
                       <div className="bg-slate-900/90 border border-slate-800 p-3.5 rounded-2xl">
                         <div className="text-[10px] text-slate-400 font-bold uppercase">PROTEIN COMPLETION</div>
-                        <div className="text-xl font-black text-amber-400">96%</div>
+                        <div className="text-xl font-black text-amber-400">No data</div>
                       </div>
                       <div className="bg-slate-900/90 border border-slate-800 p-3.5 rounded-2xl">
                         <div className="text-[10px] text-slate-400 font-bold uppercase">WATER GOAL</div>
-                        <div className="text-xl font-black text-blue-400">92%</div>
+                        <div className="text-xl font-black text-blue-400">No data</div>
                       </div>
                       <div className="bg-slate-900/90 border border-slate-800 p-3.5 rounded-2xl col-span-2 sm:col-span-1">
                         <div className="text-[10px] text-slate-400 font-bold uppercase">WORKOUT COMPLETION</div>
-                        <div className="text-xl font-black text-purple-400">93%</div>
+                        <div className="text-xl font-black text-purple-400">No data</div>
                       </div>
                     </div>
 

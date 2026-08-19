@@ -151,7 +151,7 @@ export const ScoreCardsCarousel: React.FC<ScoreCardsCarouselProps> = ({
                   className="transition-all duration-1000"
                 />
               </svg>
-              <span className="absolute text-[10px] font-bold text-white font-mono">{calculatedMetabolicScore}%</span>
+              <span className="absolute text-[10px] font-bold text-white font-mono">{calculatedMetabolicScore > 0 ? `${calculatedMetabolicScore}%` : 'No data'}</span>
             </div>
           </div>
 
@@ -167,7 +167,7 @@ export const ScoreCardsCarousel: React.FC<ScoreCardsCarouselProps> = ({
             ].map((sub, idx) => (
               <div key={idx} className="bg-black/15 p-1.5 rounded-xl border border-white/5 text-center">
                 <span className="text-slate-400 block truncate">{sub.label}</span>
-                <span className="text-white font-bold block mt-0.5">{sub.score}</span>
+                <span className="text-white font-bold block mt-0.5">{sub.score > 0 ? sub.score : 'No data'}</span>
               </div>
             ))}
           </div>
@@ -191,24 +191,24 @@ export const ScoreCardsCarousel: React.FC<ScoreCardsCarouselProps> = ({
               </div>
 
               <div className="text-xs font-bold text-white font-sans mb-1.5 flex items-center justify-between">
-                <span>{connectedWearables.map(w => w.device).join(' + ') || 'Samsung Galaxy Watch'}</span>
+                <span>{connectedWearables.map(w => w.device).join(' + ') || 'No device'}</span>
                 <span className="text-[9px] text-cyan-400 group-hover:underline font-mono">Manage Fleet →</span>
               </div>
               
               <div className="grid grid-cols-4 gap-1 text-[8px] font-mono text-slate-200 text-center">
-                <span className="bg-black/30 py-1 rounded border border-white/5">Sleep: {metrics.totalSleepHours > 0 ? `${metrics.totalSleepHours}h` : '7.8h'}</span>
-                <span className="bg-black/30 py-1 rounded border border-white/5">HRV: {metrics.avgHrvMs}ms</span>
-                <span className="bg-black/30 py-1 rounded border border-white/5">HR: {metrics.avgHeartRateBpm > 0 ? metrics.avgHeartRateBpm : 72} BPM</span>
-                <span className="bg-black/30 py-1 rounded border border-white/5">Weight: {metrics.latestWeightKg}kg</span>
-                <span className="bg-black/30 py-1 rounded border border-white/5">Steps: {metrics.totalSteps > 0 ? metrics.totalSteps.toLocaleString() : '9,480'}</span>
-                <span className="bg-black/30 py-1 rounded border border-white/5">Calories: {metrics.totalActiveCalories > 0 ? metrics.totalActiveCalories : '520'}</span>
-                <span className="bg-black/30 py-1 rounded border border-white/5">Recovery: {metrics.avgRecoveryScore}%</span>
-                <span className="bg-black/30 py-1 rounded border border-white/5">Hydration: {currentHydrationScore}%</span>
+                <span className="bg-black/30 py-1 rounded border border-white/5">Sleep: {metrics.totalSleepHours > 0 ? `${metrics.totalSleepHours}h` : 'No data'}</span>
+                <span className="bg-black/30 py-1 rounded border border-white/5">HRV: {metrics.avgHrvMs !== undefined ? `${metrics.avgHrvMs}ms` : 'No data'}</span>
+                <span className="bg-black/30 py-1 rounded border border-white/5">HR: {metrics.avgHeartRateBpm > 0 ? metrics.avgHeartRateBpm : 'No data'} BPM</span>
+                <span className="bg-black/30 py-1 rounded border border-white/5">Weight: {metrics.latestWeightKg !== undefined ? `${metrics.latestWeightKg}kg` : 'No data'}</span>
+                <span className="bg-black/30 py-1 rounded border border-white/5">Steps: {metrics.totalSteps > 0 ? metrics.totalSteps.toLocaleString() : 'No data'}</span>
+                <span className="bg-black/30 py-1 rounded border border-white/5">Calories: {metrics.totalActiveCalories > 0 ? metrics.totalActiveCalories : 'No data'}</span>
+                <span className="bg-black/30 py-1 rounded border border-white/5">Recovery: {metrics.avgRecoveryScore !== undefined ? `${metrics.avgRecoveryScore}%` : 'No data'}</span>
+                <span className="bg-black/30 py-1 rounded border border-white/5">Hydration: {currentHydrationScore > 0 ? `${currentHydrationScore}%` : 'No data'}</span>
               </div>
 
               <div className="flex items-center justify-between text-[8px] font-mono text-slate-400 mt-2 pt-1.5 border-t border-emerald-500/20">
-                <span>Last Synced: 2 Minutes Ago</span>
-                <span className="text-emerald-400 font-bold uppercase">Live Telemetry Sync</span>
+                <span>Last Synced: Never</span>
+                <span className="text-emerald-400 font-bold uppercase">Waiting for data sync</span>
               </div>
             </div>
           ) : (
@@ -255,7 +255,7 @@ export const ScoreCardsCarousel: React.FC<ScoreCardsCarouselProps> = ({
                 </div>
                 <div className="text-right">
                   <span className="text-[8px] font-mono text-slate-500">MACRO SCORE</span>
-                  <div className="text-sm font-bold text-emerald-400 font-mono mt-0.5">{nutritionScore}%</div>
+                  <div className="text-sm font-bold text-emerald-400 font-mono mt-0.5">{nutritionScore > 0 ? `${nutritionScore}%` : 'No data'}</div>
                 </div>
               </div>
 
@@ -333,11 +333,11 @@ export const ScoreCardsCarousel: React.FC<ScoreCardsCarouselProps> = ({
           <div className="flex justify-between items-baseline">
             <div>
               <span className="text-[8px] font-mono text-slate-500">ENERGY OUTPUT</span>
-              <div className="text-xl font-bold font-mono text-white mt-0.5">720 kcal</div>
+              <div className="text-xl font-bold font-mono text-white mt-0.5">{activityScore > 0 ? `${activityScore} pts` : 'No data'}</div>
             </div>
             <div className="text-right">
               <span className="text-[8px] font-mono text-slate-500">vs TDEE TARGET</span>
-              <div className="text-xs text-slate-400 font-mono mt-0.5">2500 kcal</div>
+              <div className="text-xs text-slate-400 font-mono mt-0.5">No data</div>
             </div>
           </div>
 
@@ -367,11 +367,11 @@ export const ScoreCardsCarousel: React.FC<ScoreCardsCarouselProps> = ({
           <div className="flex justify-between items-baseline">
             <div>
               <span className="text-[8px] font-mono text-slate-500">DURATION SUMMARY</span>
-              <div className="text-xl font-bold font-mono text-white mt-0.5">7h 45m</div>
+              <div className="text-xl font-bold font-mono text-white mt-0.5">{sleepScore > 0 ? `${sleepScore}/100` : 'No data'}</div>
             </div>
             <div className="text-right">
               <span className="text-[8px] font-mono text-slate-500">SLEEP RECOVERY</span>
-              <div className="text-xs text-emerald-400 font-mono mt-0.5 font-bold">82% (Excellent)</div>
+              <div className="text-xs text-emerald-400 font-mono mt-0.5 font-bold">{sleepScore > 0 ? `${sleepScore}%` : 'No data'}</div>
             </div>
           </div>
 
@@ -464,11 +464,11 @@ export const ScoreCardsCarousel: React.FC<ScoreCardsCarouselProps> = ({
           <div className="flex justify-between items-baseline">
             <div>
               <span className="text-[8px] font-mono text-slate-500">RESTING HEART RATE</span>
-              <div className="text-xl font-bold font-mono text-white mt-0.5">58 BPM</div>
+              <div className="text-xl font-bold font-mono text-white mt-0.5">{cardioScore > 0 ? `${cardioScore}/100` : 'No data'}</div>
             </div>
             <div className="text-right">
               <span className="text-[8px] font-mono text-slate-500">CARDIO RESILIENCE</span>
-              <div className="text-xs text-emerald-400 font-mono mt-0.5 font-bold">88% (Excellent)</div>
+              <div className="text-xs text-emerald-400 font-mono mt-0.5 font-bold">{cardioScore > 0 ? `${cardioScore}%` : 'No data'}</div>
             </div>
           </div>
 
@@ -497,11 +497,11 @@ export const ScoreCardsCarousel: React.FC<ScoreCardsCarouselProps> = ({
           <div className="flex justify-between items-baseline">
             <div>
               <span className="text-[8px] font-mono text-slate-500">CORTISOL STABILITY</span>
-              <div className="text-xl font-bold font-mono text-white mt-0.5">68 / 100</div>
+              <div className="text-xl font-bold font-mono text-white mt-0.5">{stressScore > 0 ? `${stressScore} / 100` : 'No data'}</div>
             </div>
             <div className="text-right">
               <span className="text-[8px] font-mono text-slate-500">HRV (rMSSD)</span>
-              <div className="text-xs text-amber-400 font-mono mt-0.5 font-bold">64ms (Average)</div>
+              <div className="text-xs text-amber-400 font-mono mt-0.5 font-bold">No data</div>
             </div>
           </div>
 
