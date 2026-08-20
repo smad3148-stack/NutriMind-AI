@@ -2787,43 +2787,13 @@ CRITICAL PERSONALITY & STYLE RULES:
   ];
 
   app.post('/api/payments/checkout', async (req, res) => {
-    const { userName, userEmail, country, currency, amount, plan, paymentMethod, couponCode, device } = req.body;
-    const paymentId = 'PAY_' + Math.floor(10000000 + Math.random() * 90000000);
-    const transactionId = 'TX_' + Math.floor(10000000 + Math.random() * 90000000);
-
-    const txRecord: GlobalTransaction = {
-      id: transactionId,
-      paymentId,
-      userName: userName || 'Mitrabha Deb',
-      userEmail: userEmail || 'ecovisionfilm@gmail.com',
-      country: country || 'United States',
-      currency: currency || 'USD',
-      amount: typeof amount === 'number' ? amount : parseFloat(amount) || 79.99,
-      plan: plan || 'Yearly Plan',
-      paymentMethod: paymentMethod || 'Instant Digital Payment',
-      couponCode: couponCode || undefined,
-      device: device || 'Web Client',
-      status: 'success',
-      timestamp: new Date().toISOString()
-    };
-
-    globalTransactionsStore.unshift(txRecord);
-
-    await addSystemAudit('info', 'PAYMENT_GATEWAY', `Successful ${txRecord.plan} checkout of ${txRecord.currency} ${txRecord.amount} by ${txRecord.userName} (${txRecord.country}) via ${txRecord.paymentMethod}`);
-
-    return res.json({
-      success: true,
-      paymentId,
-      transactionId,
-      status: 'success',
-      amount: txRecord.amount,
-      currency: txRecord.currency,
-      country: txRecord.country,
-      plan: txRecord.plan,
-      paymentMethod: txRecord.paymentMethod,
-      userName: txRecord.userName,
-      userEmail: txRecord.userEmail,
-      timestamp: txRecord.timestamp
+    // P0-06: no payment provider is integrated. This endpoint must NEVER
+    // fabricate a successful payment or write fake transactions. Until a
+    // verified provider (Stripe/Razorpay/IAP) exists, every checkout attempt
+    // returns 503 with a clear message.
+    res.status(503).json({
+      error: 'Payment system not configured.',
+      message: 'Payments are disabled until a verified payment provider is integrated.'
     });
   });
 

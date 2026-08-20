@@ -31,11 +31,11 @@ export const PremiumPanel: React.FC<PremiumPanelProps> = ({
   // Current active slide (1 to 15)
   const [currentSlide, setCurrentSlide] = useState<number>(1);
 
-  // Form details for Slide 13
+  // Form details for Slide 13 — P0-06: no prefilled fake user data.
   const [userInfo, setUserInfo] = useState({
-    name: 'Alex Rivera',
-    email: 'alex.rivera@example.com',
-    phone: '+1 (555) 234-5678'
+    name: '',
+    email: '',
+    phone: ''
   });
 
   // Selected Billing Plan for Slide 12/13/14
@@ -179,16 +179,6 @@ export const PremiumPanel: React.FC<PremiumPanelProps> = ({
     return () => clearInterval(timer);
   }, [eliteStartTime, earnedEliteDays, setIsPremium, setSelectedTier]);
 
-  const handleResetFreeAccess = () => {
-    const now = Date.now();
-    localStorage.setItem('nutrimind_elite_start_time', now.toString());
-    localStorage.setItem('nutrimind_earned_elite_days', '14');
-    localStorage.setItem('nutrimind_elite_expired', 'false');
-    setEarnedEliteDays(14);
-    setIsPremium(true);
-    setSelectedTier('ELITE');
-    notify('🔄 Elite Free Access Timer Reset! 14 Days Reactivated.');
-  };
 
   useEffect(() => {
     localStorage.setItem('nutrimind_completed_missions', JSON.stringify(completedMissions));
@@ -204,11 +194,10 @@ export const PremiumPanel: React.FC<PremiumPanelProps> = ({
       notify('Reward already claimed for this mission!');
       return;
     }
+    // P0-06: missions must never grant paid premium access without a
+    // verified payment. Completion is tracked for gamification only.
     setCompletedMissions(prev => ({ ...prev, [missionId]: true }));
-    setEarnedEliteDays(prev => prev + addedDays);
-    setIsPremium(true);
-    setSelectedTier('ELITE');
-    notify(`🎉 Mission Completed! Earned +${addedDays} Days Free Elite Access (${rewardText})!`);
+    notify(`✅ Mission completed: ${rewardText}`);
   };
 
   const slides = [
@@ -226,7 +215,7 @@ export const PremiumPanel: React.FC<PremiumPanelProps> = ({
     { id: 12, title: 'CHOOSE YOUR PLAN' },
     { id: 13, title: 'CONFIRM DETAILS' },
     { id: 14, title: 'PAYMENT METHODS' },
-    { id: 15, title: 'PAYMENT SUCCESS' },
+    { id: 15, title: 'PAYMENT UNAVAILABLE' },
   ];
 
   const planPrices = {
@@ -276,10 +265,9 @@ export const PremiumPanel: React.FC<PremiumPanelProps> = ({
   ];
 
   const handleFinishPayment = () => {
-    setIsPremium(true);
-    setSelectedTier('ELITE');
-    localStorage.setItem('nutrimind_is_lifetime', selectedPlanType === 'LIFETIME' ? 'true' : 'false');
-    notify(`🎉 Payment Successful! Welcome to NutriMind Elite (${planPrices[selectedPlanType].label})!`);
+    // P0-06: no verified payment provider exists — premium is NEVER granted
+    // without a real, verified payment.
+    notify('⚠️ Payments are not configured yet. Premium is currently unavailable.');
   };
 
   return (
@@ -484,12 +472,6 @@ export const PremiumPanel: React.FC<PremiumPanelProps> = ({
                         <span>VIEW PREMIUM PLANS & CONTINUE</span> <ChevronRight size={18} />
                       </button>
 
-                      <button
-                        onClick={handleResetFreeAccess}
-                        className="text-[11px] text-slate-400 hover:text-cyan-300 font-mono underline cursor-pointer pt-2"
-                      >
-                        Reset 14-Day Free Access (Developer Demo)
-                      </button>
                     </div>
                   </div>
                 ) : (
@@ -1333,10 +1315,7 @@ export const PremiumPanel: React.FC<PremiumPanelProps> = ({
 
                 <div className="pt-2">
                   <button
-                    onClick={() => {
-                      handleFinishPayment();
-                      setCurrentSlide(15);
-                    }}
+                    onClick={handleFinishPayment}
                     className="w-full py-4 bg-gradient-to-r from-emerald-400 via-teal-400 to-cyan-400 hover:from-emerald-300 hover:to-cyan-300 text-slate-950 rounded-2xl text-xs font-mono font-black transition cursor-pointer flex items-center justify-center gap-2 uppercase tracking-widest shadow-[0_0_35px_rgba(52,211,153,0.5)]"
                   >
                     <Lock size={16} />
@@ -1409,14 +1388,10 @@ export const PremiumPanel: React.FC<PremiumPanelProps> = ({
         profileName={userInfo.name}
         profileEmail={userInfo.email}
         isLifetimeActive={isLifetimeActive}
-        onPaymentSuccess={({ plan, isLifetime }) => {
-          setIsPremium(true);
-          setSelectedTier('ELITE');
-          if (isLifetime) {
-            setIsLifetimeActive(true);
-            localStorage.setItem('nutrimind_is_lifetime', 'true');
-          }
-          notify(`🎉 Payment Successful! Welcome to NutriMind ${plan}!`);
+        onPaymentSuccess={() => {
+          // P0-06: success is impossible while the checkout endpoint returns
+          // 503. Keep this defensive — never grant premium silently.
+          notify('⚠️ Payments are not configured yet. No premium was granted.');
         }}
       />
     </div>

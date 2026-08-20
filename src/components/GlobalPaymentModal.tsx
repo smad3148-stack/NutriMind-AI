@@ -3,7 +3,7 @@ import { motion, AnimatePresence } from 'motion/react';
 import { 
   X, Check, ShieldCheck, Lock, CreditCard, Sparkles, CheckCircle2, 
   Smartphone, Zap, RefreshCw, ChevronRight, Globe, Tag, Award, 
-  ArrowLeft, Laptop, ShieldAlert, FileText, CheckCircle
+  ArrowLeft, Laptop, ShieldAlert, FileText, CheckCircle, XCircle
 } from 'lucide-react';
 
 export interface GlobalPaymentModalProps {
@@ -165,7 +165,8 @@ export const GlobalPaymentModal: React.FC<GlobalPaymentModalProps> = ({
   const [couponCode, setCouponCode] = useState<string>('');
   const [appliedCoupon, setAppliedCoupon] = useState<{ code: string; percent: number } | null>(null);
   const [isStudentDiscount, setIsStudentDiscount] = useState<boolean>(false);
-  const [step, setStep] = useState<'SELECT' | 'PAYING' | 'SUCCESS' | 'MANAGE'>('SELECT');
+  const [step, setStep] = useState<'SELECT' | 'PAYING' | 'SUCCESS' | 'MANAGE' | 'ERROR'>('SELECT');
+  const [paymentError, setPaymentError] = useState<string | null>(null);
   const [processingMsg, setProcessingMsg] = useState<string>('Initializing SSL 256-Bit Encrypted Gate...');
   const [processingProgress, setProcessingProgress] = useState<number>(10);
   const [receiptData, setReceiptData] = useState<any>(null);
@@ -284,10 +285,18 @@ export const GlobalPaymentModal: React.FC<GlobalPaymentModalProps> = ({
       const data = await res.json();
       setProcessingProgress(100);
 
-      const isLifetime = selectedPlan === 'LIFETIME';
-      if (isLifetime) {
-        localStorage.setItem('nutrimind_is_lifetime', 'true');
+      // P0-06: a non-OK response (e.g. 503 "payment system not configured")
+      // must NEVER be treated as a successful payment.
+      if (!res.ok) {
+        setStep('ERROR');
+        setPaymentError(data?.error || 'Payment failed. Please try again.');
+        return;
       }
+
+      const isLifetime = selectedPlan === 'LIFETIME';
+      // P0-06: entitlement flags are only set by a verified payment system,
+      // never by the client. (Success path is currently unreachable — the
+      // checkout endpoint returns 503.)
 
       setReceiptData({
         txId: data.transactionId || `TX_${Date.now()}`,
@@ -317,39 +326,10 @@ export const GlobalPaymentModal: React.FC<GlobalPaymentModalProps> = ({
       }
     } catch (err) {
       console.error('Payment Error:', err);
-      // Fallback success for offline/test mode
-      const isLifetime = selectedPlan === 'LIFETIME';
-      if (isLifetime) {
-        localStorage.setItem('nutrimind_is_lifetime', 'true');
-      }
-
-      const selectedMethodObj = currentCountry.methods.find(m => m.id === selectedMethodId);
-      setReceiptData({
-        txId: `TX_${Math.floor(10000000 + Math.random() * 90000000)}`,
-        paymentId: `PAY_${Math.floor(10000000 + Math.random() * 90000000)}`,
-        amount: finalPrice,
-        currency: currentCountry.currency,
-        symbol: currentCountry.symbol,
-        plan: selectedPlan === 'MONTHLY' ? 'NutriMind Monthly Plan' : selectedPlan === 'YEARLY' ? 'NutriMind Yearly Plan' : 'NutriMind Lifetime Pass',
-        isLifetime,
-        country: currentCountry.name,
-        paymentMethod: selectedMethodObj?.name || 'Instant Checkout',
-        timestamp: new Date().toLocaleDateString(),
-        device: deviceInfo
-      });
-
-      setStep('SUCCESS');
-
-      if (onPaymentSuccess) {
-        onPaymentSuccess({
-          plan: selectedPlan,
-          isLifetime,
-          amount: finalPrice,
-          currency: currentCountry.currency,
-          txId: `TX_${Date.now()}`,
-          paymentId: `PAY_${Date.now()}`
-        });
-      }
+      // P0-06: never fabricate a successful payment on error. Show the real
+      // failure state; nothing is granted.
+      setStep('ERROR');
+      setPaymentError(err instanceof Error ? err.message : 'Payment system not configured.');
     }
   };
 
@@ -402,7 +382,7 @@ export const GlobalPaymentModal: React.FC<GlobalPaymentModalProps> = ({
                         ZERO REGRET & ZERO DARK PATTERNS POLICY
                       </span>
                       <span className="text-[9.5px] text-slate-300">
-                        No hidden fees • 7-Day Money Back Guarantee • 1-Click instant cancellation anytime.
+                        Payments are not configured yet — no payment will be processed until a verified provider is integrated.
                       </span>
                     </div>
                   </div>
@@ -673,6 +653,35 @@ export const GlobalPaymentModal: React.FC<GlobalPaymentModalProps> = ({
                 <p className="text-[10px] text-slate-500 font-mono">
                   Directing transaction securely to NutriMind Admin Ledger...
                 </p>
+              </div>
+            )}
+
+            {/* P0-06: ERROR / NOT CONFIGURED — payments are disabled until a
+                verified provider exists. No fake success is ever shown. */}
+            {step === 'ERROR' && (
+              <div className="space-y-4 py-2">
+                <div className="bg-rose-500/10 border border-rose-500/30 rounded-2xl p-4 text-center space-y-2">
+                  <div className="w-12 h-12 bg-rose-500/20 text-rose-400 rounded-full flex items-center justify-center mx-auto border border-rose-400/40">
+                    <XCircle size={28} />
+                  </div>
+                  <h4 className="text-base font-black text-white font-display uppercase tracking-wide">
+                    PAYMENT NOT CONFIGURED
+                  </h4>
+                  <p className="text-xs text-rose-300 font-medium">
+                    {paymentError || 'The payment system is not configured yet. No payment was processed.'}
+                  </p>
+                </div>
+                <div className="flex gap-2">
+                  <button
+                    onClick={() => {
+                      setStep('SELECT');
+                      setPaymentError(null);
+                    }}
+                    className="flex-1 py-2.5 bg-slate-800 hover:bg-slate-700 text-white font-bold text-xs rounded-xl transition cursor-pointer"
+                  >
+                    BACK TO PLANS
+                  </button>
+                </div>
               </div>
             )}
 
