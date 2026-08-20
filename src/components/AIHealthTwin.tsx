@@ -92,7 +92,7 @@ export const AIHealthTwin: React.FC<AIHealthTwinProps> = ({
                   YOUR AI DIGITAL HEALTH TWIN
                 </h3>
                 <span className="bg-cyan-500/20 text-cyan-300 border border-cyan-400/40 text-[9px] font-mono font-bold px-2 py-0.2 rounded-full flex items-center gap-1">
-                  <Lock size={9} /> 256-Bit Encrypted
+                  <Lock size={9} /> Local Data
                 </span>
               </div>
               <p className="text-[10px] text-slate-300 mt-0.5 flex items-center gap-2 font-mono">

@@ -1283,7 +1283,7 @@ export const PremiumPanel: React.FC<PremiumPanelProps> = ({
                     <h2 className="text-xl font-black text-white font-mono uppercase tracking-tight flex items-center gap-2">
                       <CreditCard className="text-cyan-400" size={22} /> SELECT PAYMENT METHOD
                     </h2>
-                    <p className="text-xs text-slate-400">Step 3 of 3: Secure 256-Bit SSL Encrypted Gateway</p>
+                    <p className="text-xs text-slate-400">Step 3 of 3: Checkout</p>
                   </div>
                   <span className="text-xs text-emerald-400 font-mono font-bold bg-emerald-500/10 px-3 py-1 rounded-full border border-emerald-500/30">
                     SSL SECURED

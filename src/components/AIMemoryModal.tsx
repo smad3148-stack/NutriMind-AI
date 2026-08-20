@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import { Brain, Sparkles, Plus, Trash2, X, ShieldCheck, Check, Edit2, Lock, Tag } from 'lucide-react';
 import { AIMemoryItem } from '../types';
+import { getAiMemoryConsent, setAiMemoryConsent } from '../lib/chatStorage';
 
 interface AIMemoryModalProps {
   isOpen: boolean;
@@ -25,6 +26,9 @@ export const AIMemoryModal: React.FC<AIMemoryModalProps> = ({
   const [newCategory, setNewCategory] = useState<AIMemoryItem['category']>('Preference');
   const [isAdding, setIsAdding] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
+  // P0-07: explicit consent before memories (incl. Medical/Allergy) are
+  // shared with the AI. Default OFF.
+  const [memoryConsent, setMemoryConsent] = useState<boolean>(() => getAiMemoryConsent());
 
   if (!isOpen) return null;
 
@@ -208,11 +212,34 @@ export const AIMemoryModal: React.FC<AIMemoryModalProps> = ({
             </div>
           </div>
 
+          {/* P0-07: explicit AI-sharing consent toggle */}
+          <div className="px-4 py-3 border-t border-white/10 bg-slate-950 space-y-1.5">
+            <label className="flex items-center justify-between gap-3 cursor-pointer">
+              <div>
+                <span className="text-[10px] font-mono font-bold text-cyan-400 uppercase tracking-wider block">
+                  Share Memories with NutriChat AI
+                </span>
+                <span className="text-[9px] text-slate-400 block mt-0.5 leading-relaxed">
+                  When enabled, your memories (including Medical / Allergy entries) are sent to the AI as context. This is off by default.
+                </span>
+              </div>
+              <input
+                type="checkbox"
+                checked={memoryConsent}
+                onChange={(e) => {
+                  setMemoryConsent(e.target.checked);
+                  setAiMemoryConsent(e.target.checked);
+                }}
+                className="w-4 h-4 rounded accent-cyan-400 cursor-pointer shrink-0"
+              />
+            </label>
+          </div>
+
           {/* Footer */}
           <div className="p-4 border-t border-white/10 bg-slate-950 flex items-center justify-between text-xs">
             <div className="flex items-center gap-1.5 text-slate-400 text-[10px] font-mono">
-              <ShieldCheck size={14} className="text-emerald-400" />
-              <span>AES-256 Encrypted Local Memory Storage</span>
+              <ShieldCheck size={14} className="text-cyan-400" />
+              <span>Stored locally in your browser (not encrypted)</span>
             </div>
             {memories.length > 0 && (
               <button

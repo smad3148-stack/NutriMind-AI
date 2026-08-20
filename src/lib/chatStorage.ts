@@ -3,69 +3,39 @@ import { ChatThread, ChatMessage, AIMemoryItem, PrivacySettings } from '../types
 const STORAGE_KEY_THREADS = 'nutrimind_chat_threads_v2';
 const STORAGE_KEY_MEMORIES = 'nutrimind_ai_memories_v2';
 const STORAGE_KEY_PRIVACY = 'nutrimind_privacy_settings_v2';
+const STORAGE_KEY_MEMORY_CONSENT = 'nutrimind_ai_memory_consent';
 
-// 1. DEFAULT INITIAL SEEDS
-export const DEFAULT_AI_MEMORIES: AIMemoryItem[] = [
-  {
-    id: 'mem-1',
-    key: 'Primary Goal',
-    value: 'Weight Loss & Cellular Longevity (Calorie deficit with high protein)',
-    category: 'Goal',
-    createdAt: new Date().toISOString(),
-    isCustom: false
-  },
-  {
-    id: 'mem-2',
-    key: 'Dietary Preference',
-    value: 'Prefers high protein, low glycemic index foods; avoids processed sugars',
-    category: 'Preference',
-    createdAt: new Date().toISOString(),
-    isCustom: false
-  },
-  {
-    id: 'mem-3',
-    key: 'Allergies & Sensitivities',
-    value: 'Lactose sensitivity; mild sensitivity to artificial preservatives',
-    category: 'Allergy',
-    createdAt: new Date().toISOString(),
-    isCustom: false
-  },
-  {
-    id: 'mem-4',
-    key: 'Workout Schedule',
-    value: 'Strength training 4x/week + 8,000 daily steps via connected Garmin',
-    category: 'Workout',
-    createdAt: new Date().toISOString(),
-    isCustom: false
-  },
-  {
-    id: 'mem-5',
-    key: 'Target Hydration',
-    value: 'Daily target: 2,500 mL water',
-    category: 'Dietary',
-    createdAt: new Date().toISOString(),
-    isCustom: false
+// P0-07: memory sharing with the AI requires explicit user consent.
+// Default is OFF - memories (including Medical/Allergy entries) are never
+// sent to the LLM until the user opts in.
+export const getAiMemoryConsent = (): boolean => {
+  try {
+    return localStorage.getItem(STORAGE_KEY_MEMORY_CONSENT) === 'true';
+  } catch (e) {
+    return false;
   }
-];
+};
+
+export const setAiMemoryConsent = (consent: boolean) => {
+  try {
+    localStorage.setItem(STORAGE_KEY_MEMORY_CONSENT, consent ? 'true' : 'false');
+  } catch (e) {
+    console.warn('Error saving AI memory consent:', e);
+  }
+};
 
 export const DEFAULT_PRIVACY_SETTINGS: PrivacySettings = {
   incognitoByDefault: false,
   disableHistory: false,
-  encryptedLocalStorage: true,
   adminAccessLocked: true,
   autoDeleteAfterDays: 0
 };
 
-// Simple Client-side XOR / Base64 Encrypted LocalStorage Helper
-const encodeData = (data: string): string => {
-  try {
-    return btoa(encodeURIComponent(data));
-  } catch (e) {
-    return data;
-  }
-};
-
-const decodeData = (data: string): string => {
+// P0-07: storage is plaintext JSON in localStorage (per-browser). It is NOT
+// encrypted - we never claim otherwise. decodeLegacyBase64 exists only to
+// migrate data written by earlier builds that base64-obfuscated it; new
+// writes are plaintext.
+const decodeLegacyBase64 = (data: string): string => {
   try {
     return decodeURIComponent(atob(data));
   } catch (e) {
@@ -78,7 +48,7 @@ export const loadChatThreads = (): ChatThread[] => {
   try {
     const raw = localStorage.getItem(STORAGE_KEY_THREADS);
     if (!raw) return [];
-    const decoded = raw.startsWith('eyJ') || raw.startsWith('W3') ? decodeData(raw) : raw;
+    const decoded = raw.startsWith('eyJ') || raw.startsWith('W3') ? decodeLegacyBase64(raw) : raw;
     const parsed = JSON.parse(decoded);
     return Array.isArray(parsed) ? parsed : [];
   } catch (e) {
@@ -87,11 +57,9 @@ export const loadChatThreads = (): ChatThread[] => {
   }
 };
 
-export const saveChatThreads = (threads: ChatThread[], encrypt: boolean = true) => {
+export const saveChatThreads = (threads: ChatThread[]) => {
   try {
-    const json = JSON.stringify(threads);
-    const dataToSave = encrypt ? encodeData(json) : json;
-    localStorage.setItem(STORAGE_KEY_THREADS, dataToSave);
+    localStorage.setItem(STORAGE_KEY_THREADS, JSON.stringify(threads));
   } catch (e) {
     console.warn('Error saving chat threads:', e);
   }
@@ -101,19 +69,18 @@ export const saveChatThreads = (threads: ChatThread[], encrypt: boolean = true) 
 export const loadAIMemories = (): AIMemoryItem[] => {
   try {
     const raw = localStorage.getItem(STORAGE_KEY_MEMORIES);
-    if (!raw) return DEFAULT_AI_MEMORIES;
-    const decoded = raw.startsWith('eyJ') || raw.startsWith('W3') ? decodeData(raw) : raw;
+    if (!raw) return [];
+    const decoded = raw.startsWith('eyJ') || raw.startsWith('W3') ? decodeLegacyBase64(raw) : raw;
     const parsed = JSON.parse(decoded);
-    return Array.isArray(parsed) && parsed.length > 0 ? parsed : DEFAULT_AI_MEMORIES;
+    return Array.isArray(parsed) ? parsed : [];
   } catch (e) {
-    return DEFAULT_AI_MEMORIES;
+    return [];
   }
 };
 
 export const saveAIMemories = (memories: AIMemoryItem[]) => {
   try {
-    const json = JSON.stringify(memories);
-    localStorage.setItem(STORAGE_KEY_MEMORIES, encodeData(json));
+    localStorage.setItem(STORAGE_KEY_MEMORIES, JSON.stringify(memories));
   } catch (e) {
     console.warn('Error saving AI memories:', e);
   }
@@ -256,7 +223,7 @@ export const exportThreadToPDF = (thread: ChatThread) => {
         </div>
       `).join('')}
       <div class="footer">
-        NutriMind AI Enterprise Biological OS • Encrypted Health Record • Confidential Medical Data
+        NutriMind AI Enterprise Biological OS • Local export (not encrypted) • Contains personal data
       </div>
       <script>
         window.onload = function() { window.print(); };

@@ -167,7 +167,7 @@ export const GlobalPaymentModal: React.FC<GlobalPaymentModalProps> = ({
   const [isStudentDiscount, setIsStudentDiscount] = useState<boolean>(false);
   const [step, setStep] = useState<'SELECT' | 'PAYING' | 'SUCCESS' | 'MANAGE' | 'ERROR'>('SELECT');
   const [paymentError, setPaymentError] = useState<string | null>(null);
-  const [processingMsg, setProcessingMsg] = useState<string>('Initializing SSL 256-Bit Encrypted Gate...');
+  const [processingMsg, setProcessingMsg] = useState<string>('Checking payment availability...');
   const [processingProgress, setProcessingProgress] = useState<number>(10);
   const [receiptData, setReceiptData] = useState<any>(null);
   const [deviceInfo, setDeviceInfo] = useState<string>('Detecting Device...');
@@ -250,15 +250,15 @@ export const GlobalPaymentModal: React.FC<GlobalPaymentModalProps> = ({
   const handleStartPayment = async () => {
     setStep('PAYING');
     setProcessingProgress(15);
-    setProcessingMsg('256-Bit SSL Encryption Handshake...');
+    setProcessingMsg('Checking payment availability...');
 
     await new Promise(r => setTimeout(r, 400));
     setProcessingProgress(40);
-    setProcessingMsg('Running AI Fraud Detection & Verification...');
+    setProcessingMsg('Verifying payment details...');
 
     await new Promise(r => setTimeout(r, 500));
     setProcessingProgress(75);
-    setProcessingMsg(`Processing ${currentCountry.currency} Payment via ${currentCountry.methods.find(m => m.id === selectedMethodId)?.name || 'Direct Ingress'}...`);
+    setProcessingMsg(`Requesting ${currentCountry.currency} payment via ${currentCountry.methods.find(m => m.id === selectedMethodId)?.name || 'Direct Ingress'}...`);
 
     await new Promise(r => setTimeout(r, 600));
     setProcessingProgress(95);
@@ -612,7 +612,7 @@ export const GlobalPaymentModal: React.FC<GlobalPaymentModalProps> = ({
 
                   <div className="flex items-center justify-between text-[9px] font-mono text-slate-400 px-1">
                     <span className="flex items-center gap-1">
-                      <Lock size={10} className="text-emerald-400" /> 256-Bit SSL Encryption
+                      <Lock size={10} className="text-emerald-400" /> TLS Secured
                     </span>
                     <span className="flex items-center gap-1">
                       <ShieldCheck size={10} className="text-cyan-400" /> Fraud Guard Protected

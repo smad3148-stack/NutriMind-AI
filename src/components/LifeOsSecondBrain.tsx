@@ -8,6 +8,7 @@ import {
 } from 'lucide-react';
 import { AIMemoryItem, WearableMetrics, PrivacySettings } from '../types';
 import { aggregateHealthMetrics } from '../lib/wearableEcosystem';
+import { getAiMemoryConsent, setAiMemoryConsent } from '../lib/chatStorage';
 
 interface LifeOsSecondBrainProps {
   userName?: string;
@@ -46,7 +47,10 @@ export const LifeOsSecondBrain: React.FC<LifeOsSecondBrainProps> = ({
   const [showConfirmDeleteAll, setShowConfirmDeleteAll] = useState(false);
 
   // Settings Toggles (backed by PrivacySettings or state fallback)
-  const [enableAiMemory, setEnableAiMemory] = useState(true);
+  // P0-07: the "Share with AI" toggle is wired to the real consent flag
+  // (default OFF), so memories are never sent to the AI without explicit
+  // opt-in. The other toggles remain UI-only placeholders.
+  const [enableAiMemory, setEnableAiMemory] = useState<boolean>(() => getAiMemoryConsent());
   const [enablePredictions, setEnablePredictions] = useState(true);
   const [enableDeviceHistory, setEnableDeviceHistory] = useState(true);
 
@@ -317,7 +321,7 @@ export const LifeOsSecondBrain: React.FC<LifeOsSecondBrainProps> = ({
                     </div>
                     <p className="text-xs text-slate-300 leading-relaxed font-sans">{mem.value}</p>
                     <span className="text-[8.5px] font-mono text-slate-500 block">
-                      Saved: {new Date(mem.createdAt).toLocaleDateString()} • User Consented
+                      Saved locally: {new Date(mem.createdAt).toLocaleDateString()}
                     </span>
                   </div>
 
@@ -541,15 +545,17 @@ export const LifeOsSecondBrain: React.FC<LifeOsSecondBrainProps> = ({
             <div className="bg-slate-900 p-4 rounded-2xl border border-white/10 space-y-3">
               <div className="flex items-center justify-between">
                 <div>
-                  <span className="font-bold text-white block">Enable AI Memory Storage</span>
-                  <span className="text-[10px] text-slate-400">Allows NutriMind to remember routines & preferences</span>
+                  <span className="font-bold text-white block">Share Memories with NutriChat AI</span>
+                  <span className="text-[10px] text-slate-400">Sends your stored memories (incl. medical/allergy info) to the AI as context. Off by default.</span>
                 </div>
                 <input
                   type="checkbox"
                   checked={enableAiMemory}
                   onChange={e => {
-                    setEnableAiMemory(e.target.checked);
-                    onTriggerToast(e.target.checked ? 'AI Memory Enabled' : 'AI Memory Disabled');
+                    const next = e.target.checked;
+                    setEnableAiMemory(next);
+                    setAiMemoryConsent(next);
+                    onTriggerToast(next ? 'Memories shared with AI' : 'Memories no longer shared with AI');
                   }}
                   className="w-4 h-4 accent-indigo-500 rounded cursor-pointer"
                 />
