@@ -44,24 +44,21 @@ export const EditProfileModal: React.FC<EditProfileModalProps> = ({
   const [activeTab, setActiveTab] = useState<'basic' | 'health' | 'emergency' | 'family'>('basic');
 
   // Form Fields
-  const [tempName, setTempName] = useState(profileName || 'Utpal Bikash Deb');
-  const [tempPhone, setTempPhone] = useState(profilePhone || '+918787642594');
+  const [tempName, setTempName] = useState(profileName || '');
+  const [tempPhone, setTempPhone] = useState(profilePhone || '');
   const [tempAvatar, setTempAvatar] = useState(profileAvatar);
-  const [nickname, setNickname] = useState('Utpal');
-  const [dob, setDob] = useState('1998-05-14');
+  const [nickname, setNickname] = useState('');
+  const [dob, setDob] = useState('');
   const [heightCm, setHeightCm] = useState(175);
   const [weightKg, setWeightKg] = useState(72);
-  const [bloodGroup, setBloodGroup] = useState('O+');
-  const [diseases, setDiseases] = useState('None');
-  const [allergies, setAllergies] = useState('Peanut, Lactose');
-  const [emergencyName, setEmergencyName] = useState('Sunita Deb');
-  const [emergencyPhone, setEmergencyPhone] = useState('+919862123456');
+  const [bloodGroup, setBloodGroup] = useState('');
+  const [diseases, setDiseases] = useState('');
+  const [allergies, setAllergies] = useState('');
+  const [emergencyName, setEmergencyName] = useState('');
+  const [emergencyPhone, setEmergencyPhone] = useState('');
 
-  // Family members list
-  const [familyMembers, setFamilyMembers] = useState([
-    { id: 'f1', name: 'Sunita Deb', relation: 'Spouse', goal: 'Maintain' },
-    { id: 'f2', name: 'Aarav Deb', relation: 'Son', goal: 'Weight Gain' }
-  ]);
+  // Family members list (P0-11: starts empty — never prefilled with real PII)
+  const [familyMembers, setFamilyMembers] = useState<{ id: string; name: string; relation: string; goal: string }[]>([]);
   const [newFamilyName, setNewFamilyName] = useState('');
   const [newFamilyRelation, setNewFamilyRelation] = useState('Spouse');
 

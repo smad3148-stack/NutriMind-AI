@@ -924,206 +924,6 @@ Return a clean, valid JSON object matching this schema EXACTLY:
     return "Hii! Main tumhari help ke liye yaha hu. Batao aaj kya poochna chahte ho - diet, workout ya health advice?";
   }
 
-  function handlePresetAcceptanceTests(messages: any[], lastMessageText: string): any {
-    const normText = lastMessageText.toLowerCase().trim();
-
-    // 1. Mitrabha / Weight Gain profile setup query
-    if (normText.includes('mitrabha') || (normText.includes('19 years old') && normText.includes('55 kg') && normText.includes('gain weight'))) {
-      const responseText = `Hi Mitrabha! It's wonderful to meet you. I have securely logged your profile: 19 years old, 55 kg, 5'4", with the primary goal of **Weight Gain**. Let's build an elite, highly optimized metabolic strategy to help you gain healthy muscle mass and optimize your strength.
-
-### 📊 1. Daily Calorie & Protein Targets
-- **Daily Calorie Target:** **2,650 kcal** per day (incorporating a clean +450 kcal surplus above your TDEE).
-- **Daily Protein Target:** **110 grams** (essential to stimulate muscle protein synthesis and recovery).
-- **Water Intake:** Drink **3.0 to 3.5 liters** of water daily to maintain cellular hydration, support nutrient absorption, and assist with muscle recovery.
-
----
-
-### 🥗 2. Complete 7-Day Indian Weight Gain Meal Plan
-Here is a premium, nutrient-dense meal plan totaling approximately 2,650–2,700 kcal daily:
-
-- **Day 1:**
-  - **Breakfast:** 3 Paneer Stuffed Parathas cooked with 1 tbsp ghee + 1 bowl of curd + 1 banana.
-  - **Mid-Meal:** A handful of mixed nuts (almonds, cashews, walnuts) and raisins.
-  - **Lunch:** 2 cups of Basmati rice, 1.5 cups of Dal Makhani, 150g Paneer Bhurji, and a green salad.
-  - **Evening:** 2 slices of whole wheat toast with generous peanut butter + 1 glass of whole milk.
-  - **Dinner:** 3 whole wheat Chapatis, 150g Chicken Curry (or Soya Chunks Curry), and 1 cup of curd.
-- **Day 2:**
-  - **Breakfast:** Oats Upma cooked in whole milk with nuts, seeds, and raisins.
-  - **Mid-Meal:** 1 Avocado-Banana Smoothie with peanut butter.
-  - **Lunch:** 3 Chapatis, 1.5 cups of Rajma Curry, Aloo Gobi, and 1 cup of dahi.
-  - **Evening:** Roasted Chickpeas (chana) with chopped onions and tomatoes.
-  - **Dinner:** 150g Fish Curry (or Tofu Curry), 2 cups of Jeera Rice, and a mixed salad.
-- **Day 3:**
-  - **Breakfast:** 3-Egg Masala Omelette (or Tofu Scramble) with 2 buttered whole wheat toasts + 1 apple.
-  - **Mid-Meal:** Boiled sprouts salad with pomegranate and pumpkin seeds.
-  - **Lunch:** Egg Curry (3 eggs) or Paneer Tikka, 2 cups of Steamed Rice, and Yellow Moong Dal.
-  - **Evening:** 1 glass of fresh Mango Milkshake (or almond-dates shake).
-  - **Dinner:** 150g Grilled Chicken Breast (or Paneer Tikka), Sweet Potato mash, and steamed broccoli.
-- **Day 4:**
-  - **Breakfast:** 3 Besan Chillas stuffed with grated paneer + mint chutney + 1 cup warm milk.
-  - **Mid-Meal:** Fruit salad with chia seeds and walnuts.
-  - **Lunch:** Chicken Biryani (or Paneer Pulav) with rich mixed veggie Raita.
-  - **Evening:** 2 boiled eggs (or boiled chana) + 1 cup of almond milk.
-  - **Dinner:** Mixed Veg Khichdi cooked with ghee, Moong Dal, and a roasted papad.
-- **Day 5:**
-  - **Breakfast:** 4 Rava Idlis with Coconut Chutney and Sambar + 1 cup warm milk.
-  - **Mid-Meal:** 4 dry dates and a handful of cashews.
-  - **Lunch:** 3 Chapatis, Mushroom Matar Malai Curry, Dal Fry, and Cucumber Raita.
-  - **Evening:** Fruit and Nut milkshake with honey.
-  - **Dinner:** 150g Grilled Paneer (or Salmon), Quinoa Salad, and steamed asparagus.
-- **Day 6:**
-  - **Breakfast:** Masala Oats with peanuts and peas + 2 boiled egg whites (or paneer).
-  - **Mid-Meal:** Peanut Butter Smoothie with dates.
-  - **Lunch:** 2 cups of Steamed Rice, Kadhi Pakora, Bhindi Masala, and roasted papad.
-  - **Evening:** Hummus with whole wheat pita bread or carrots.
-  - **Dinner:** Soy Protein Curry, 3 Rotis, mixed salad, and bowl of curd.
-- **Day 7:**
-  - **Breakfast:** Moong Dal Chilla with paneer stuffing + fresh orange juice.
-  - **Mid-Meal:** Roasted Makhana (foxnuts) in ghee.
-  - **Lunch:** Chicken/Paneer Saagwala Curry, 3 Butter Rotis, and beetroot salad.
-  - **Evening:** Banana milkshake with honey and almond butter.
-  - **Dinner:** Rich egg/tofu curry, 2 cups of steamed Basmati rice, and sauteed vegetables.
-
----
-
-### 🏋️ 3. Beginner Gym Exercise Routine
-Perform these compound exercises 3-4 times a week to stimulate muscle growth:
-1. **Bodyweight/Goblet Squats:** 3 sets of 10-12 reps (Focuses on quadriceps, glutes, and hamstrings).
-2. **Dumbbell Chest Press:** 3 sets of 10 reps (Targets chest, shoulders, and triceps).
-3. **Lat Pulldowns or Assisted Pull-ups:** 3 sets of 10 reps (Develops back strength and lats).
-4. **Dumbbell Shoulder Press:** 3 sets of 10 reps (Strengthens the deltoids).
-5. **Planks:** 3 sets of 45-60 seconds (Builds foundational core stability).
-
----
-
-### ❓ Follow-up Question
-To help me fine-tune this weight gain strategy: **Do you prefer vegetarian protein sources (like paneer, lentils, and tofu), or do you include non-vegetarian options (like chicken, eggs, and fish) in your daily diet?**`;
-
-      return {
-        id: 'msg_mitrabha_' + Math.random().toString(36).substr(2, 9),
-        sender: 'assistant',
-        text: responseText,
-        timestamp: new Date().toISOString(),
-        source: "gemini"
-      };
-    }
-
-    // 1. Emotional & Stress Empathy queries
-    if (normText.includes('i am sad') || normText.includes("i'm sad") || normText.includes('feeling sad') || normText.includes('feel sad') || normText.includes('feeling low') || normText.includes('i feel down') || normText.includes('i am crying') || normText.includes('i am depressed') || normText.includes('i hate myself') || normText.includes('i failed') || normText.includes('lost my job')) {
-      return {
-        id: 'msg_sad_' + Math.random().toString(36).substr(2, 9),
-        sender: 'assistant',
-        text: "I'm right here with you. Take a deep breath. Today, don't worry about strict workout numbers—focus on getting rest, drinking water, and going to bed early. Everything is going to be okay.",
-        timestamp: new Date().toISOString(),
-        source: "gemini"
-      };
-    }
-
-    if (normText.includes('i am happy') || normText.includes('got promotion') || normText.includes('i am smiling') || normText.includes('great news')) {
-      return {
-        id: 'msg_happy_' + Math.random().toString(36).substr(2, 9),
-        sender: 'assistant',
-        text: "That's fantastic news! 🎉 Super happy for you! Celebrate this moment—you've earned it!",
-        timestamp: new Date().toISOString(),
-        source: "gemini"
-      };
-    }
-
-    // Hinglish gym / sleep query
-    if (normText.includes('gym jana hai') || normText.includes('neend nahi ayi') || normText.includes('neend nahi aayi') || normText.includes('neend nahi aai')) {
-      return {
-        id: 'msg_hinglish_gym_' + Math.random().toString(36).substr(2, 9),
-        sender: 'assistant',
-        text: "Agar aaj neend poori nahi hui hai, toh aaj heavy weight lifting mat karo. Light mobility exercises ya 20 min walk kar lo, aur 500ml extra paani piyo. Aaj raat time se so jana!",
-        timestamp: new Date().toISOString(),
-        source: "gemini"
-      };
-    }
-
-    // 2. Goal questions
-    if (normText === 'what is my goal?' || normText === 'what was my goal?' || normText.includes('my goal?')) {
-      return {
-        id: 'msg_goal_' + Math.random().toString(36).substr(2, 9),
-        sender: 'assistant',
-        text: "Your goal is **Weight Gain** (specifically healthy muscle hypertrophy and physical strength optimization).",
-        timestamp: new Date().toISOString(),
-        source: "gemini"
-      };
-    }
-
-    // 3. Weight questions
-    if (normText === 'how much do i weigh?' || normText.includes('do i weigh') || normText.includes('how much do i weigh')) {
-      return {
-        id: 'msg_weight_' + Math.random().toString(36).substr(2, 9),
-        sender: 'assistant',
-        text: "You weigh **55 kg**.",
-        timestamp: new Date().toISOString(),
-        source: "gemini"
-      };
-    }
-
-    // 4. Calorie suggestion questions
-    if (normText.includes('calorie target') || normText.includes('calories target') || normText.includes('calories did you suggest') || normText.includes('calorie did you suggest')) {
-      return {
-        id: 'msg_calorie_suggest_' + Math.random().toString(36).substr(2, 9),
-        sender: 'assistant',
-        text: "I suggested a daily target of **2,650 calories (kcal)** per day, which incorporates a clean caloric surplus to support your weight gain goal.",
-        timestamp: new Date().toISOString(),
-        source: "gemini"
-      };
-    }
-
-    // Memory retrieval queries
-    if (normText.includes('pichli baar tumne kya recommend') || normText.includes('what did you recommend last time') || normText.includes('previous recommendations')) {
-      return {
-        id: 'msg_memory_recall_' + Math.random().toString(36).substr(2, 9),
-        sender: 'assistant',
-        text: "Last time we discussed your 2,650 kcal weight gain plan with 110g protein daily, along with a 3-day compound lifting routine focusing on squats, chest press, and lat pulldowns.",
-        timestamp: new Date().toISOString(),
-        source: "gemini"
-      };
-    }
-
-    // Zero fake data enforcement for un-synced physiological telemetry
-    if (normText.includes('what is my blood pressure') || normText.includes('what is my heart rate') || normText.includes('my glucose level')) {
-      return {
-        id: 'msg_zero_fake_data_' + Math.random().toString(36).substr(2, 9),
-        sender: 'assistant',
-        text: "Device Required / Waiting for Sync. Please connect your Apple Health, Galaxy Watch, or Fitbit in the Connected Devices panel to view real-time telemetry.",
-        timestamp: new Date().toISOString(),
-        source: "gemini"
-      };
-    }
-
-    // 5. Bengali weight loss query
-    if (normText.includes('আমি ওজন কমাতে চাই') || normText.includes('ওজন কমাতে')) {
-      return {
-        id: 'msg_loss_bn_' + Math.random().toString(36).substr(2, 9),
-        sender: 'assistant',
-        text: `ওজন কমানোর জন্য একটি বৈজ্ঞানিক ও টেকসই ডায়েট প্ল্যান নিচে দেওয়া হলো:
-
-১. **ক্যালোরি ঘাটতি (Calorie Deficit):** প্রক্রিয়াজাত খাবার ও চিনি সম্পূর্ণ পরিহার করে পুষ্টিকর ও কম ক্যালোরিযুক্ত খাবার গ্রহণ করুন।
-২. **উচ্চ প্রোটিন ও ফাইবার:** শাকসবজি, ফলমূল, ডাল এবং চর্বিহীন প্রোটিন (ডিম, মুরগির মাংস, বা টফু) বেশি খান। এটি পেশী রক্ষা করে এবং ক্ষুধা নিয়ন্ত্রণ করে।
-৩. **পর্যাপ্ত জল পান:** মেটাবলিজম ঠিক রাখতে এবং মেদ ঝরাতে দিনে অন্তত ৩-৪ লিটার জল পান করুন।
-৪. **পরিমিত ঘুম ও স্ট্রেস ম্যানেজমেন্ট:** প্রতিদিন ৭-৮ ঘণ্টা গভীর ঘুম নিশ্চিত করুন, যা কর্টিসল হরমোন নিয়ন্ত্রণ করে ওজন কমাতে সাহায্য করবে।`,
-        timestamp: new Date().toISOString(),
-        source: "gemini"
-      };
-    }
-
-    // 6. Dog's blood pressure
-    if (normText.includes("dog's blood pressure") || normText.includes("dog blood pressure")) {
-      return {
-        id: 'msg_hallucination_' + Math.random().toString(36).substr(2, 9),
-        sender: 'assistant',
-        text: "I do not have access to your dog's physiological health records or blood pressure data, and diagnosing veterinary metrics falls outside my metabolic scope. Could you share some more context, or is there a specific human metabolic goal we are tracking today?",
-        timestamp: new Date().toISOString(),
-        source: "gemini"
-      };
-    }
-
-    return null;
-  }
 
   // 3. AI HEALTH COACH (Direct Conversational Integration)
   app.post('/api/coach/chat', requireUserAuth, aiMinuteLimiter.middleware(aiRequestKey), aiDailyBudget.middleware(aiRequestKey), async (req: AuthenticatedRequest, res) => {
@@ -1142,11 +942,6 @@ To help me fine-tune this weight gain strategy: **Do you prefer vegetarian prote
 
     const activeAi = getDynamicGeminiClient();
     const lastMessageText = (messages[messages.length - 1]?.text || '').trim();
-
-    const presetResponse = handlePresetAcceptanceTests(messages, lastMessageText);
-    if (presetResponse) {
-      return res.json(presetResponse);
-    }
 
     const greetLang = isGreeting(lastMessageText);
     if (greetLang) {
@@ -1257,7 +1052,7 @@ CRITICAL PERSONALITY & STYLE RULES:
    - AUTOMATICALLY DETECT & MIRROR USER LANGUAGE ON EVERY MESSAGE:
      * User speaks Hindi → NutriChat responds in warm natural Hindi.
      * User speaks Bengali → NutriChat responds in natural Bengali (e.g. "Ami tomar sathe achi.").
-     * User speaks Hinglish → NutriChat responds in natural Hinglish (e.g. "Bilkul Mitrabha! Main tumhari help karunga.").
+     * User speaks Hinglish → NutriChat responds in natural Hinglish (e.g. "Bilkul! Main tumhari help karunga.").
      * User speaks English → NutriChat responds in natural English (e.g. "I'm here with you.").
    - 100x SEAMLESS AUTOMATIC LANGUAGE SWITCHING: If user switches language 100 times, switch 100 times automatically WITHOUT EVER asking "Please select your language" or "Which language do you prefer?".
    - NEVER FEEL LIKE GOOGLE TRANSLATE: Speak with natural human understanding, warmth, and high empathy ("AI UNDERSTANDS ME").
@@ -2115,7 +1910,7 @@ CRITICAL PERSONALITY & STYLE RULES:
       version: 'v2.4.0',
       channel: 'production',
       action: 'deploy',
-      deployedBy: 'ecovisionfilm@gmail.com',
+      deployedBy: 'admin',
       status: 'success',
       notes: 'Standard monthly build deployment.',
       createdAt: new Date().toISOString()
@@ -2597,14 +2392,15 @@ CRITICAL PERSONALITY & STYLE RULES:
   });
 
   // 7. DEPLOY OTA UPDATE
-  app.post('/api/admin/ota/deploy', requireAdminAuth, async (req, res) => {
+  app.post('/api/admin/ota/deploy', requireAdminAuth, async (req: AuthenticatedRequest, res) => {
     const { version, channel, description, bundleUrl, deployedBy } = req.body;
     if (!version || !channel || !bundleUrl) {
       return res.status(400).json({ error: 'Missing version, channel, or bundleUrl.' });
     }
 
     const prisma = getPrisma();
-    const updater = deployedBy || 'ecovisionfilm@gmail.com';
+    // Attribute to the verified admin identity; never invent an identity.
+    const updater = req.user?.email || deployedBy || 'admin';
     
     const newUpdate = {
       id: crypto.randomUUID ? crypto.randomUUID() : 'ota-' + Math.random().toString(36).substr(2, 9),
@@ -2689,14 +2485,15 @@ CRITICAL PERSONALITY & STYLE RULES:
   });
 
   // 8. EMERGENCY OTA SYSTEM ROLLBACK
-  app.post('/api/admin/ota/rollback', requireAdminAuth, async (req, res) => {
+  app.post('/api/admin/ota/rollback', requireAdminAuth, async (req: AuthenticatedRequest, res) => {
     const { otaUpdateId, deployedBy, notes } = req.body;
     if (!otaUpdateId) {
       return res.status(400).json({ error: 'Missing target otaUpdateId for rollback.' });
     }
 
     const prisma = getPrisma();
-    const updater = deployedBy || 'ecovisionfilm@gmail.com';
+    // Attribute to the verified admin identity; never invent an identity.
+    const updater = req.user?.email || deployedBy || 'admin';
 
     let targetUpdate: any = null;
     if (prisma) {
@@ -2774,8 +2571,8 @@ CRITICAL PERSONALITY & STYLE RULES:
     {
       id: 'TX_98240214',
       paymentId: 'PAY_98240214',
-      userEmail: 'ecovisionfilm@gmail.com',
-      userName: 'Mitrabha Deb',
+      userEmail: 'demo.user@example.com',
+      userName: 'Demo User',
       country: 'India',
       currency: 'INR',
       amount: 5999,

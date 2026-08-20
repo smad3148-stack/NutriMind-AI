@@ -277,8 +277,7 @@ export default function AdminDashboard() {
           version: otaVersion,
           channel: otaChannel,
           description: otaDescription,
-          bundleUrl: otaBundleUrl,
-          deployedBy: 'ecovisionfilm@gmail.com'
+          bundleUrl: otaBundleUrl
         })
       });
 
@@ -316,7 +315,6 @@ export default function AdminDashboard() {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           otaUpdateId,
-          deployedBy: 'ecovisionfilm@gmail.com',
           notes: `Rollback of ${channel.toUpperCase()} environment to build ${version}.`
         })
       });

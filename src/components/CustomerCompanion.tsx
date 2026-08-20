@@ -57,9 +57,9 @@ export default function CustomerCompanion({ token, userId }: CustomerCompanionPr
   const [helpSection, setHelpSection] = useState<{title: string, what: string, why: string, improve: string, source: string, example: string} | null>(null);
   const [showReportsOnDashboard, setShowReportsOnDashboard] = useState(false);
 
-  // Profile Information
-  const [profileName, setProfileName] = useState('Mitrabha Deb');
-  const [profilePhone, setProfilePhone] = useState('+918787642594');
+  // Profile Information (P0-11: no prefilled personal data — starts empty)
+  const [profileName, setProfileName] = useState('');
+  const [profilePhone, setProfilePhone] = useState('');
   const [profileAvatar, setProfileAvatar] = useState('https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=256&q=80');
 
   // Bio Metrics Manual Log Modals
@@ -1138,7 +1138,7 @@ export default function CustomerCompanion({ token, userId }: CustomerCompanionPr
           >
             <CleanHomeDashboard
               userGoal={userGoal}
-              userName="Mitrabha"
+              userName={profileName || undefined}
               meals={meals}
               waterIntakeToday={waterIntakeToday}
               sleepScore={sleepScore}
@@ -1193,7 +1193,7 @@ export default function CustomerCompanion({ token, userId }: CustomerCompanionPr
             className="space-y-4"
           >
             <LifeOsSecondBrain
-              userName="Utpal"
+              userName={profileName || undefined}
               userGoal={userGoal}
               memories={aiMemories}
               wearables={wearables}

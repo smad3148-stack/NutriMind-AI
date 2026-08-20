@@ -150,8 +150,8 @@ export const GamificationHub: React.FC<GamificationHubProps> = ({
 
   const renderLeaderboard = () => {
     const list = [
-      { rank: 1, name: 'Utpal Bikash Deb', xp: 8420, streak: 34, avatar: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=256&q=80', badge: '🥇 Legend' },
-      { rank: 2, name: 'Mitrabha Deb', xp: game.totalXP, streak: game.streakDays, avatar: 'https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?auto=format&fit=crop&w=256&q=80', badge: `🥈 ${currentLevel.name}`, isUser: true },
+      { rank: 1, name: 'Arjun Verma', xp: 8420, streak: 34, avatar: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=256&q=80', badge: '🥇 Legend' },
+      { rank: 2, name: 'You', xp: game.totalXP, streak: game.streakDays, avatar: 'https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?auto=format&fit=crop&w=256&q=80', badge: `🥈 ${currentLevel.name}`, isUser: true },
       { rank: 3, name: 'Aarav Sharma', xp: 4200, streak: 18, avatar: 'https://images.unsplash.com/photo-1570295999919-56ceb5ecca61?auto=format&fit=crop&w=256&q=80', badge: '🥉 Gold' },
       { rank: 4, name: 'Priya Mukherjee', xp: 3900, streak: 14, avatar: 'https://images.unsplash.com/photo-1494790108377-be9c29b29330?auto=format&fit=crop&w=256&q=80', badge: '⭐ Gold' },
       { rank: 5, name: 'David Miller', xp: 3100, streak: 9, avatar: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&w=256&q=80', badge: '✨ Silver' },

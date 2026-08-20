@@ -32,7 +32,7 @@ type Level2PageType = 'health_score' | 'sleep' | 'recovery' | 'water' | 'calorie
 
 export const CleanHomeDashboard: React.FC<CleanHomeDashboardProps> = ({
   userGoal,
-  userName = 'Mitrabha',
+  userName = 'there',
   meals,
   waterIntakeToday,
   sleepScore,

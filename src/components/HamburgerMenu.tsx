@@ -153,8 +153,8 @@ export const HamburgerMenu: React.FC<HamburgerMenuProps> = ({
                   />
 
                   <div className="flex-1 min-w-0">
-                    <h4 className="font-bold text-[#D1F2EB] text-sm truncate">{profileName || 'Mitrabha Deb'}</h4>
-                    <p className="text-[10px] text-[#D1F2EB]/60 font-mono mt-0.5">{profilePhone || '+918787642594'}</p>
+                    <h4 className="font-bold text-[#D1F2EB] text-sm truncate">{profileName || 'NutriMind User'}</h4>
+                    <p className="text-[10px] text-[#D1F2EB]/60 font-mono mt-0.5">{profilePhone || 'No phone on file'}</p>
                     <div className="mt-1.5 flex items-center gap-1.5">
                       <span className="bg-[#50C878]/15 border border-[#50C878]/30 text-[#50C878] text-[9px] font-mono font-bold uppercase tracking-wider px-2 py-0.5 rounded-full">
                         {isPremium ? 'PRO+ Member' : 'Free Client'}
