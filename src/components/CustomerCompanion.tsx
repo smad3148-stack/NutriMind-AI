@@ -38,7 +38,8 @@ import { aggregateHealthMetrics } from '../lib/wearableEcosystem';
 import { 
   loadChatThreads, saveChatThreads, 
   loadAIMemories, saveAIMemories, 
-  loadPrivacySettings, savePrivacySettings 
+  loadPrivacySettings, savePrivacySettings,
+  getAiMemoryConsent
 } from '../lib/chatStorage';
 import { detectLanguageFromText, SUPPORTED_LANGUAGES } from '../lib/languageDetector';
 
@@ -235,7 +236,7 @@ export default function CustomerCompanion({ token, userId }: CustomerCompanionPr
 
   useEffect(() => {
     if (!privacySettings.disableHistory) {
-      saveChatThreads(threads, privacySettings.encryptedLocalStorage);
+      saveChatThreads(threads);
     }
   }, [threads, privacySettings]);
 
@@ -788,7 +789,9 @@ export default function CustomerCompanion({ token, userId }: CustomerCompanionPr
           messages: updatedMessages,
           wearableData: liveWearableMetrics,
           detectedLanguage: detectedLang.code,
-          memories: aiMemories.map(m => `${m.key}: ${m.value}`),
+          // P0-07: memories (incl. Medical/Allergy) are only sent to the AI
+          // with explicit user consent. Default: off.
+          memories: getAiMemoryConsent() ? aiMemories.map(m => `${m.key}: ${m.value}`) : [],
           contextSnapshot: {
             userGoal,
             totalCaloriesToday,
@@ -865,7 +868,8 @@ export default function CustomerCompanion({ token, userId }: CustomerCompanionPr
         body: JSON.stringify({
           messages: trimmedMsgs,
           wearableData: liveWearableMetrics,
-          memories: aiMemories.map(m => `${m.key}: ${m.value}`)
+          // P0-07: memories only sent with explicit consent (default off).
+          memories: getAiMemoryConsent() ? aiMemories.map(m => `${m.key}: ${m.value}`) : []
         })
       });
 

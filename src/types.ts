@@ -68,7 +68,6 @@ export interface AIMemoryItem {
 export interface PrivacySettings {
   incognitoByDefault: boolean;
   disableHistory: boolean;
-  encryptedLocalStorage: boolean;
   adminAccessLocked: boolean;
   autoDeleteAfterDays: number; // 0 = never
 }

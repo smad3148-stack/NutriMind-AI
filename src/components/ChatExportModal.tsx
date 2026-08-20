@@ -163,7 +163,7 @@ export const ChatExportModal: React.FC<ChatExportModalProps> = ({
                   <div className="p-3 bg-slate-900 border border-white/10 rounded-2xl flex items-center justify-between gap-2">
                     <div className="overflow-hidden">
                       <p className="text-xs font-bold text-white truncate">{thread?.title}</p>
-                      <p className="text-[9px] text-slate-400 font-mono">End-to-end encrypted snapshot link</p>
+                      <p className="text-[9px] text-slate-400 font-mono">Shared snapshot link (not encrypted)</p>
                     </div>
                     <button
                       onClick={handleCopyShareLink}
@@ -281,14 +281,14 @@ export const ChatExportModal: React.FC<ChatExportModalProps> = ({
             {/* TAB 3: PRIVACY & SECURITY */}
             {activeTab === 'privacy' && (
               <div className="space-y-4">
-                {/* Enterprise Admin Privacy Guard Notice */}
-                <div className="p-3.5 bg-emerald-500/10 border border-emerald-500/25 rounded-2xl space-y-1.5">
-                  <div className="flex items-center gap-2 text-emerald-400 font-bold text-xs">
+                {/* P0-07: honest storage notice (replaces false encryption claims) */}
+                <div className="p-3.5 bg-cyan-500/10 border border-cyan-500/25 rounded-2xl space-y-1.5">
+                  <div className="flex items-center gap-2 text-cyan-400 font-bold text-xs">
                     <ShieldCheck size={16} />
-                    <span>Strict Enterprise Privacy Mandate</span>
+                    <span>How your data is stored</span>
                   </div>
-                  <p className="text-[10px] text-emerald-200/90 leading-relaxed">
-                    Admins and system maintainers have <span className="font-extrabold underline">ZERO ACCESS</span> to your private conversations unless explicit consent is provided or required by law. All data is encrypted client-side.
+                  <p className="text-[10px] text-cyan-200/90 leading-relaxed">
+                    Conversations and memories are stored locally in your browser (unencrypted, per-device). They are not synced to a server. To let NutriChat AI use your memories as context, enable "Share Memories with AI" in the Memory panel — this is off by default.
                   </p>
                 </div>
 
@@ -316,19 +316,6 @@ export const ChatExportModal: React.FC<ChatExportModalProps> = ({
                       type="checkbox"
                       checked={privacySettings.disableHistory}
                       onChange={(e) => onUpdatePrivacySettings({ ...privacySettings, disableHistory: e.target.checked })}
-                      className="w-4 h-4 rounded accent-cyan-400 cursor-pointer"
-                    />
-                  </div>
-
-                  <div className="p-3 bg-slate-900 border border-white/10 rounded-2xl flex items-center justify-between">
-                    <div>
-                      <h4 className="font-bold text-xs text-white">Client-Side Storage Encryption</h4>
-                      <p className="text-[9px] text-slate-400">AES-256 local database locking</p>
-                    </div>
-                    <input
-                      type="checkbox"
-                      checked={privacySettings.encryptedLocalStorage}
-                      onChange={(e) => onUpdatePrivacySettings({ ...privacySettings, encryptedLocalStorage: e.target.checked })}
                       className="w-4 h-4 rounded accent-cyan-400 cursor-pointer"
                     />
                   </div>

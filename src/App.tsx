@@ -269,8 +269,8 @@ export default function App() {
             <ShieldAlert size={12} className="text-[#50C878]" />
             <span>
               {session 
-                ? `Operational Mode: Secure Connection Enabled` 
-                : 'Operational Mode: Secure Connection Active'}
+                ? `Operational Mode: Signed in` 
+                : 'Operational Mode: Demo mode'}
             </span>
           </div>
           <div>
