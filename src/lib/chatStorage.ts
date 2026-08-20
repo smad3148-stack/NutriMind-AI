@@ -186,54 +186,89 @@ export const exportThreadToTxt = (thread: ChatThread) => {
 };
 
 export const exportThreadToPDF = (thread: ChatThread) => {
-  // Generates a print-formatted window or downloadable HTML report
+  // Generates a print-formatted window. P0-08: the document is built with
+  // DOM APIs only — every user-controlled value (thread title, message text)
+  // is assigned via textContent, which the browser treats as plain text.
+  // No string-based document building is used, so a chat message containing
+  // <script> or markup can never execute or alter the export layout.
   const printWindow = window.open('', '_blank');
   if (!printWindow) {
     exportThreadToTxt(thread);
     return;
   }
 
-  const htmlContent = `
-    <!DOCTYPE html>
-    <html>
-    <head>
-      <title>NutriMind AI - ${thread.title}</title>
-      <style>
-        body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; padding: 40px; color: #0f172a; max-width: 800px; margin: 0 auto; background: #fafafa; }
-        .header { border-bottom: 2px solid #06b6d4; padding-bottom: 16px; margin-bottom: 24px; }
-        .header h1 { margin: 0; font-size: 24px; color: #0891b2; }
-        .header p { margin: 4px 0 0; font-size: 12px; color: #64748b; font-family: monospace; }
-        .message { margin-bottom: 16px; padding: 16px; rounded: 12px; border-radius: 12px; }
-        .user { background: #e0f2fe; border-left: 4px solid #0284c7; }
-        .assistant { background: #ffffff; border-left: 4px solid #06b6d4; box-shadow: 0 2px 8px rgba(0,0,0,0.05); }
-        .sender { font-size: 11px; font-weight: bold; text-transform: uppercase; color: #475569; margin-bottom: 6px; font-family: monospace; }
-        .text { font-size: 13px; line-height: 1.6; white-space: pre-wrap; }
-        .footer { margin-top: 40px; border-top: 1px solid #e2e8f0; pt: 16px; font-size: 10px; color: #94a3b8; text-align: center; }
-      </style>
-    </head>
-    <body>
-      <div class="header">
-        <h1>NutriMind AI Biological Consultation</h1>
-        <p>Topic: ${thread.title} | ID: ${thread.id} | Generated: ${new Date().toLocaleString()}</p>
-      </div>
-      ${thread.messages.map(m => `
-        <div class="message ${m.sender}">
-          <div class="sender">${m.sender === 'user' ? 'Patient / User' : 'NutriMind Clinical AI'} (${new Date(m.timestamp).toLocaleTimeString()})</div>
-          <div class="text">${m.text.replace(/</g, '&lt;').replace(/>/g, '&gt;')}</div>
-        </div>
-      `).join('')}
-      <div class="footer">
-        NutriMind AI Enterprise Biological OS • Local export (not encrypted) • Contains personal data
-      </div>
-      <script>
-        window.onload = function() { window.print(); };
-      </script>
-    </body>
-    </html>
-  `;
+  const doc = printWindow.document;
+  doc.open();
 
-  printWindow.document.write(htmlContent);
-  printWindow.document.close();
+  const root = doc.createElement('html');
+
+  const head = doc.createElement('head');
+  const pageTitle = doc.createElement('title');
+  pageTitle.textContent = `NutriMind AI - ${thread.title}`;
+  head.appendChild(pageTitle);
+
+  const style = doc.createElement('style');
+  style.textContent = [
+    'body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; padding: 40px; color: #0f172a; max-width: 800px; margin: 0 auto; background: #fafafa; }',
+    '.header { border-bottom: 2px solid #06b6d4; padding-bottom: 16px; margin-bottom: 24px; }',
+    '.header h1 { margin: 0; font-size: 24px; color: #0891b2; }',
+    '.header p { margin: 4px 0 0; font-size: 12px; color: #64748b; font-family: monospace; }',
+    '.message { margin-bottom: 16px; padding: 16px; border-radius: 12px; }',
+    '.user { background: #e0f2fe; border-left: 4px solid #0284c7; }',
+    '.assistant { background: #ffffff; border-left: 4px solid #06b6d4; box-shadow: 0 2px 8px rgba(0,0,0,0.05); }',
+    '.sender { font-size: 11px; font-weight: bold; text-transform: uppercase; color: #475569; margin-bottom: 6px; font-family: monospace; }',
+    '.text { font-size: 13px; line-height: 1.6; white-space: pre-wrap; }',
+    '.footer { margin-top: 40px; border-top: 1px solid #e2e8f0; padding-top: 16px; font-size: 10px; color: #94a3b8; text-align: center; }',
+  ].join('\n');
+  head.appendChild(style);
+  root.appendChild(head);
+
+  const body = doc.createElement('body');
+
+  const headerDiv = doc.createElement('div');
+  headerDiv.className = 'header';
+  const h1 = doc.createElement('h1');
+  h1.textContent = 'NutriMind AI Biological Consultation';
+  const headerP = doc.createElement('p');
+  headerP.textContent = `Topic: ${thread.title} | ID: ${thread.id} | Generated: ${new Date().toLocaleString()}`;
+  headerDiv.appendChild(h1);
+  headerDiv.appendChild(headerP);
+  body.appendChild(headerDiv);
+
+  thread.messages.forEach((msg) => {
+    const msgDiv = doc.createElement('div');
+    msgDiv.className = `message ${msg.sender === 'user' ? 'user' : 'assistant'}`;
+
+    const senderDiv = doc.createElement('div');
+    senderDiv.className = 'sender';
+    senderDiv.textContent = `${msg.sender === 'user' ? 'Patient / User' : 'NutriMind Clinical AI'} (${new Date(msg.timestamp).toLocaleTimeString()})`;
+    msgDiv.appendChild(senderDiv);
+
+    const textDiv = doc.createElement('div');
+    textDiv.className = 'text';
+    // textContent = auto-escaped plain text; a message containing <script>
+    // or markup renders literally.
+    textDiv.textContent = msg.text;
+    msgDiv.appendChild(textDiv);
+
+    body.appendChild(msgDiv);
+  });
+
+  const footerDiv = doc.createElement('div');
+  footerDiv.className = 'footer';
+  footerDiv.textContent =
+    'NutriMind AI Enterprise Biological OS • Local export (not encrypted) • Contains personal data';
+  body.appendChild(footerDiv);
+
+  root.appendChild(body);
+  doc.appendChild(root);
+  doc.close();
+
+  // Print once the print window has laid out (no inline scripts are used).
+  setTimeout(() => {
+    printWindow.focus();
+    printWindow.print();
+  }, 200);
 };
 
 export const exportAllDataJSON = (threads: ChatThread[], memories: AIMemoryItem[]) => {
