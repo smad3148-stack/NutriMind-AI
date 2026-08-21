@@ -25,7 +25,7 @@ const HAMBURGER = readFileSync(resolve(process.cwd(), 'src/components/HamburgerM
 
 const COMPONENTS_DIR = resolve(process.cwd(), 'src/components');
 const LIB_DIR = resolve(process.cwd(), 'src/lib');
-const scannedFiles: Record<string, string> = { 'server.ts': SERVER, 'src/App.tsx': APP };
+const scannedFiles: Record<string, string> = { 'server.ts': SERVER, 'src/App.tsx': APP, 'src/components/HamburgerMenu.tsx': HAMBURGER };
 for (const f of readdirSync(COMPONENTS_DIR)) {
   if (f.endsWith('.tsx') && !f.endsWith('.test.tsx')) {
     scannedFiles[`src/components/${f}`] = readFileSync(resolve(COMPONENTS_DIR, f), 'utf8');
@@ -35,6 +35,10 @@ for (const f of readdirSync(LIB_DIR)) {
   if (f.endsWith('.ts') && !f.endsWith('.test.ts')) {
     scannedFiles[`src/lib/${f}`] = readFileSync(resolve(LIB_DIR, f), 'utf8');
   }
+}
+// Full-repo coverage: DB seeds and config templates must also stay clean.
+for (const f of ['prisma/seed.ts', 'supabase_schema.sql', 'metadata.json']) {
+  scannedFiles[f] = readFileSync(resolve(process.cwd(), f), 'utf8');
 }
 
 const BANNED_EVERYWHERE = [
@@ -56,17 +60,10 @@ describe('P0-11: no hardcoded profile PII', () => {
     }
   });
 
-  it('personal name appears nowhere except the deliberate founder credits', () => {
+  it('personal name appears nowhere at all (previous "founder credits" exception revoked in P0-11 audit)', () => {
     for (const [file, content] of Object.entries(scannedFiles)) {
-      if (file === 'src/App.tsx' || file === 'src/components/HamburgerMenu.tsx') continue;
       expect(content.includes('Mitrabha'), `${file} must not contain the personal name`).toBe(false);
     }
-    // The two exceptions are single founder-credit lines, not profile data.
-    const appHits = APP.split('\n').filter(l => l.includes('Mitrabha'));
-    expect(appHits.length).toBe(1);
-    expect(appHits[0]).toContain('Founder & Creator');
-    const menuHits = HAMBURGER.split('\n').filter(l => l.includes('Mitrabha'));
-    expect(menuHits.length).toBe(1);
   });
 
   it('coach chat has no preset canned-response backdoor', () => {

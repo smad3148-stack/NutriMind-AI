@@ -785,13 +785,7 @@ export const HamburgerMenu: React.FC<HamburgerMenuProps> = ({
             </p>
 
             <div className="bg-[#2E1A47]/40 border border-[#663399]/40 p-4 rounded-2xl space-y-1 shadow-inner">
-              <span className="text-[10px] font-mono text-[#A3779D] uppercase tracking-wider block">
-                Founder & Creator
-              </span>
-              <h4 className="text-lg font-extrabold text-[#FBE4E3]">
-                Mitrabha Deb
-              </h4>
-              <p className="text-[11px] text-[#A3779D] font-mono pt-1">
+              <p className="text-[11px] text-[#A3779D] font-mono">
                 Designed & Developed in India.
               </p>
             </div>
