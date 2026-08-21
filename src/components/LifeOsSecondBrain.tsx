@@ -25,7 +25,7 @@ interface LifeOsSecondBrainProps {
 }
 
 export const LifeOsSecondBrain: React.FC<LifeOsSecondBrainProps> = ({
-  userName = 'Utpal',
+  userName = 'User',
   userGoal,
   memories,
   wearables,

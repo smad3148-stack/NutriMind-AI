@@ -155,8 +155,8 @@ export const GlobalPaymentModal: React.FC<GlobalPaymentModalProps> = ({
   onClose,
   initialPlan = 'YEARLY',
   onPaymentSuccess,
-  profileName = 'Mitrabha Deb',
-  profileEmail = 'ecovisionfilm@gmail.com',
+  profileName = '',
+  profileEmail = '',
   isLifetimeActive = false
 }) => {
   const [selectedPlan, setSelectedPlan] = useState<'MONTHLY' | 'YEARLY' | 'LIFETIME'>(initialPlan);

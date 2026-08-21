@@ -215,7 +215,7 @@ INSERT INTO public.revenue_by_month (month, amount, target) VALUES
 ON CONFLICT (month) DO NOTHING;
 
 INSERT INTO public.transactions (id, user_email, plan, amount, status, timestamp) VALUES
-('tx104', 'ecovisionfilm@gmail.com', 'Premium Monthly', 14.99, 'success', NOW() - INTERVAL '15 minutes'),
+('tx104', 'demo.user@example.com', 'Premium Monthly', 14.99, 'success', NOW() - INTERVAL '15 minutes'),
 ('tx103', 'sarah.jones@example.com', 'Family Plan Annual', 149.99, 'success', NOW() - INTERVAL '2 hours'),
 ('tx102', 'marcus.fit@example.com', 'Pro Coach Addon', 49.99, 'success', NOW() - INTERVAL '6 hours'),
 ('tx101', 'john.smith@example.com', 'Premium Monthly', 14.99, 'failed', NOW() - INTERVAL '12 hours')
@@ -370,7 +370,7 @@ CREATE POLICY "No direct access to user roles"
 
 -- Promote a user to admin (run once in the Supabase SQL editor):
 -- INSERT INTO public.user_roles (user_id, role)
--- SELECT id, 'admin' FROM auth.users WHERE email = 'ecovisionfilm@gmail.com'
+-- SELECT id, 'admin' FROM auth.users WHERE email = 'you@example.com'
 -- ON CONFLICT (user_id, role) DO NOTHING;
 
 -- ======================================================================

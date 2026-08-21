@@ -61,7 +61,7 @@ export const VoicePersonaSettings: React.FC<VoicePersonaSettingsProps> = ({
         return;
       }
       setIsPlayingPreview(true);
-      const text = `Hello Mitrabha! I am your ${gender} NutriMind AI coach, tuned to ${style} resonance at ${speedVal}x pace.`;
+      const text = `Hello! I am your ${gender} NutriMind AI coach, tuned to ${style} resonance at ${speedVal}x pace.`;
       const utterance = new SpeechSynthesisUtterance(text);
       utterance.rate = speedVal;
       utterance.pitch = gender === 'female' ? 1.2 : 0.95;

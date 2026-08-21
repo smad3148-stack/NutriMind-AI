@@ -34,7 +34,7 @@ export const TweakWallSection: React.FC = () => {
     },
     {
       id: 'post2' as const,
-      user: 'Mitrabha D.',
+      user: 'Rahul K.',
       userImg: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&w=100&q=80',
       foodImg: 'https://images.unsplash.com/photo-1517881917430-e70dfb3610aa?auto=format&fit=crop&w=300&q=80',
       calories: 280,
@@ -42,7 +42,7 @@ export const TweakWallSection: React.FC = () => {
       fat: 4,
       carbs: 52,
       fibre: 9,
-      advice: 'Excellent high-fiber prebiotic meal, Mitrabha. Swapping wildflower honey for monk fruit sweet drops keeps insulin spikes at zero while fully sustaining glycogen storage.'
+      advice: 'Excellent high-fiber prebiotic meal, Rahul. Swapping wildflower honey for monk fruit sweet drops keeps insulin spikes at zero while fully sustaining glycogen storage.'
     },
     {
       id: 'post3' as const,

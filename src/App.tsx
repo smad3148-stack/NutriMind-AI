@@ -274,7 +274,7 @@ export default function App() {
             </span>
           </div>
           <div>
-            <span>© 2026 NutriMind AI Inc. Founder & Creator: Mitrabha Deb. Designed & Developed in India.</span>
+            <span>© 2026 NutriMind AI Inc. Designed & Developed in India.</span>
           </div>
         </div>
       </footer>

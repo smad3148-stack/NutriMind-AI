@@ -153,8 +153,8 @@ export const HamburgerMenu: React.FC<HamburgerMenuProps> = ({
                   />
 
                   <div className="flex-1 min-w-0">
-                    <h4 className="font-bold text-[#D1F2EB] text-sm truncate">{profileName || 'Mitrabha Deb'}</h4>
-                    <p className="text-[10px] text-[#D1F2EB]/60 font-mono mt-0.5">{profilePhone || '+918787642594'}</p>
+                    <h4 className="font-bold text-[#D1F2EB] text-sm truncate">{profileName || 'NutriMind User'}</h4>
+                    <p className="text-[10px] text-[#D1F2EB]/60 font-mono mt-0.5">{profilePhone || 'No phone on file'}</p>
                     <div className="mt-1.5 flex items-center gap-1.5">
                       <span className="bg-[#50C878]/15 border border-[#50C878]/30 text-[#50C878] text-[9px] font-mono font-bold uppercase tracking-wider px-2 py-0.5 rounded-full">
                         {isPremium ? 'PRO+ Member' : 'Free Client'}
@@ -785,13 +785,7 @@ export const HamburgerMenu: React.FC<HamburgerMenuProps> = ({
             </p>
 
             <div className="bg-[#2E1A47]/40 border border-[#663399]/40 p-4 rounded-2xl space-y-1 shadow-inner">
-              <span className="text-[10px] font-mono text-[#A3779D] uppercase tracking-wider block">
-                Founder & Creator
-              </span>
-              <h4 className="text-lg font-extrabold text-[#FBE4E3]">
-                Mitrabha Deb
-              </h4>
-              <p className="text-[11px] text-[#A3779D] font-mono pt-1">
+              <p className="text-[11px] text-[#A3779D] font-mono">
                 Designed & Developed in India.
               </p>
             </div>

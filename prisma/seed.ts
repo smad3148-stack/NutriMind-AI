@@ -66,7 +66,7 @@ async function main() {
       version: 'v2.4.0',
       channel: 'production',
       action: 'deploy',
-      deployedBy: 'ecovisionfilm@gmail.com',
+      deployedBy: 'admin',
       status: 'success',
       notes: 'Standard monthly build deployment.',
     },
