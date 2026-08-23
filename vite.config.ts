@@ -17,6 +17,11 @@ export default defineConfig(() => {
       },
     },
     server: {
+      // Allow proxied preview hosts (Google AI Studio preview, sandbox
+      // tunnels). Vite 6 blocks unknown Host headers with a 403, which is
+      // what produced the white screen in the AI Studio preview iframe.
+      // This only affects the dev server; production serves static files.
+      allowedHosts: true as const,
       // Disable HMR in sandbox/iframe preview mode using server.hmr=false fallback
       hmr: process.env.DISABLE_HMR !== 'false' ? false : {
         protocol: 'wss',

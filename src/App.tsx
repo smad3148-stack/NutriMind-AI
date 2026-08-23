@@ -290,7 +290,9 @@ export default function App() {
               transition={{ duration: 0.25 }}
               className="py-4"
             >
-              <AdminDashboard />
+              <ErrorBoundary>
+                <AdminDashboard />
+              </ErrorBoundary>
             </motion.div>
           )}
 
@@ -303,9 +305,11 @@ export default function App() {
           <div className="flex items-center gap-1.5">
             <ShieldAlert size={12} className="text-[#50C878]" />
             <span>
-              {session 
-                ? `Operational Mode: Signed in` 
-                : 'Operational Mode: Demo mode'}
+              {session
+                ? 'Operational Mode: Signed in'
+                : demoMode
+                  ? 'Operational Mode: Demo mode'
+                  : 'Operational Mode: Signed out'}
             </span>
           </div>
           <div>

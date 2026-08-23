@@ -338,6 +338,19 @@ export async function createApp(httpServer?: http.Server): Promise<express.Expre
     res.json({ demoMode: !isAuthConfigured(), ...getPublicSupabaseConfig() });
   });
 
+  // HEALTH CHECK (public) - liveness/readiness probe for deployment
+  // platforms and uptime monitors. Reports which subsystems are configured
+  // without exposing any secret values.
+  app.get('/api/health', (_req, res) => {
+    res.json({
+      status: 'ok',
+      timestamp: new Date().toISOString(),
+      authConfigured: isAuthConfigured(),
+      databaseConfigured: !!process.env.DATABASE_URL,
+      geminiConfigured: !!process.env.GEMINI_API_KEY,
+    });
+  });
+
   // 1. MEAL ENDPOINTS
   app.get('/api/meals', requireUserAuth, async (req: AuthenticatedRequest, res) => {
     const supabase = req.supabaseUserClient;
@@ -2885,7 +2898,8 @@ async function startServer() {
   const server = http.createServer();
   const app = await createApp(server);
   server.on('request', app);
-  const PORT = 3000;
+  // Platforms (containers, sandboxes, PaaS) inject PORT at runtime.
+  const PORT = Number(process.env.PORT) || 3000;
 
   server.listen(PORT, '0.0.0.0', () => {
     console.log(`[NutriMind AI] Enterprise Server active at http://localhost:${PORT}`);
