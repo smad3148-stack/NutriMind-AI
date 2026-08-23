@@ -64,6 +64,22 @@ export function isAuthConfigured(): boolean {
 }
 
 /**
+ * Public client-facing Supabase configuration (project URL + anon key).
+ * These values are public by design - the anon key is meant to ship to
+ * browsers and only grants access allowed by RLS policies - so they are
+ * served at runtime via /api/auth/config instead of being baked into the
+ * client bundle at build time. Empty strings when unconfigured.
+ */
+export function getPublicSupabaseConfig(): { supabaseUrl: string; supabaseAnonKey: string } {
+  const url = clean(process.env.NEXT_PUBLIC_SUPABASE_URL || process.env.SUPABASE_URL);
+  const anonKey = clean(process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY || process.env.SUPABASE_ANON_KEY);
+  if (isPlaceholder(url) || isPlaceholder(anonKey)) {
+    return { supabaseUrl: '', supabaseAnonKey: '' };
+  }
+  return { supabaseUrl: url, supabaseAnonKey: anonKey };
+}
+
+/**
  * Express middleware that authenticates a request and attaches
  * `req.user` and `req.supabaseUserClient`. Fail-closed when Supabase is
  * configured: missing/invalid tokens receive 401 and the request is never

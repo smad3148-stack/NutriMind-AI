@@ -17,6 +17,7 @@ const ENV_KEYS = [
   'SUPABASE_URL',
   'NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY',
   'SUPABASE_ANON_KEY',
+  'SUPABASE_SERVICE_ROLE_KEY',
 ];
 
 function makeReqRes() {
@@ -150,6 +151,41 @@ describe('server/supabaseUser', () => {
       await requireAdminAuth(req as any, resSpy as any, next as any);
       expect(nextCalled()).toBe(false);
       expect(spy.statusCode).toBe(401);
+    });
+  });
+
+  describe('getPublicSupabaseConfig (runtime client config for /api/auth/config)', () => {
+    it('returns empty strings when no credentials are configured', async () => {
+      const { getPublicSupabaseConfig } = await importFresh();
+      expect(getPublicSupabaseConfig()).toEqual({ supabaseUrl: '', supabaseAnonKey: '' });
+    });
+
+    it('returns empty strings for placeholder credentials', async () => {
+      process.env.NEXT_PUBLIC_SUPABASE_URL = 'https://your-supabase-project.supabase.co';
+      process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY = 'your-supabase-anon-key';
+      const { getPublicSupabaseConfig } = await importFresh();
+      expect(getPublicSupabaseConfig()).toEqual({ supabaseUrl: '', supabaseAnonKey: '' });
+    });
+
+    it('returns the public URL and anon key when configured', async () => {
+      process.env.NEXT_PUBLIC_SUPABASE_URL = 'https://real-project.supabase.co';
+      process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.realanonkey';
+      const { getPublicSupabaseConfig } = await importFresh();
+      expect(getPublicSupabaseConfig()).toEqual({
+        supabaseUrl: 'https://real-project.supabase.co',
+        supabaseAnonKey: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.realanonkey',
+      });
+    });
+
+    it('never includes the service-role key', async () => {
+      process.env.SUPABASE_URL = 'https://real-project.supabase.co';
+      process.env.SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.realanonkey';
+      process.env.SUPABASE_SERVICE_ROLE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.servicerole';
+      const { getPublicSupabaseConfig } = await importFresh();
+      const cfg = getPublicSupabaseConfig();
+      expect(JSON.stringify(cfg)).not.toContain('servicerole');
+      expect(cfg.supabaseUrl).toBe('https://real-project.supabase.co');
+      expect(cfg.supabaseAnonKey).toBe('eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.realanonkey');
     });
   });
 });

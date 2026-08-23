@@ -3,6 +3,8 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
+import { getSupabaseRuntimeConfig } from './supabase';
+
 export type EnvironmentChannel = 'development' | 'beta' | 'staging' | 'production';
 
 export interface EnvConfiguration {
@@ -48,7 +50,7 @@ class EnvironmentStrategy {
           apiBaseUrl: productionHost,
           enableMocks: false,
           enableLogs: false,
-          supabaseUrl: (import.meta as any).env?.VITE_SUPABASE_URL || '',
+          supabaseUrl: getSupabaseRuntimeConfig()?.supabaseUrl || '',
           analyticsEnabled: true,
           crashReportingEnabled: true,
           syncIntervalMs: 15 * 60 * 1000 // 15 mins
@@ -59,7 +61,7 @@ class EnvironmentStrategy {
           apiBaseUrl: stagingHost,
           enableMocks: false,
           enableLogs: true,
-          supabaseUrl: (import.meta as any).env?.VITE_SUPABASE_URL || '',
+          supabaseUrl: getSupabaseRuntimeConfig()?.supabaseUrl || '',
           analyticsEnabled: true,
           crashReportingEnabled: true,
           syncIntervalMs: 5 * 60 * 1000 // 5 mins
@@ -70,7 +72,7 @@ class EnvironmentStrategy {
           apiBaseUrl: stagingHost,
           enableMocks: true, // Allow fallback mocks for beta trialists
           enableLogs: true,
-          supabaseUrl: (import.meta as any).env?.VITE_SUPABASE_URL || '',
+          supabaseUrl: getSupabaseRuntimeConfig()?.supabaseUrl || '',
           analyticsEnabled: true,
           crashReportingEnabled: true,
           syncIntervalMs: 2 * 60 * 1000 // 2 mins
@@ -82,7 +84,7 @@ class EnvironmentStrategy {
           apiBaseUrl: devHost,
           enableMocks: true,
           enableLogs: true,
-          supabaseUrl: (import.meta as any).env?.VITE_SUPABASE_URL || '',
+          supabaseUrl: getSupabaseRuntimeConfig()?.supabaseUrl || '',
           analyticsEnabled: false,
           crashReportingEnabled: false,
           syncIntervalMs: 30 * 1000 // 30s
@@ -98,7 +100,7 @@ class EnvironmentStrategy {
     const config = this.getConfig();
 
     if (!config.supabaseUrl) {
-      warnings.push('VITE_SUPABASE_URL is not set. Database synchronizations will fall back to offline states.');
+      warnings.push('Supabase is not configured on the server (no URL / anon key from /api/auth/config). Database synchronizations will fall back to offline states.');
     }
 
     return {

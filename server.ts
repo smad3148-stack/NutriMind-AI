@@ -9,7 +9,7 @@ import path from 'path';
 import { createServer as createViteServer } from 'vite';
 import { GoogleGenAI } from '@google/genai';
 import { getSupabaseAdmin } from './server/supabaseAdmin';
-import { requireUserAuth, requireAdminAuth, isAuthConfigured, AuthenticatedRequest } from './server/supabaseUser';
+import { requireUserAuth, requireAdminAuth, isAuthConfigured, getPublicSupabaseConfig, AuthenticatedRequest } from './server/supabaseUser';
 import { createAiRateLimiter, createAiDailyBudget, aiRequestKey } from './server/rateLimit';
 import { ChatMessage } from './src/types';
 import { getPrisma, handlePrismaError } from './server/prisma';
@@ -327,9 +327,12 @@ async function startServer() {
   // --- API ROUTING PAIRS FOR SUPABASE POSTGRESQL CRUD ---
 
   // 0. AUTH CONFIG (public) - lets the client show an explicit Demo Mode
-  // entry point ONLY when the auth backend is genuinely unconfigured.
+  // entry point ONLY when the auth backend is genuinely unconfigured, and
+  // hands the browser its public Supabase config (URL + anon key) at runtime
+  // so the client bundle carries no build-time credentials. The anon key is
+  // public by design (RLS governs access); the service-role key is never sent.
   app.get('/api/auth/config', (_req, res) => {
-    res.json({ demoMode: !isAuthConfigured() });
+    res.json({ demoMode: !isAuthConfigured(), ...getPublicSupabaseConfig() });
   });
 
   // 1. MEAL ENDPOINTS
