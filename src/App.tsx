@@ -10,7 +10,7 @@ import CustomerCompanion from './components/CustomerCompanion';
 import AdminDashboard from './components/AdminDashboard';
 import SupabaseAuth from './components/SupabaseAuth';
 import { ErrorBoundary } from './components/ErrorBoundary';
-import { getSupabase } from './lib/supabase';
+import { getSupabase, setSupabaseRuntimeConfig } from './lib/supabase';
 import { setSessionToken } from './lib/sessionToken';
 
 export default function App() {
@@ -24,11 +24,18 @@ export default function App() {
   const [userProfile, setUserProfile] = useState<{ email: string; name?: string } | null>(null);
 
   const [isResettingPassword, setIsResettingPassword] = useState<boolean>(false);
+  // Runtime auth backend config has been fetched from /api/auth/config.
+  // The Supabase client is configured from this response, so no auth UI or
+  // session restore may run before it resolves.
+  const [authConfigLoaded, setAuthConfigLoaded] = useState<boolean>(false);
   // P0-01: mirrors the server-side admin check so the Clinician Portal is
   // hidden for non-admins. null = not yet checked / signed out.
   const [isAdmin, setIsAdmin] = useState<boolean | null>(null);
 
+  // Session restore runs only after the runtime Supabase config has been
+  // fetched from /api/auth/config and installed via setSupabaseRuntimeConfig.
   useEffect(() => {
+    if (!authConfigLoaded) return;
     const supabase = getSupabase();
     if (!supabase) return;
 
@@ -61,7 +68,7 @@ export default function App() {
     return () => {
       subscription?.unsubscribe();
     };
-  }, []);
+  }, [authConfigLoaded]);
 
   const handleLogout = async () => {
     const supabase = getSupabase();
@@ -76,19 +83,33 @@ export default function App() {
 
   const isUserAuthenticated = (!!session || demoMode) && !isResettingPassword;
 
-  // P0-03: ask the server whether the auth backend is configured. The Demo
-  // Mode entry button is rendered only when demoMode === true, and entering
-  // demo mode is always an explicit user action.
+  // Fetch the runtime auth configuration from the server. The response
+  // carries the public Supabase URL + anon key (installed into the client
+  // via setSupabaseRuntimeConfig) and reports whether the auth backend is
+  // configured. The Demo Mode entry button is rendered only when
+  // demoMode === true, and entering demo mode is always an explicit user
+  // action (P0-03). Fail closed on any error: no Supabase client, no demo
+  // entry.
   useEffect(() => {
     let cancelled = false;
     fetch('/api/auth/config')
       .then((res) => (res.ok ? res.json() : { demoMode: false }))
-      .then((cfg: { demoMode?: boolean }) => {
-        if (!cancelled) setDemoModeAvailable(!!cfg.demoMode);
+      .then((cfg: { demoMode?: boolean; supabaseUrl?: string; supabaseAnonKey?: string }) => {
+        if (cancelled) return;
+        setSupabaseRuntimeConfig({
+          supabaseUrl: cfg.supabaseUrl || '',
+          supabaseAnonKey: cfg.supabaseAnonKey || '',
+        });
+        setDemoModeAvailable(!!cfg.demoMode);
+        setAuthConfigLoaded(true);
       })
       .catch(() => {
-        // Fail closed: no demo entry when the server cannot be reached.
-        if (!cancelled) setDemoModeAvailable(false);
+        if (cancelled) return;
+        // Fail closed: no demo entry and no Supabase client when the server
+        // cannot be reached - but stop loading so the UI can surface it.
+        setSupabaseRuntimeConfig({ supabaseUrl: '', supabaseAnonKey: '' });
+        setDemoModeAvailable(false);
+        setAuthConfigLoaded(true);
       });
     return () => {
       cancelled = true;
@@ -212,7 +233,21 @@ export default function App() {
       <main className="flex-1 p-4 sm:p-6 md:p-8 max-w-7xl w-full mx-auto flex flex-col justify-center">
         <AnimatePresence mode="wait">
           
-          {!isUserAuthenticated ? (
+          {!authConfigLoaded ? (
+            <motion.div
+              key="config_loading"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              transition={{ duration: 0.25 }}
+              className="py-24 flex flex-col items-center justify-center gap-4"
+            >
+              <div className="w-10 h-10 rounded-full border-2 border-[#50C878]/20 border-t-[#50C878] animate-spin" />
+              <p className="text-xs font-mono text-[#D1F2EB]/50 uppercase tracking-widest">
+                Connecting to authentication service…
+              </p>
+            </motion.div>
+          ) : !isUserAuthenticated ? (
             <motion.div
               key="auth_screen"
               initial={{ opacity: 0, scale: 0.98, y: 15 }}

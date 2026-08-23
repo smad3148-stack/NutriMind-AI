@@ -6,80 +6,77 @@
 import { createClient } from '@supabase/supabase-js';
 import { createBrowserClient } from '@supabase/ssr';
 
-function sanitizeClientEnvValue(val: string | undefined): string {
-  if (!val) return '';
-  let cleaned = val.trim();
-  
-  if (cleaned.startsWith('"') && cleaned.endsWith('"')) {
-    cleaned = cleaned.slice(1, -1);
-  }
-  if (cleaned.startsWith("'") && cleaned.endsWith("'")) {
-    cleaned = cleaned.slice(1, -1);
-  }
-  cleaned = cleaned.trim();
-
-  // If it's a known placeholder, return empty
-  if (
-    cleaned.startsWith('(') || 
-    cleaned.includes('Paste your') || 
-    cleaned.includes('your-') || 
-    cleaned.includes('your_') ||
-    cleaned.length < 5
-  ) {
-    return '';
-  }
-
-  // Supabase keys must be JWTs (starting with eyJ) or begin with sb_ (newer client keys). URL starts with http.
-  if (!cleaned.startsWith('http') && !cleaned.startsWith('eyJ') && !cleaned.startsWith('sb_')) {
-    return '';
-  }
-  
-  return cleaned;
+/**
+ * Runtime Supabase configuration, fetched from the server at startup
+ * (GET /api/auth/config). The project URL and anon key are public by design
+ * (the anon key only grants access permitted by RLS policies), so they are
+ * delivered per-deployment at runtime instead of being baked into the
+ * client bundle at build time.
+ */
+export interface SupabaseRuntimeConfig {
+  supabaseUrl: string;
+  supabaseAnonKey: string;
 }
 
-// Client-side environment variables accessed via import.meta.env for full Vite integration
-const supabaseUrl = 
-  sanitizeClientEnvValue((import.meta as any).env?.NEXT_PUBLIC_SUPABASE_URL) || 
-  sanitizeClientEnvValue((import.meta as any).env?.VITE_SUPABASE_URL) || 
-  sanitizeClientEnvValue((import.meta as any).env?.SUPABASE_URL) || 
-  '';
-
-const supabaseAnonKey = 
-  sanitizeClientEnvValue((import.meta as any).env?.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY) || 
-  sanitizeClientEnvValue((import.meta as any).env?.VITE_SUPABASE_ANON_KEY) || 
-  sanitizeClientEnvValue((import.meta as any).env?.SUPABASE_ANON_KEY) || 
-  '';
-
+let runtimeConfig: SupabaseRuntimeConfig | null = null;
 let supabaseInstance: any = null;
 let warnMissingSecretsOnce = false;
 
 /**
+ * Stores the runtime configuration fetched from the server. Must be called
+ * before getSupabase() is expected to return a client. Resets any cached
+ * client so a re-configuration takes effect.
+ */
+export function setSupabaseRuntimeConfig(config: SupabaseRuntimeConfig): void {
+  runtimeConfig = config;
+  supabaseInstance = null;
+}
+
+export function getSupabaseRuntimeConfig(): SupabaseRuntimeConfig | null {
+  return runtimeConfig;
+}
+
+export function isSupabaseConfigured(): boolean {
+  return !!(runtimeConfig?.supabaseUrl && runtimeConfig?.supabaseAnonKey);
+}
+
+/**
  * Lazy initialization of Supabase client using @supabase/ssr and @supabase/supabase-js.
- * This prevents crashes on startup if keys are not defined in the workspace yet.
+ * Returns null until setSupabaseRuntimeConfig() has provided a valid
+ * configuration - the app fetches it from /api/auth/config at startup.
  */
 export function getSupabase() {
   if (!supabaseInstance) {
-    if (!supabaseUrl || !supabaseAnonKey) {
-      if (!warnMissingSecretsOnce) {
+    if (!isSupabaseConfigured()) {
+      // Only warn once the server has answered with an empty config - a null
+      // runtimeConfig just means the startup fetch has not completed yet.
+      if (runtimeConfig && !warnMissingSecretsOnce) {
         console.warn(
-          '⚠️ [SUPABASE_MISSING_SECRETS] VITE_SUPABASE_URL / NEXT_PUBLIC_SUPABASE_URL or VITE_SUPABASE_ANON_KEY / NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY is undefined. ' +
-          'Enterprise database features will fallback to client-side sandboxed simulation mode. ' +
-          'Configure these keys in your Settings Secrets block to connect real live databases.'
+          '\u26a0\ufe0f [SUPABASE_MISSING_SECRETS] The server did not provide a Supabase URL / anon key via /api/auth/config. ' +
+          'Database features will fall back to sandboxed demo mode. ' +
+          'Configure SUPABASE_URL and SUPABASE_ANON_KEY (or the NEXT_PUBLIC_* equivalents) on the server.'
         );
         warnMissingSecretsOnce = true;
       }
       return null;
     }
+    const { supabaseUrl, supabaseAnonKey } = runtimeConfig!;
     try {
       // Use @supabase/ssr browser client creator
       supabaseInstance = createBrowserClient(supabaseUrl, supabaseAnonKey);
     } catch (err) {
       console.warn('Failed to initialize @supabase/ssr client, falling back to standard client:', err);
-      supabaseInstance = createClient(supabaseUrl, supabaseAnonKey);
+      try {
+        supabaseInstance = createClient(supabaseUrl, supabaseAnonKey);
+      } catch (fallbackErr) {
+        console.warn('Failed to initialize Supabase client:', fallbackErr);
+        return null;
+      }
     }
   }
   return supabaseInstance;
 }
+
 
 /**
  * Helper to upload files to Supabase Storage bucket
