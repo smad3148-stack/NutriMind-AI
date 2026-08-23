@@ -6,7 +6,6 @@
 import express from 'express';
 import http from 'http';
 import path from 'path';
-import { createServer as createViteServer } from 'vite';
 import { GoogleGenAI } from '@google/genai';
 import { getSupabaseAdmin } from './server/supabaseAdmin';
 import { requireUserAuth, requireAdminAuth, isAuthConfigured, getPublicSupabaseConfig, AuthenticatedRequest } from './server/supabaseUser';
@@ -274,10 +273,14 @@ function validateChatMessages(messages: any[]): string | null {
 }
 
 
-async function startServer() {
+/**
+ * Builds the Express application with all middleware and API routes.
+ * Used both by the traditional Node server (startServer) and by the Vercel
+ * serverless function (api/[...slug].ts), which cannot listen on a port.
+ * `httpServer` is only needed in development for Vite HMR.
+ */
+export async function createApp(httpServer?: http.Server): Promise<express.Express> {
   const app = express();
-  const server = http.createServer(app);
-  const PORT = 3000;
 
   // Middlewares
   app.use(express.json({ limit: '15mb' }));
@@ -2857,12 +2860,12 @@ CRITICAL PERSONALITY & STYLE RULES:
 
   if (process.env.NODE_ENV !== 'production') {
     const disableHmr = process.env.DISABLE_HMR === 'true';
+    // Loaded lazily so serverless bundles never pull Vite into the cold path.
+    const { createServer: createViteServer } = await import('vite');
     const vite = await createViteServer({
       server: {
         middlewareMode: true,
-        hmr: disableHmr ? false : {
-          server,
-        },
+        hmr: disableHmr ? false : (httpServer ? { server: httpServer } : undefined),
       },
       appType: 'spa',
     });
@@ -2875,9 +2878,22 @@ CRITICAL PERSONALITY & STYLE RULES:
     });
   }
 
+  return app;
+}
+
+async function startServer() {
+  const server = http.createServer();
+  const app = await createApp(server);
+  server.on('request', app);
+  const PORT = 3000;
+
   server.listen(PORT, '0.0.0.0', () => {
     console.log(`[NutriMind AI] Enterprise Server active at http://localhost:${PORT}`);
   });
 }
 
-startServer();
+// Vercel sets VERCEL=1: there the app is served by the serverless function
+// in api/[...slug].ts and nothing may listen on a port.
+if (!process.env.VERCEL) {
+  startServer();
+}
