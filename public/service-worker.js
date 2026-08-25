@@ -4,21 +4,22 @@
  * outbox synchronization hooks, and push notifications event listeners.
  */
 
-const CACHE_NAME = 'nutrimind-v1-cache';
+// Versioned cache name: bump on every change so the activate handler evicts
+// caches from older deployments instead of serving stale bundles.
+const CACHE_NAME = 'nutrimind-v2-cache';
 const PRE_CACHE_ASSETS = [
-  '/',
-  '/index.html',
   '/manifest.json',
   '/assets/icon-192.png',
   '/assets/icon-512.png'
 ];
 
-// Install Event: Pre-cache Static Assets
+// Install Event: Pre-cache Static Assets. Each asset is cached individually
+// so a single missing file cannot abort the whole installation.
 self.addEventListener('install', (event) => {
   event.waitUntil(
     caches.open(CACHE_NAME).then((cache) => {
       console.log('[Service Worker] Pre-caching offline shell...');
-      return cache.addAll(PRE_CACHE_ASSETS);
+      return Promise.allSettled(PRE_CACHE_ASSETS.map((asset) => cache.add(asset)));
     }).then(() => self.skipWaiting())
   );
 });
@@ -49,7 +50,26 @@ self.addEventListener('fetch', (event) => {
     return;
   }
 
-  // Handle standard page loads & assets
+  // HTML navigations are network-first: serving a cached index.html whose
+  // hashed asset chunks no longer exist on the server is a classic white
+  // screen after redeploys. Fall back to the cached shell only when offline.
+  const acceptHeader = request.headers.get('accept') || '';
+  if (request.mode === 'navigate' || acceptHeader.includes('text/html')) {
+    event.respondWith(
+      fetch(request)
+        .then((networkResponse) => {
+          if (networkResponse && networkResponse.status === 200 && networkResponse.type === 'basic') {
+            const responseToCache = networkResponse.clone();
+            caches.open(CACHE_NAME).then((cache) => cache.put(request, responseToCache));
+          }
+          return networkResponse;
+        })
+        .catch(() => caches.match(request).then((cached) => cached || caches.match('/index.html')))
+    );
+    return;
+  }
+
+  // Handle static assets: cache-first with background revalidation
   event.respondWith(
     caches.match(request).then((cachedResponse) => {
       if (cachedResponse) {
@@ -75,12 +95,6 @@ self.addEventListener('fetch', (event) => {
         });
 
         return networkResponse;
-      }).catch(() => {
-        // Fallback for HTML documents when offline
-        const acceptHeader = request.headers.get('accept');
-        if (acceptHeader && acceptHeader.includes('text/html')) {
-          return caches.match('/');
-        }
       });
     })
   );

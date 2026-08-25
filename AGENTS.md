@@ -88,6 +88,25 @@ supabase_schema.sql               # Canonical Supabase Postgres schema (RLS + tr
   `carbs`, `fat` (server.ts reads `portionData.label`). Labels are display
   strings (e.g. "1 Pack", "100g"), not size identifiers.
 
+## Deployment lessons (2026-08-23 forensic investigation)
+- **Vercel needs `api/[...slug].ts` + `vercel.json`**: without them Vercel
+  deploys only the static Vite bundle — the Express backend never runs and
+  `/api/*` is 404 (this was the production "Authentication backend is not
+  configured" root cause). `server.ts` exports `createApp()`; `startServer()`
+  is skipped when `VERCEL=1`. PORT is honored from env (was hardcoded 3000).
+- **Vite 6 blocks unknown Host headers (403)** — this was the Google AI
+  Studio preview white screen. `server.allowedHosts: true` in vite.config.ts
+  is required for any proxied preview (usercontent.goog, tunnels).
+- **Service worker must be network-first for HTML**: cache-first index.html
+  + purged hashed chunks = white screen after redeploys. Cache name is
+  versioned (`nutrimind-v2-cache`) — bump it on every SW change.
+- **Runtime Supabase config**: client fetches `/api/auth/config` at startup
+  (no build-time credential injection). Server env: `SUPABASE_URL` +
+  `SUPABASE_ANON_KEY` (or `NEXT_PUBLIC_*` equivalents). `/api/health` is a
+  public liveness probe reporting which subsystems are configured.
+- Vercel Deployment Protection (SSO) is enabled on the project — external
+  verification of previews needs a Protection Bypass secret.
+
 ## Commands
 | Command | Purpose |
 |---|---|
