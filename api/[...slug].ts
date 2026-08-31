@@ -9,10 +9,15 @@
  * The Express app is built once per function instance (cold start) and
  * reused across invocations. Importing server.ts is side-effect safe:
  * startServer() is skipped when process.env.VERCEL is set.
+ *
+ * NOTE: the '../server.js' specifier must keep its extension. The repo
+ * contains both a server.ts file and a server/ directory, and the bare
+ * '../server' specifier resolved to the directory inside the Node ESM
+ * runtime, crashing every invocation with ERR_UNSUPPORTED_DIR_IMPORT.
  */
 
 import type { Request, Response } from 'express';
-import { createApp } from '../server';
+import { createApp } from '../server.js';
 
 let appPromise: ReturnType<typeof createApp> | null = null;
 
