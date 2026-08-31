@@ -1,27 +1,38 @@
 /**
  * Vercel Serverless Function: catch-all for every /api/* request.
  *
- * Vercel cannot run the long-lived Express server (dist/server.cjs), so
- * without this function no /api route exists on Vercel deployments - the
- * platform serves the SPA fallback instead, the client's
- * fetch('/api/auth/config') fails to parse, and getSupabase() stays null.
+ * Vercel cannot run the long-lived Express server, so without this function no
+ * /api route exists on Vercel deployments: the platform serves the SPA
+ * fallback instead, the client's fetch('/api/auth/config') fails, and
+ * getSupabase() stays null ("Authentication backend is not configured").
  *
- * The Express app is built once per function instance (cold start) and
- * reused across invocations. Importing server.ts is side-effect safe:
- * startServer() is skipped when process.env.VERCEL is set.
+ * IMPORTANT: we import the *bundled* build output (dist/server.cjs, produced by
+ * `npm run build` via esbuild) rather than server.ts directly. The server
+ * sources use extensionless relative imports ("./server/supabaseAdmin"), which
+ * Node's ESM loader in the Vercel runtime rejects with ERR_MODULE_NOT_FOUND /
+ * ERR_UNSUPPORTED_DIR_IMPORT, crashing every invocation. The esbuild bundle has
+ * all of those resolved at build time.
  *
- * NOTE: the '../server.js' specifier must keep its extension. The repo
- * contains both a server.ts file and a server/ directory, and the bare
- * '../server' specifier resolved to the directory inside the Node ESM
- * runtime, crashing every invocation with ERR_UNSUPPORTED_DIR_IMPORT.
+ * The Express app is built once per function instance (cold start) and reused.
+ * Importing the bundle is side-effect safe: startServer() is skipped when
+ * process.env.VERCEL is set.
  */
 
 import type { Request, Response } from 'express';
-import { createApp } from '../server.js';
+// @ts-ignore - CommonJS bundle emitted by the build step, no type declarations.
+import serverBundle from '../dist/server.cjs';
 
-let appPromise: ReturnType<typeof createApp> | null = null;
+type CreateApp = () => Promise<(req: Request, res: Response) => unknown>;
+
+const createApp: CreateApp = (serverBundle as any).createApp ?? (serverBundle as any).default?.createApp;
+
+let appPromise: ReturnType<CreateApp> | null = null;
 
 export default async function handler(req: Request, res: Response) {
+  if (typeof createApp !== 'function') {
+    res.status(500).json({ error: 'Server bundle missing createApp export' });
+    return;
+  }
   if (!appPromise) {
     appPromise = createApp();
   }
