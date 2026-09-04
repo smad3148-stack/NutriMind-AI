@@ -31,11 +31,16 @@ interface SupabaseAuthProps {
   // Recovery links (Supabase PASSWORD_RECOVERY event) carry a temp token
   //that must be redeemed by showing the "New Password" form immediately.
   recoveryMode?: boolean;
+
+  // When set, /api/auth/config could not be fetched/parsed at startup (after
+  // one retry). Shown instead of the generic submit-time "Authentication
+  // backend is not configured" so the real cause is visible.
+  configError?: string | null;
 }
 
 type AuthMode = 'signin' | 'signup' | 'forgot' | 'otp_verify' | 'reset';
 
-export default function SupabaseAuth({ onAuthSuccess, onResetPasswordStateChange, demoModeAvailable = false, onDemoMode, recoveryMode = false }: SupabaseAuthProps) {
+export default function SupabaseAuth({ onAuthSuccess, onResetPasswordStateChange, demoModeAvailable = false, onDemoMode, recoveryMode = false, configError = null }: SupabaseAuthProps) {
   const [authMode, setAuthMode] = useState<AuthMode>(recoveryMode ? 'reset' : 'signin');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -447,6 +452,15 @@ export default function SupabaseAuth({ onAuthSuccess, onResetPasswordStateChange
             {authMode === 'reset' && 'Choose a secure new password to continue.'}
           </p>
         </div>
+
+        {configError && (
+          <div className="p-4 rounded-2xl mb-6 text-xs flex items-start gap-2.5 border border-amber-500/30 bg-amber-500/10 text-amber-300">
+            <ShieldAlert size={16} className="shrink-0 mt-0.5 text-amber-400" />
+            <span className="leading-relaxed">
+              Could not load the auth configuration endpoint (/api/auth/config). {configError}. Auth requests cannot proceed until it responds with a valid Supabase config.
+            </span>
+          </div>
+        )}
 
         {message && (
           <div className={`p-4 rounded-2xl mb-6 text-xs flex items-start gap-2.5 border transition-all ${
