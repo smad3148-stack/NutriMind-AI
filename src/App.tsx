@@ -32,6 +32,12 @@ export default function App() {
   // The Supabase client is configured from this response, so no auth UI or
   // session restore may run before it resolves.
   const [authConfigLoaded, setAuthConfigLoaded] = useState<boolean>(false);
+  // Set only when /api/auth/config could not be fetched/parsed after a retry.
+
+  // (e.g. the deployment served HTML or a non-JSON body for /api/*).
+  // Surfaces an explicit explanation instead of the ambiguous
+  // "Authentication backend is not configured" submit-time error.
+  const [configError, setConfigError] = useState<string | null>(null);
   // P0-01: mirrors the server-side admin check so the Clinician Portal is
   // hidden for non-admins. null = not yet checked / signed out.
   const [isAdmin, setIsAdmin] = useState<boolean | null>(null);
@@ -111,25 +117,58 @@ export default function App() {
   // entry.
   useEffect(() => {
     let cancelled = false;
-    fetch('/api/auth/config')
-      .then((res) => (res.ok ? res.json() : { demoMode: false }))
-      .then((cfg: { demoMode?: boolean; supabaseUrl?: string; supabaseAnonKey?: string }) => {
-        if (cancelled) return;
-        setSupabaseRuntimeConfig({
-          supabaseUrl: cfg.supabaseUrl || '',
-          supabaseAnonKey: cfg.supabaseAnonKey || '',
-        });
-        setDemoModeAvailable(!!cfg.demoMode);
-        setAuthConfigLoaded(true);
-      })
-      .catch(() => {
+    let retried = false;
+
+    const installConfig = (cfg: { demoMode?: boolean; supabaseUrl?: string; supabaseAnonKey?: string }) => {
+      setSupabaseRuntimeConfig({
+        supabaseUrl: cfg.supabaseUrl || '',
+        supabaseAnonKey: cfg.supabaseAnonKey || '',
+      });
+      setDemoModeAvailable(!!cfg.demoMode);
+      setConfigError(null);
+      setAuthConfigLoaded(true);
+    };
+
+    const fetchConfig = async (noCache: boolean): Promise<void> => {
+      const res = await fetch('/api/auth/config', noCache ? { cache: 'no-store' } : undefined);
+      if (!res.ok) {
+        throw new Error(`/api/auth/config responded with HTTP ${res.status}`);
+      }
+      const cfg: unknown = await res.json();
+      const isObj = typeof cfg === 'object' && cfg !== null;
+      if (!isObj || typeof (cfg as any).supabaseUrl !== 'string' || typeof (cfg as any).supabaseAnonKey !== 'string') {
+        throw new Error('/api/auth/config did not return a Supabase config object');
+      }
+      installConfig(cfg as { demoMode?: boolean; supabaseUrl?: string; supabaseAnonKey?: string });
+    };
+
+    const run = async () => {
+      try {
+        await fetchConfig(false);
+      } catch (err: any) {
+        // One cache-busted retry: a stale service-worker copy or edge cache
+        // can serve HTML (or an old shell) for /api/* on some deployments.
+        if (!retried) {
+          retried = true;
+          try {
+            await fetchConfig(true);
+            return;
+          } catch {
+            // fall through to the shared error handler below
+          }
+        }
         if (cancelled) return;
         // Fail closed: no demo entry and no Supabase client when the server
         // cannot be reached - but stop loading so the UI can surface it.
         setSupabaseRuntimeConfig({ supabaseUrl: '', supabaseAnonKey: '' });
         setDemoModeAvailable(false);
+        setConfigError(err?.message || 'Could not reach /api/auth/config.');
         setAuthConfigLoaded(true);
-      });
+      }
+    };
+
+    void run();
+
     return () => {
       cancelled = true;
     };
@@ -283,6 +322,7 @@ export default function App() {
                 }} 
                 onDemoMode={() => setDemoMode(true)}
                 demoModeAvailable={demoModeAvailable}
+                configError={configError}
                 onResetPasswordStateChange={(active) => {
                   // The manual "Forgot password" flow also toggles this flag;
                   // only the recovery-link lander keeps the reset form open on its own.
