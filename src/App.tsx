@@ -24,6 +24,10 @@ export default function App() {
   const [userProfile, setUserProfile] = useState<{ email: string; name?: string } | null>(null);
 
   const [isResettingPassword, setIsResettingPassword] = useState<boolean>(false);
+  // True only when the user arrived via a Supabase recovery link (the
+  // PASSWORD_RECOVERY auth event). Distinguishes "reset form" from the
+  // plain sign-in screen the recovery-landing is shown on.
+  const [recoveryModeActive, setRecoveryModeActive] = useState<boolean>(false);
   // Runtime auth backend config has been fetched from /api/auth/config.
   // The Supabase client is configured from this response, so no auth UI or
   // session restore may run before it resolves.
@@ -53,15 +57,29 @@ export default function App() {
 
     // Listen for auth state changes
     const { data: { subscription } } = supabase.auth.onAuthStateChange((event, newSession) => {
-      setSession(newSession);
-      setSessionToken(newSession?.access_token); // P0-04: keep in sync
-      if (newSession?.user) {
+      if (event === 'PASSWORD_RECOVERY') {
+        // A recovery link was clicked. Show the new-password form instead of
+        // the login screen, and keep the recovery session out of the app
+        // until the user has actually set a new password.
+        setSession(null);
+        setSessionToken(undefined);
+        setRecoveryModeActive(true);
+        setIsResettingPassword(true);
         setUserProfile({
-          email: newSession.user.email || '',
-          name: newSession.user.user_metadata?.full_name || 'Athlete'
+          email: newSession?.user?.email || (newSession as any)?.email || '',
+          name: newSession?.user?.user_metadata?.full_name || (newSession as any)?.user_metadata?.full_name || 'Athlete',
         });
       } else {
-        setUserProfile(null);
+        setSession(newSession);
+        setSessionToken(newSession?.access_token);
+        if (newSession?.user) {
+          setUserProfile({
+            email: newSession.user.email || '',
+            name: newSession.user.user_metadata?.full_name || 'Athlete',
+          });
+        } else {
+          setUserProfile(null);
+        }
       }
     });
 
@@ -79,6 +97,7 @@ export default function App() {
     setSessionToken(undefined); // P0-04: clear shared token
     setDemoMode(false);
     setIsResettingPassword(false);
+    setRecoveryModeActive(false);
   };
 
   const isUserAuthenticated = (!!session || demoMode) && !isResettingPassword;
@@ -260,12 +279,19 @@ export default function App() {
                 onAuthSuccess={(newSession) => {
                   setSession(newSession);
                   setIsResettingPassword(false);
+                  setRecoveryModeActive(false);
                 }} 
                 onDemoMode={() => setDemoMode(true)}
                 demoModeAvailable={demoModeAvailable}
                 onResetPasswordStateChange={(active) => {
+                  // The manual "Forgot password" flow also toggles this flag;
+                  // only the recovery-link lander keeps the reset form open on its own.
+                  if (!active) {
+                    setRecoveryModeActive(false);
+                  }
                   setIsResettingPassword(active);
                 }}
+                recoveryMode={recoveryModeActive}
               />
             </motion.div>
           ) : currentMode === 'customer' ? (

@@ -28,12 +28,15 @@ interface SupabaseAuthProps {
   // It is never an automatic fallback on an auth error.
   demoModeAvailable?: boolean;
   onDemoMode?: () => void;
+  // Recovery links (Supabase PASSWORD_RECOVERY event) carry a temp token
+  //that must be redeemed by showing the "New Password" form immediately.
+  recoveryMode?: boolean;
 }
 
 type AuthMode = 'signin' | 'signup' | 'forgot' | 'otp_verify' | 'reset';
 
-export default function SupabaseAuth({ onAuthSuccess, onResetPasswordStateChange, demoModeAvailable = false, onDemoMode }: SupabaseAuthProps) {
-  const [authMode, setAuthMode] = useState<AuthMode>('signin');
+export default function SupabaseAuth({ onAuthSuccess, onResetPasswordStateChange, demoModeAvailable = false, onDemoMode, recoveryMode = false }: SupabaseAuthProps) {
+  const [authMode, setAuthMode] = useState<AuthMode>(recoveryMode ? 'reset' : 'signin');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
